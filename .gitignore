@@ -1,0 +1,8 @@
+bower_components
+public/css
+public/js
+node_modules
+*.swp
+*.swo
+*.db
+.env
