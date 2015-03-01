@@ -10,7 +10,7 @@ var browserify = require('gulp-browserify'),
     concat = require('gulp-concat');
 
 var staticDir = './public',
-    assetsDir = './assets',
+    assetsDir = './src',
     watch = false,
     cssFilter = gulpFilter('*.css'),
     jsFilter = gulpFilter('*.js'),
