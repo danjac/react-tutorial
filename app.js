@@ -42,27 +42,17 @@ let db = knex({
 
 
 app.get("/", function(req, res) {
-
-    db.first().from('users') 
-        .where('email', 'danjac354@gmail.com')
-        .then(function(user) {
-            console.log(user);
-        });
-
-    res.render("index", {
-        markup: '',
-        data: '{}'
-    });
+    renderReact(res, "/", {});
 });
 
 function renderReact(res, route, props, template) {
     props = props || {};
-    template = template || "index.html";
+    template = template || "index";
     Router.run(Routes, route, function(Handler, state) {
         let markup = React.renderToString(Handler(props));
         res.render(template, {
             markup: markup,
-            data: props
+            data: JSON.stringify(props)
         });
     });
 
