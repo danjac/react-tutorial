@@ -11,7 +11,7 @@ const express = require('express'),
     React = require('react'),
     Router = require('react-router');
 
-var app = express();
+let app = express();
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -27,13 +27,16 @@ if ('development' == app.get('env')) {
     app.use(errorHandler());
 }
 
+app.get("/", function(req, res) {
+    res.render("index");
+});
 
 function render(res, route, props, template) {
     // Routes.jsx should be loaded
     props = props || {};
     template = template || "index";
     Router.run(Routes, route, function(Handler, state) {
-        var markup = React.renderToString(Handler(props));
+        let markup = React.renderToString(Handler(props));
         res.render(template, {
             markup: markup,
             data: props
