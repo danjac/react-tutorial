@@ -9,6 +9,7 @@ const express = require('express'),
     methodOverride = require('method-override'),
     errorHandler= require('errorhandler'),
     serveStatic = require('serve-static'),
+    knex = require('knex'),
     React = require('react'),
     Router = require('react-router'),
     Routes = require('./src/js/Routes.jsx');
@@ -30,7 +31,24 @@ if ('development' == app.get('env')) {
     app.use(errorHandler());
 }
 
+let db = knex({
+    client: 'pg',
+    connection: {
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME
+    }
+});
+
+
 app.get("/", function(req, res) {
+
+    db.first().from('users') 
+        .where('email', 'danjac354@gmail.com')
+        .then(function(user) {
+            console.log(user);
+        });
+
     res.render("index", {
         markup: '',
         data: '{}'
