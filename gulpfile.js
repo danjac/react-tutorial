@@ -7,13 +7,14 @@ var browserify = require('gulp-browserify'),
     shell = require('gulp-shell'),
     minifyCss = require('gulp-minify-css'),
     gulpFilter = require('gulp-filter'),
-    concat = require('gulp-concat');
+    concat = require('gulp-concat'),
+    es6ify = require('es6ify');
 
 var staticDir = './public',
     assetsDir = './src',
     watch = false,
     cssFilter = gulpFilter('*.css'),
-    jsFilter = gulpFilter('*.js'),
+    jsFilter = gulpFilter(['*.js', '*.jsx']),
     fontFilter = gulpFilter(['*.eot', '*.woff', '*.svg', '*.ttf']);
 
 
@@ -40,8 +41,10 @@ gulp.task('build-js', function() {
             fullPaths: true,
             transform: [
                 "reactify",
-                "envify"
-            ]
+                "envify",
+                es6ify.configure(/.jsx/)
+            ],
+            extensions: ['.js', '.jsx']
         }))
         .pipe(plumber())
         .pipe(concat('app.js'))

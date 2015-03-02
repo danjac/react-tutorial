@@ -1,4 +1,5 @@
 require('node-jsx').install()
+require('dotenv').load()
 
 const express = require('express'),
     http = require('http'),
@@ -9,32 +10,36 @@ const express = require('express'),
     errorHandler= require('errorhandler'),
     serveStatic = require('serve-static'),
     React = require('react'),
-    Router = require('react-router');
+    Router = require('react-router'),
+    Routes = require('./src/js/Routes.jsx');
 
 let app = express();
 
 // all environments
 app.set('port', process.env.PORT || 3000);
-app.set('views', __dirname + '/views');
+app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'ejs');
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(methodOverride());
-app.use(serveStatic(path.join(__dirname, '../public')));
+app.use(serveStatic(path.join(__dirname, '/public')));
 
 // development only
 if ('development' == app.get('env')) {
+    console.log("Using development environment");
     app.use(errorHandler());
 }
 
 app.get("/", function(req, res) {
-    res.render("index");
+    res.render("index", {
+        markup: '',
+        data: '{}'
+    });
 });
 
-function render(res, route, props, template) {
-    // Routes.jsx should be loaded
+function renderReact(res, route, props, template) {
     props = props || {};
-    template = template || "index";
+    template = template || "index.html";
     Router.run(Routes, route, function(Handler, state) {
         let markup = React.renderToString(Handler(props));
         res.render(template, {
