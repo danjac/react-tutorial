@@ -7,3 +7,4 @@ knexfile.js
 *.swo
 *.db
 .env
+:w
