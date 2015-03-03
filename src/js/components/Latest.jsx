@@ -1,11 +1,15 @@
-var React = require('react');
+var React = require('react'),
+    Posts = require('./Posts'),
+    actions = require('../actions');
+
 
 module.exports = React.createClass({
 
+    fetchPosts: function(page) {
+        actions.fetchPosts(page);
+    },
+
     render: function() {
-        console.log("latest props", this.props);
-        return (
-            <div>Latest posts go here...</div>
-        );
+        return <Posts posts={this.props.latestPosts} fetchPosts={this.fetchPosts} />
     }
 });

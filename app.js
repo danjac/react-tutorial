@@ -45,8 +45,7 @@ var db = knex({
 app.get("/", function(req, res) {
     getPosts().then(function(posts) {
         renderReact(res, "/", {
-            posts: posts,
-            preloaded: "popular"
+            popularPosts: posts,
         });
     });
 });
@@ -54,8 +53,7 @@ app.get("/", function(req, res) {
 app.get("/latest", function(req, res) {
     getPosts().then(function(posts) {
         renderReact(res, "/latest", {
-            posts: posts,
-            preloaded: "latest"
+            latestPosts: posts,
         });
     });
 });
@@ -77,7 +75,8 @@ function getPosts(page){
         'posts.id',
         'posts.title',
         'posts.url',
-        'users.name'
+        'users.name AS author',
+        'users.id AS author_id'
     ).from('posts').innerJoin(
         'users',
         'users.id',
