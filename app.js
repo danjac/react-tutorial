@@ -15,6 +15,7 @@ var express = require('express'),
     Routes = require('./src/js/Routes.jsx');
 
 var app = express();
+const PAGE_SIZE = 10;
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -42,7 +43,12 @@ var db = knex({
 
 
 app.get("/", function(req, res) {
-    renderReact(res, "/", {});
+    getPosts().then(function(posts) {
+        console.log(posts)
+        renderReact(res, "/", {
+            posts: posts
+        });
+    });
 });
 
 app.get("/latest", function(req, res) {
@@ -50,11 +56,31 @@ app.get("/latest", function(req, res) {
 });
 
 
+function getPosts(page){
+
+    page = page || 1;
+
+    var offset = ((page - 1) * PAGE_SIZE);
+
+    return db.select(
+        'posts.id',
+        'posts.title',
+        'posts.url',
+        'users.name'
+    ).from('posts').innerJoin(
+        'users',
+        'users.id',
+        'posts.user_id'
+    ).orderBy(
+        'posts.id', 'desc'
+    ).limit(PAGE_SIZE).offset(offset);
+}
+
 function renderReact(res, route, props, template) {
     props = props || {};
     template = template || "index";
     Router.run(Routes, route, function(Handler, state) {
-        let markup = React.renderToString(Handler(props));
+        var markup = React.renderToString(Handler(props));
         res.render(template, {
             markup: markup,
             data: JSON.stringify(props)
