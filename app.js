@@ -1,7 +1,7 @@
 require('node-jsx').install()
 require('dotenv').load()
 
-const express = require('express'),
+var express = require('express'),
     http = require('http'),
     path = require('path'),
     bodyParser = require('body-parser'),
@@ -14,7 +14,7 @@ const express = require('express'),
     Router = require('react-router'),
     Routes = require('./src/js/Routes.jsx');
 
-let app = express();
+var app = express();
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -31,7 +31,7 @@ if ('development' == app.get('env')) {
     app.use(errorHandler());
 }
 
-let db = knex({
+var db = knex({
     client: 'pg',
     connection: {
         user: process.env.DB_USER,
@@ -44,6 +44,11 @@ let db = knex({
 app.get("/", function(req, res) {
     renderReact(res, "/", {});
 });
+
+app.get("/latest", function(req, res) {
+    renderReact(res, "/latest", {});
+});
+
 
 function renderReact(res, route, props, template) {
     props = props || {};

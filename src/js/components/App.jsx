@@ -1,18 +1,25 @@
-import React from 'react';
-import Router from 'react-router';
+var  React = require('react'),
+     {RouteHandler} = require('react-router'),
+     {Navbar, Nav} = require('react-bootstrap'),
+     {NavItemLink} = require('react-router-bootstrap');
 
-const Route = Router.Route,
-      RouteHandler = Router.RouteHandler;
-
-
-export default React.createClass({
+module.exports = React.createClass({
     render: function(){
+
+        var navbar = (
+            <Navbar brand="Lobsters" className="navbar navbar-inverse" fixedTop={true} fluid={true}>
+              <Nav className="navbar-left">
+                <NavItemLink to="popular">Lobsters</NavItemLink>
+                <NavItemLink to="latest">Latest</NavItemLink>
+              </Nav>
+            </Navbar>
+        );
+
         return (
-        <div>
             <div className="container-fluid">
+                {navbar}
                <RouteHandler /> 
             </div>
-        </div>
         );
     }
 });

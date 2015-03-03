@@ -8,6 +8,8 @@ var browserify = require('gulp-browserify'),
     minifyCss = require('gulp-minify-css'),
     gulpFilter = require('gulp-filter'),
     concat = require('gulp-concat'),
+    uglify = require('gulp-uglify'),
+    sourcemaps = require('gulp-sourcemaps'),
     es6ify = require('es6ify');
 
 var staticDir = './public',
@@ -34,6 +36,7 @@ var dest = {
 gulp.task('build-js', function() {
 
     gulp.src(src.js + '/app.js')
+        .pipe(sourcemaps.init())
         .pipe(babel())
         .pipe(browserify({
             cache: {},
@@ -46,8 +49,10 @@ gulp.task('build-js', function() {
             ],
             extensions: ['.js', '.jsx']
         }))
+        .pipe(uglify())
         .pipe(plumber())
         .pipe(concat('app.js'))
+        .pipe(sourcemaps.write())
         .pipe(gulp.dest(dest.js));
 
 });
