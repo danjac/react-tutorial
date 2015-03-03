@@ -38,6 +38,7 @@
     "reactify": "^1.0.0",
     "reflux": "^0.2.5",
     "serve-static": "^1.9.1",
+    "superagent": "^0.21.0",
     "watchify": "^2.4.0"
   },
   "scripts": {}

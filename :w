@@ -6,9 +6,14 @@ var React = require('react'),
 
 module.exports = React.createClass({
 
+    statics: {
+        willTransitionTo: function(transition, params) {
+           actions.updatePosts(1); 
+        }
+    },
+
     propTypes: {
-        posts: React.PropTypes.array,
-        page: React.PropTypes.number
+        posts: React.PropTypes.array
     },
 
     mixins: [
@@ -16,16 +21,7 @@ module.exports = React.createClass({
     ],
 
     getInitialState: function() {
-        if (this.props.preloaded === 'popular') {
-            return this.props;
-        }
-        return PostStore.getDefaultData();
-    },
-
-    componentDidMount: function() {
-        if (this.props.preloaded !== 'popular') {
-            actions.fetchPosts(1);
-        }
+        return this.props || PostStore.getDefaultData();
     },
 
     onUpdate: function(data) {
@@ -36,12 +32,10 @@ module.exports = React.createClass({
         var posts = this.state.posts || [];
 
         return (
-            <ul className="list-unstyled">
+            <ul className="unstyled">
                 {posts.map(function(post) {
                     return (
-                        <li key={post.id}>
-                            <a href={post.url} target="_blank">{post.title}</a>
-                        </li> 
+                        <li key={post.id}>{post.title}</li> 
                     );
                 })}
             </ul>

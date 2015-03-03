@@ -44,17 +44,28 @@ var db = knex({
 
 app.get("/", function(req, res) {
     getPosts().then(function(posts) {
-        console.log(posts)
         renderReact(res, "/", {
-            posts: posts
+            posts: posts,
+            preloaded: "popular"
         });
     });
 });
 
 app.get("/latest", function(req, res) {
-    renderReact(res, "/latest", {});
+    getPosts().then(function(posts) {
+        renderReact(res, "/latest", {
+            posts: posts,
+            preloaded: "latest"
+        });
+    });
 });
 
+app.get("/api/posts/", function(req, res) {
+    var page = parseInt(req.params.page || 1);
+    getPosts(page).then(function(posts) {
+        res.json(posts);
+    });
+});
 
 function getPosts(page){
 

@@ -18,7 +18,7 @@ module.exports = React.createClass({
         return (
             <div className="container-fluid">
                 {navbar}
-               <RouteHandler /> 
+               <RouteHandler {...this.props} /> 
             </div>
         );
     }
