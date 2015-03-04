@@ -23,10 +23,7 @@ module.exports = React.createClass({
     },
 
     componentDidMount: function() {
-        // only fetch if we need to 
-        if (this.props.posts === undefined) {
-            this.props.fetchPosts(1);
-        }
+        this.props.fetchPosts(1);
     },
 
     handlePageClick: function(page) {

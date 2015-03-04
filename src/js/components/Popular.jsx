@@ -6,7 +6,7 @@ var React = require('react'),
 module.exports = React.createClass({
 
     fetchPosts: function(page) {
-        actions.fetchPosts(page);
+        actions.fetchPopularPosts(page);
     },
 
     render: function() {
