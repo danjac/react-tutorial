@@ -4,12 +4,9 @@ require('dotenv').load()
 var express = require('express'),
     http = require('http'),
     path = require('path'),
-    bodyParser = require('body-parser'),
-    morgan = require('morgan'),
-    methodOverride = require('method-override'),
     errorHandler= require('errorhandler'),
-    serveStatic = require('serve-static'),
-    knex = require('knex'),
+    jwt = require('jsonwebtoken'),
+    expressJwt = require('express-jwt'),
     React = require('react'),
     Router = require('react-router'),
     Routes = require('./src/js/Routes.jsx');
@@ -18,15 +15,54 @@ var app = express();
 
 const PAGE_SIZE = 10;
 const DEV_ENV = 'development' == app.get('env');
+const SECRET_KEY = process.env.SECRET_KEY || "secret"; 
 
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'ejs');
-app.use(morgan('dev'));
-app.use(bodyParser.json());
-app.use(methodOverride());
-app.use(serveStatic(path.join(__dirname, '/public')));
+app.use(require('morgan')('dev'));
+app.use(require('body-parser').json());
+app.use(require('method-override')());
+app.use(require('serve-static')(path.join(__dirname, '/public')));
+
+app.use(expressJwt({
+    secret: SECRET_KEY,
+    credentialsRequired: false,
+    requestProperty: 'authToken'
+}).unless({ path: ["/public"]}));
+
+
+app.use(function(req, res, next) {
+
+    res.reactify = function(route, props={}, template="index") {
+        Router.run(Routes, route, function(Handler, state) {
+            if (req.user) {
+                props.user = req.user;
+            }
+            res.render(template, {
+                markup: React.renderToString(Handler(props)),
+                data: JSON.stringify(props)
+            });
+        });
+    };
+
+    return next();
+
+});
+
+
+app.use(function(req, res, next) {
+    if (!req.authToken) {
+        return next();
+    }
+    db("users")
+        .where("id", req.authToken.id)
+        .first().then(function(user) {
+            req.user = user;
+            return next();
+        });
+});
 
 // development only
 if (DEV_ENV) {
@@ -34,7 +70,8 @@ if (DEV_ENV) {
     app.use(errorHandler());
 }
 
-var db = knex({
+// database 
+var db = require('knex')({
     client: 'pg',
     debug: DEV_ENV,
     connection: {
@@ -44,10 +81,37 @@ var db = knex({
     }
 });
 
+// authentication
+
+
+app.post("/api/login/", function(req, res) {
+
+    db("users")
+        .where("name", req.body.identity)
+        .orWhere("email", req.body.identity)
+        .first().then(function(user) {
+
+            if (!user || user.password !== res.body.password) {
+                res.send(401);
+                return;
+            } 
+
+            var token = jwt.sign({ id: user.id }, SECRET_KEY, {
+                expiresInMinutes: 60 * 24
+            });
+
+            res.json({
+                token: token,
+                user: user
+            });
+
+        });
+        
+});
 
 app.get("/", function(req, res) {
     getPosts(1, "score").then(function(posts) {
-        renderReact(res, "/", {
+        res.reactify("/", {
             popularPosts: posts,
         });
     });
@@ -55,14 +119,14 @@ app.get("/", function(req, res) {
 
 app.get("/latest", function(req, res) {
     getPosts(1, "id").then(function(posts) {
-        renderReact(res, "/latest", {
+        res.reactify("/latest", {
             latestPosts: posts,
         });
     });
 });
 
 app.get("/login", function(req, res) {
-    renderReact(res, "/login");
+    res.reactify("/login");
 });
 
 app.get("/api/posts/", function(req, res) {
@@ -94,17 +158,6 @@ function getPosts(page, orderBy){
     ).orderBy(
         'posts.' + orderBy, 'desc'
     ).limit(PAGE_SIZE).offset(offset);
-}
-
-function renderReact(res, route, props={}, template="index") {
-    Router.run(Routes, route, function(Handler, state) {
-        var markup = React.renderToString(Handler(props));
-        res.render(template, {
-            markup: markup,
-            data: JSON.stringify(props)
-        });
-    });
-
 }
 
 http.createServer(app).listen(app.get('port'), function(){

@@ -28,7 +28,7 @@ module.exports = Reflux.createStore({
     },
 
     warning: function(msg){
-        this.addMessage("error", msg);
+        this.addMessage("warning", msg);
     },
 
     loginSuccess: function(user) {
