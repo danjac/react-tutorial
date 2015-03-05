@@ -1,7 +1,19 @@
 var React = require('react'),
-    actions = require('../actions');
+    Reflux = require('reflux'),
+    Router = require('react-router'),
+    actions = require('../actions'),
+    UserStore = require('../stores/UserStore');
 
 module.exports = React.createClass({
+
+    mixins: [
+        Router.Navigation,
+        Reflux.listenTo(actions.loginSuccess, 'onLoginSuccess')
+    ],
+
+    onLoginSuccess: function() {
+        this.transitionTo("/");
+    },
 
     handleSubmit: function(event) {
         event.preventDefault();

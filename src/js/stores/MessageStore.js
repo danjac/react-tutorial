@@ -37,6 +37,10 @@ module.exports = Reflux.createStore({
 
     loginFailure: function() {
         this.warning("Sorry, you have entered incorrect login info");
+    },
+
+    logout: function() {
+        this.success("Bye for now");
     }
 
 });

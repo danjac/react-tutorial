@@ -8,31 +8,60 @@ actions = Reflux.createActions([
    "fetchPostsComplete",
    "login",
    "loginSuccess",
-   "loginFailure"
+   "loginFailure",
+   "logout",
+   "getUser",
+   "getUserComplete"
 ]);
  
-actions.login.preEmit = function(identity, password) {
 
-    // we'll do an API call here
-    //
-    console.log("LOGIN", identity);
+const AUTH_TOKEN = "authToken";
 
-    if (identity === "danjac") {
-        var user = {
-            id: 2,
-            name: "danjac",
-            email: "danjac354@gmail.com"
-        }
-        actions.loginSuccess(user);
-    } else {
-        console.log("fail");
-        actions.loginFailure();
+var bearer = function(request) {
+    var token = window.localStorage.getItem(AUTH_TOKEN);
+    console.log("TOKEN", token);
+    if (token) {
+        request.set('Authorization', 'Bearer ' + token);
     }
 };
 
-function fetchPosts(page, orderBy) {
+actions.logout.preEmit = function() {
+    window.localStorage.removeItem(AUTH_TOKEN);
+}
 
-    request('GET', '/api/posts')
+actions.login.preEmit = function(identity, password) {
+
+    request.post('/api/login')
+        .send({
+            identity: identity,
+            password: password
+        })
+        .end(function(res) {
+            if (res.unauthorized) {
+                actions.loginFailure();
+                return;
+            }
+            window.localStorage.setItem(AUTH_TOKEN, res.body.token);
+            actions.loginSuccess(res.body.user);
+        });
+};
+
+actions.getUser.preEmit = function() {
+
+    request.get("/api/auth")
+        .use(bearer)
+        .end(function(res) {
+            if (res.unauthorized) {
+                actions.getUserComplete(null);
+                return;
+            }
+            actions.getUserComplete(res.body);
+        });
+};
+
+var fetchPosts = function(page, orderBy) {
+
+    request.get('/api/posts')
         .query({
             page: page,
             orderBy: orderBy
@@ -40,7 +69,7 @@ function fetchPosts(page, orderBy) {
         .end(function(res) {
             actions.fetchPostsComplete(page, res.body);
         });
-}
+};
 
 actions.fetchLatestPosts.preEmit = function(page){
     fetchPosts(page, "id");

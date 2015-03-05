@@ -64,6 +64,13 @@ app.use(function(req, res, next) {
         });
 });
 
+var authRequired = function(req, res, next) {
+    if (!req.user) {
+        res.sendStatus(401);
+    }
+    next();
+};
+
 // development only
 if (DEV_ENV) {
     console.log("Using development environment");
@@ -84,15 +91,18 @@ var db = require('knex')({
 // authentication
 
 
+app.get("/api/auth/", [authRequired], function(req, res) {
+    return res.json(req.user);
+});
+
 app.post("/api/login/", function(req, res) {
 
     db("users")
         .where("name", req.body.identity)
         .orWhere("email", req.body.identity)
         .first().then(function(user) {
-
-            if (!user || user.password !== res.body.password) {
-                res.send(401);
+            if (!user || user.password !== req.body.password) {
+                res.sendStatus(401);
                 return;
             } 
 
@@ -142,7 +152,6 @@ function getPosts(page, orderBy){
     orderBy = ["score", "id"].includes(orderBy) ? orderBy : "id";
 
     var offset = ((page - 1) * PAGE_SIZE);
-
 
     return db.select(
         'posts.id',
