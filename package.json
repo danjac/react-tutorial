@@ -28,8 +28,11 @@
     "jsonwebtoken": "^3.2.2",
     "jwt-simple": "^0.2.0",
     "knex": "^0.7.4",
+    "lodash": "^3.3.1",
     "main-bower-files": "^2.5.0",
     "method-override": "^2.3.1",
+    "moment": "^2.9.0",
+    "moment-timezone": "^0.3.0",
     "morgan": "^1.5.1",
     "node-jsx": "^0.12.4",
     "pg": "^4.3.0",
@@ -42,6 +45,7 @@
     "reflux": "^0.2.5",
     "serve-static": "^1.9.1",
     "superagent": "^0.21.0",
+    "validator": "^3.33.0",
     "watchify": "^2.4.0"
   },
   "scripts": {}

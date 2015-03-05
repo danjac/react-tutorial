@@ -31,14 +31,12 @@ module.exports = React.createClass({
 
     getRightNav: function () {
         var className = "navbar-right";
-        var logout = function() {
-            actions.logout();
-        };
         if (this.state.user) {
             return (
               <Nav className={className}>
-                <NavItemLink to="popular">{this.state.user.name}</NavItemLink>
-                <NavItem onClick={logout}>Logout</NavItem>
+                <NavItemLink to="submit">Submit a post</NavItemLink>
+                <NavItem>{this.state.user.name}</NavItem>
+                <NavItem onClick={actions.logout}>Logout</NavItem>
               </Nav>
             );
         }
@@ -56,7 +54,6 @@ module.exports = React.createClass({
     },
 
     componentDidMount: function () {
-        console.log("check if loggedin");
         actions.getUser();
     },
 

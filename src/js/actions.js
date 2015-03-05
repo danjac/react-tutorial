@@ -11,7 +11,10 @@ actions = Reflux.createActions([
    "loginFailure",
    "logout",
    "getUser",
-   "getUserComplete"
+   "getUserComplete",
+   "submitPost",
+   "submitPostSuccess",
+   "submitPostFailure"
 ]);
  
 
@@ -24,6 +27,23 @@ var bearer = function(request) {
         request.set('Authorization', 'Bearer ' + token);
     }
 };
+
+actions.submitPost.preEmit = function(title, url) {
+    request.post("/api/submit")
+        .use(bearer)
+        .send({
+            title: title,
+            url: url
+        })
+        .end(function(res) {
+            if (res.unauthorized || res.badRequest) {
+                // we probably want a generic "unauthed" action
+                actions.submitPostFailure();
+                return; 
+            }
+            actions.submitPostSuccess(res.body);
+        });
+}
 
 actions.logout.preEmit = function() {
     window.localStorage.removeItem(AUTH_TOKEN);

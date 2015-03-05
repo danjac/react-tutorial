@@ -1,4 +1,5 @@
 var Reflux = require('reflux'),
+    _ = require('lodash'),
     actions = require('../actions');
 
 module.exports = Reflux.createStore({
@@ -11,6 +12,10 @@ module.exports = Reflux.createStore({
 
     getDefaultData: function() {
         return this.user;
+    },
+
+    isLoggedIn: function() {
+        return !_.isEmpty(this.user);
     },
 
     getUserComplete: function(user) {

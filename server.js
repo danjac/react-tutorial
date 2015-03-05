@@ -4,12 +4,15 @@ require('dotenv').load()
 var express = require('express'),
     http = require('http'),
     path = require('path'),
+    _ = require('lodash'),
     errorHandler= require('errorhandler'),
+    moment = require('moment'),
     jwt = require('jsonwebtoken'),
     expressJwt = require('express-jwt'),
     React = require('react'),
     Router = require('react-router'),
-    Routes = require('./src/js/Routes.jsx');
+    Routes = require('./src/js/Routes.jsx'),
+    validators = require('./src/js/validators');
 
 var app = express();
 
@@ -52,24 +55,38 @@ app.use(function(req, res, next) {
 });
 
 
-app.use(function(req, res, next) {
-    if (!req.authToken) {
-        return next();
-    }
-    db("users")
-        .where("id", req.authToken.id)
-        .first().then(function(user) {
-            req.user = user;
-            return next();
-        });
-});
+var authenticate = function(required=false) {
 
-var authRequired = function(req, res, next) {
-    if (!req.user) {
-        res.sendStatus(401);
-    }
-    next();
+    return function(req, res, next) {
+
+        var unauthenticated = function() {
+            if (required) {
+                if (req.xhr) {
+                    return res.sendStatus(401);
+                } 
+                return res.redirect("/login");
+            } 
+            return next();
+        }
+
+        if (!req.authToken) {
+            return unauthenticated();
+        }
+        db("users")
+            .where("id", req.authToken.id)
+            .first().then(function(user) {
+                if (!user) {
+                    return unauthenticated();
+                }
+                req.user = user;
+                next();
+            });
+    };
+
 };
+
+var authOnly = authenticate(false);
+var authRequire = authenticate(true);
 
 // development only
 if (DEV_ENV) {
@@ -91,7 +108,7 @@ var db = require('knex')({
 // authentication
 
 
-app.get("/api/auth/", [authRequired], function(req, res) {
+app.get("/api/auth/", [authRequire], function(req, res) {
     return res.json(req.user);
 });
 
@@ -139,11 +156,40 @@ app.get("/login", function(req, res) {
     res.reactify("/login");
 });
 
+app.get("/submit", function(req, res) {
+    res.reactify("/submit");
+});
+
 app.get("/api/posts/", function(req, res) {
     var page = parseInt(req.query.page || 1);
     getPosts(page, req.query.orderBy).then(function(posts) {
         res.json(posts);
     });
+});
+
+app.post("/api/submit/", [authRequire], function(req, res) {
+
+    var title = req.body.title,
+        url = req.body.url,
+        errors = validators.newPost(title, url);
+
+    if (!_.isEmpty(errors)) {
+        return res.json(402, errors);
+    }
+
+    db("posts")
+        .returning("id")
+        .insert({
+            title: title,
+            url:  url,
+            user_id: req.user.id,
+            created_at: moment.utc()
+        }).then(function(ids) {
+            return db("posts").where("id", ids[0]).first()
+        }).then(function(post) {
+            res.json(post);
+        });
+
 });
 
 function getPosts(page, orderBy){

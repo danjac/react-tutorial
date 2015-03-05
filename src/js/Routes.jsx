@@ -4,6 +4,7 @@ var  React = require('react'),
      Popular = require('./components/Popular'),
      Latest = require('./components/Latest'),
      Login = require('./components/Login'),
+     Submit = require('./components/Submit'),
      {DefaultRoute, Route} = Router;
  
 module.exports = (
@@ -11,6 +12,7 @@ module.exports = (
         <DefaultRoute name="popular" handler={Popular} />
         <Route name="latest" path="latest" handler={Latest} />
         <Route name="login" path="login" handler={Login} />
+        <Route name="submit" path="submit" handler={Submit} />
     </Route>
 );
 

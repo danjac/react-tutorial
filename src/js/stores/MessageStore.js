@@ -41,6 +41,10 @@ module.exports = Reflux.createStore({
 
     logout: function() {
         this.success("Bye for now");
+    },
+
+    submitPostSuccess: function() {
+        this.success("Thank you for your post!");
     }
 
 });
