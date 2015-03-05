@@ -11,7 +11,8 @@ module.exports = React.createClass({
     mixins: [
         Router.Navigation,
         Router.State,
-        Reflux.listenTo(actions.loginSuccess, 'onLoginSuccess')
+        Reflux.listenTo(actions.loginSuccess, 'onUserUpdate'),
+        Reflux.listenTo(actions.getUserComplete, 'onUserUpdate')
     ],
 
     getInitialState: function() {
@@ -20,10 +21,13 @@ module.exports = React.createClass({
         }
     },
 
-    onLoginSuccess: function() {
-        console.log("QUERY", this.getQuery());
-        var nextPath = this.getQuery().nextPath || "/";
-        this.transitionTo(nextPath);
+    onUserUpdate: function(user) {
+        // if user is already logged in then move on
+        //
+        if (user) {
+            var nextPath = this.getQuery().nextPath || "/";
+            this.transitionTo(nextPath);
+        }
     },
 
     handleSubmit: function(event) {

@@ -157,7 +157,10 @@ app.get("/login", function(req, res) {
 });
 
 app.get("/submit", function(req, res) {
-    res.reactify("/submit");
+    // the "redirectTo" prop is checked in componentDidMount client
+    // side - we need to do this for any components running
+    // possible redirects
+    res.reactify("/wait", {redirectTo: "/submit"});
 });
 
 app.get("/api/posts/", function(req, res) {

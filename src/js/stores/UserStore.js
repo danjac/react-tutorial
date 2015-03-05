@@ -31,7 +31,7 @@ module.exports = Reflux.createStore({
     logout: function() {
         this.user = null;
         this.trigger();
-    },
+    }
 
 });
  

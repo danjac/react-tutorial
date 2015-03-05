@@ -9,6 +9,7 @@ actions = Reflux.createActions([
    "login",
    "loginSuccess",
    "loginFailure",
+   "loginRequired",
    "logout",
    "getUser",
    "getUserComplete",

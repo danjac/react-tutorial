@@ -13,11 +13,10 @@ module.exports = React.createClass({
         Reflux.listenTo(UserStore, 'onUserUpdate')
     ],
 
-
     getInitialState: function() {
         return {
             messages: MessageStore.getDefaultData(),
-            user: UserStore.getDefaultData()
+            user: UserStore.getDefaultData(),
         }
     },
 
@@ -47,12 +46,6 @@ module.exports = React.createClass({
         );
     },
 
-    componentWillUpdate: function () {
-        if (this.props.user) {
-            this.setState({ user: this.props.user });
-        }
-    },
-
     componentDidMount: function () {
         actions.getUser();
     },
@@ -78,7 +71,7 @@ module.exports = React.createClass({
                     var onDismiss = function(){
                         actions.dismissAlert(index);
                     };
-                    return <Alert onDismiss={onDismiss} key={index} bsStyle={msg.level}>{msg.text}</Alert>;
+                    return <Alert onDismiss={onDismiss} key={index} dismissAfter={3000} bsStyle={msg.level}>{msg.text}</Alert>;
                 })}
                <RouteHandler user={this.state.user} {...this.props} /> 
             </div>
