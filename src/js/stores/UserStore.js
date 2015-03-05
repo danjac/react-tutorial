@@ -20,6 +20,7 @@ module.exports = Reflux.createStore({
 
     getUserComplete: function(user) {
         this.user = user;
+        console.log("USERCOMPLETE", this.user);
         this.trigger();
     },
 

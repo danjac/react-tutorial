@@ -1,7 +1,5 @@
 var  React = require('react'),
-     Reflux = require('reflux'),
-     {RouteHandler} = require('react-router'),
-     {Alert, Navbar, Nav, NavItem} = require('react-bootstrap'),
+     Reflux = require('reflux'), {RouteHandler} = require('react-router'), {Alert, Navbar, Nav, NavItem} = require('react-bootstrap'),
      {NavItemLink} = require('react-router-bootstrap'),
      UserStore = require('../stores/UserStore'),
      MessageStore = require('../stores/MessageStore');

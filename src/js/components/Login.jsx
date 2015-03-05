@@ -4,6 +4,7 @@ var React = require('react'),
     {Input} = require('react-bootstrap'),
     validator = require('validator'),
     _ = require('lodash'),
+    UserStore = require('../stores/UserStore'),
     actions = require('../actions');
 
 module.exports = React.createClass({
@@ -11,8 +12,7 @@ module.exports = React.createClass({
     mixins: [
         Router.Navigation,
         Router.State,
-        Reflux.listenTo(actions.loginSuccess, 'onUserUpdate'),
-        Reflux.listenTo(actions.getUserComplete, 'onUserUpdate')
+        Reflux.listenTo(UserStore, 'onLoginSuccess'),
     ],
 
     getInitialState: function() {
@@ -21,12 +21,15 @@ module.exports = React.createClass({
         }
     },
 
-    onUserUpdate: function(user) {
-        // if user is already logged in then move on
-        //
+    redirect: function() {
+        var nextPath = this.getQuery().nextPath || "/";
+        this.transitionTo(nextPath);
+    },
+    
+    onLoginSuccess: function() {
+        var user = UserStore.getDefaultData();
         if (user) {
-            var nextPath = this.getQuery().nextPath || "/";
-            this.transitionTo(nextPath);
+            this.redirect();
         }
     },
 
