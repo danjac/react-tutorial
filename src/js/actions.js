@@ -15,7 +15,9 @@ actions = Reflux.createActions([
    "getUserComplete",
    "submitPost",
    "submitPostSuccess",
-   "submitPostFailure"
+   "submitPostFailure",
+   "deletePost",
+   "deletePostComplete"
 ]);
  
 
@@ -27,6 +29,14 @@ var bearer = function(request) {
     if (token) {
         request.set('Authorization', 'Bearer ' + token);
     }
+};
+
+actions.deletePost.preEmit = function(post) {
+    request.del("/api/" + post.id)
+        .use(bearer)
+        .end(function() {
+            actions.deletePostComplete(post);
+        });
 };
 
 actions.submitPost.preEmit = function(title, url) {

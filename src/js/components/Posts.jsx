@@ -35,7 +35,21 @@ module.exports = React.createClass({
     },
 
     render: function() {
+
         var posts = this.state.posts || [];
+        var user = this.props.user;
+
+        var deleteLink = function(post) {
+            var handleDelete = function(event) {
+                console.log("deleting...");
+                event.preventDefault();
+                actions.deletePost(post);
+            };
+            if (user && post.author_id === user.id) {
+                return <a onClick={handleDelete}>delete</a>;
+            }
+            return '';
+        }
 
         return (
             <ul className="list-unstyled">
@@ -43,7 +57,9 @@ module.exports = React.createClass({
                     return (
                         <li key={post.id}>
                             <a href={post.url} target="_blank">{post.title}</a><br />
-                            <small><mark><a href="#">{post.author}</a></mark></small>
+                            <small><mark><a href="#">{post.author}</a></mark>
+                            {deleteLink(post)} 
+                            </small>
                         </li> 
                     );
                 })}

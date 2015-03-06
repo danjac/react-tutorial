@@ -1,5 +1,7 @@
 var  React = require('react'),
-     Reflux = require('reflux'), {RouteHandler} = require('react-router'), {Alert, Navbar, Nav, NavItem} = require('react-bootstrap'),
+     Reflux = require('reflux'), {RouteHandler} = require('react-router'), 
+     Router = require('react-router'),
+     {Alert, Navbar, Nav, NavItem} = require('react-bootstrap'),
      {NavItemLink} = require('react-router-bootstrap'),
      UserStore = require('../stores/UserStore'),
      MessageStore = require('../stores/MessageStore');
@@ -7,8 +9,11 @@ var  React = require('react'),
 module.exports = React.createClass({
 
     mixins: [
+        Router.Navigation,
+        Router.State,
         Reflux.listenTo(MessageStore, 'onMessagesUpdate'),
-        Reflux.listenTo(UserStore, 'onUserUpdate')
+        Reflux.listenTo(UserStore, 'onUserUpdate'),
+        Reflux.listenTo(actions.logout, 'onLogout')
     ],
 
     getInitialState: function() {
@@ -16,6 +21,11 @@ module.exports = React.createClass({
             messages: MessageStore.getDefaultData(),
             user: UserStore.getDefaultData(),
         }
+    },
+
+    onLogout: function() {
+        // reload this page
+        window.location.href = this.getPath();
     },
 
     onMessagesUpdate: function() {
@@ -31,7 +41,6 @@ module.exports = React.createClass({
         if (this.state.user) {
             return (
               <Nav className={className}>
-                <NavItemLink to="submit">Submit a post</NavItemLink>
                 <NavItem>{this.state.user.name}</NavItem>
                 <NavItem onClick={actions.logout}>Logout</NavItem>
               </Nav>
@@ -55,6 +64,7 @@ module.exports = React.createClass({
               <Nav className="navbar-left">
                 <NavItemLink to="popular">Top</NavItemLink>
                 <NavItemLink to="latest">New</NavItemLink>
+                <NavItemLink to="submit">Submit a post</NavItemLink>
               </Nav>
               {this.getRightNav()}
             </Navbar>

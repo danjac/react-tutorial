@@ -10,6 +10,6 @@ module.exports = React.createClass({
     },
 
     render: function() {
-        return <Posts posts={this.props.popularPosts} fetchPosts={this.fetchPosts} />
+        return <Posts posts={this.props.popularPosts} fetchPosts={this.fetchPosts} user={this.props.user}/>
     }
 });

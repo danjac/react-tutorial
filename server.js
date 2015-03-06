@@ -38,12 +38,29 @@ app.use(expressJwt({
 
 app.use(function(req, res, next) {
 
-    res.reactify = function(route, props={}, template="index") {
-        Router.run(Routes, route, function(Handler, state) {
-            if (req.user) {
-                props.user = req.user;
+    res.reactify = function(route, props={}, opts={}) {
+        var router = Router.create({
+            routes: Routes,
+            location: route,
+            onError: function(err) {
+                next(err);
+            },
+            onAbort: function(abortReason) {
+                if (abortReason.constructor.name === 'Redirect') {
+                    var url = router.makePath(
+                        abortReason.to, 
+                        abortReason.params, 
+                        abortReason.query
+                    );
+                    res.redirect(url);
+                } else {
+                    next(abortReason);
+                }
             }
-            res.render(template, {
+        });
+
+        router.run(function(Handler, state) {
+            res.render(opts.template || 'index', {
                 markup: React.renderToString(Handler(props)),
                 data: JSON.stringify(props)
             });
@@ -156,12 +173,9 @@ app.get("/login", function(req, res) {
     res.reactify("/login");
 });
 
-app.get("/submit", function(req, res) {
-    // the "redirectTo" prop is checked in componentDidMount client
-    // side - we need to do this for any components running
-    // possible redirects
-    res.reactify("/wait", {redirectTo: "/submit"});
-});
+app.get("/submit", (req, res) =>
+    res.reactify("/submit")
+);
 
 app.get("/api/posts/", function(req, res) {
     var page = parseInt(req.query.page || 1);
@@ -191,6 +205,18 @@ app.post("/api/submit/", [authRequire], function(req, res) {
             return db("posts").where("id", ids[0]).first()
         }).then(function(post) {
             res.json(post);
+        });
+
+});
+
+app.delete("/api/:id", [authRequire], function(req, res) {
+
+    db("posts")
+        .where({
+            id: req.params.id,
+            user_id: req.user.id
+        }).del().then(function(){
+            res.sendStatus(200);
         });
 
 });
