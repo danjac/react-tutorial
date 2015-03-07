@@ -24,7 +24,8 @@ module.exports = React.createClass({
     },
 
     onLogout: function() {
-        // reload this page
+        // reload this page: we should use transitionTo, 
+        // but that doesn't call the willTransitionTo authentication.
         window.location.href = this.getPath();
     },
 
@@ -60,7 +61,7 @@ module.exports = React.createClass({
     render: function(){
 
         var navbar = (
-            <Navbar brand="Lobsters" className="navbar navbar-inverse" fixedTop={true} fluid={true}>
+            <Navbar brand="" className="navbar navbar-inverse" fixedTop={true} fluid={true}>
               <Nav className="navbar-left">
                 <NavItemLink to="popular">Top</NavItemLink>
                 <NavItemLink to="latest">New</NavItemLink>
