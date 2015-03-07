@@ -28,11 +28,38 @@ module.exports = React.createClass({
     },
 
     handlePageClick: function(page) {
+        console.log("FETCH POSTS FOR PAGE", page);
         this.props.fetchPosts(page);
+    },
+    
+    handleLastPageClick: function(event) {
+        event.preventDefault();
+        if (this.state.isFirst) {
+            return;
+        }
+        this.handlePageClick(this.state.page - 1);
+    },
+
+    handleNextPageClick: function(event) {
+        event.preventDefault();
+        if (this.state.isLast) {
+            return;
+        }
+        this.handlePageClick(this.state.page + 1);
     },
 
     onUpdate: function(data) {
         this.setState(data);
+    },
+
+    renderPager: function () {
+        return (
+            <Pager>
+                <PageItem previous onClick={this.handleLastPageClick} disabled={this.state.isFirst}>&larr; Previous</PageItem>
+                <PageItem next onClick={this.handleNextPageClick} disabled={this.state.isLast}>&rarr; Next</PageItem>
+            </Pager>
+        );
+
     },
 
     render: function() {
@@ -40,28 +67,6 @@ module.exports = React.createClass({
         var posts = this.state.posts || [];
         var user = this.props.user;
 
-        var onLastPageClick = function(event) {
-            event.preventDefault();
-            if (this.state.isFirstPage) {
-                return;
-            }
-            this.handlePageClick(this.state.page - 1);
-        };
-
-        var onNextPageClick = function(event) {
-            event.preventDefault();
-            if (this.state.isLastPage) {
-                return;
-            }
-            this.handlePageClick(this.state.page + 1);
-        };
-
-       var pager = (
-            <Pager>
-                <PageItem previous disabled={this.state.isFirst}>&larr; Previous</PageItem>
-                <PageItem next disabled={this.state.isLast}>&rarr; Next</PageItem>
-            </Pager>
-        );
         var deleteLink = function(post) {
             var handleDelete = function(event) {
                 console.log("deleting...");
@@ -88,7 +93,7 @@ module.exports = React.createClass({
                         );
                     })}
                 </ul>
-                {pager}
+                {this.renderPager()}
             </div>
         );
     }
