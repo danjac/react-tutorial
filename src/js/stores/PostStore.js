@@ -10,12 +10,17 @@ module.exports = Reflux.createStore({
     init: function() {
         this.posts = [];
         this.page = 1;
+        this.total = 0;
+        this.isFirst = true;
+        this.isLast = true;
     },
 
     _trigger: function() {
         this.trigger({
             posts: this.posts,
-            page: this.page
+            page: this.page,
+            isFirst: this.isFirst,
+            isLast: this.isLast
         });
     },
 
@@ -26,16 +31,22 @@ module.exports = Reflux.createStore({
         this._trigger();
     },
 
-    fetchPostsComplete: function(page, posts) {
-        this.posts = posts;
+    fetchPostsComplete: function(page, result) {
         this.page = page;
+        this.posts = result.posts;
+        this.isFirst = result.isFirst;
+        this.isLast = result.isLast;
+        this.total = result.total;
         this._trigger();
     },
 
     getDefaultData: function() {
         return {
             posts: this.posts,
-            page: this.page
+            page: this.page,
+            total: this.total,
+            isFirst: this.isFirst,
+            isLast: this.isLast
         }
     }
 });

@@ -40,7 +40,7 @@ actions.deletePost.preEmit = function(post) {
 };
 
 actions.submitPost.preEmit = function(title, url) {
-    request.post("/api/submit")
+    request.post("/api/submit/")
         .use(bearer)
         .send({
             title: title,
@@ -62,7 +62,7 @@ actions.logout.preEmit = function() {
 
 actions.login.preEmit = function(identity, password) {
 
-    request.post('/api/login')
+    request.post('/api/login/')
         .send({
             identity: identity,
             password: password
@@ -79,7 +79,7 @@ actions.login.preEmit = function(identity, password) {
 
 actions.getUser.preEmit = function() {
 
-    request.get("/api/auth")
+    request.get("/api/auth/")
         .use(bearer)
         .end(function(res) {
             if (res.unauthorized) {
@@ -92,7 +92,7 @@ actions.getUser.preEmit = function() {
 
 var fetchPosts = function(page, orderBy) {
 
-    request.get('/api/posts')
+    request.get('/api/posts/')
         .query({
             page: page,
             orderBy: orderBy

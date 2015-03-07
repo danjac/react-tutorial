@@ -41,6 +41,10 @@ var getPosts = function(db, page, orderBy){
 
     var offset = ((page - 1) * pageSize);
 
+    var result = {
+        isFirst: (page === 1)
+    };
+
     return db.select(
         'posts.id',
         'posts.title',
@@ -54,7 +58,18 @@ var getPosts = function(db, page, orderBy){
         'posts.user_id'
     ).orderBy(
         'posts.' + orderBy, 'desc'
-    ).limit(pageSize).offset(offset);
+    ).limit(pageSize).offset(offset).then(function(posts) {
+        return posts;
+    }).then(function(posts) {
+        result.posts = posts;
+        return db("posts").count("id").first();
+    }).then(function(total) {
+        result.total = parseInt(total.count);
+        var numPages = Math.ceil(result.total / pageSize);
+        result.isLast = page == numPages;
+        return result;
+    });
+
 };
 
 
@@ -63,18 +78,14 @@ module.exports = function(app, db) {
     var auth = authenticate(db);
 
     app.get("/", function(req, res) {
-        getPosts(db, 1, "score").then(function(posts) {
-            res.reactify("/", {
-                popularPosts: posts,
-            });
+        getPosts(db, 1, "score").then(function(result) {
+            res.reactify("/", result);
         });
     });
 
     app.get("/latest/", function(req, res) {
-        getPosts(db, 1, "id").then(function(posts) {
-            res.reactify("/latest", {
-                latestPosts: posts,
-            });
+        getPosts(db, 1, "id").then(function(result) {
+            res.reactify("/latest", result);
         });
     });
 
@@ -114,8 +125,8 @@ module.exports = function(app, db) {
 
     app.get("/api/posts/", function(req, res) {
         var page = parseInt(req.query.page || 1);
-        getPosts(db, page, req.query.orderBy).then(function(posts) {
-            res.json(posts);
+        getPosts(db, page, req.query.orderBy).then(function(result) {
+            res.json(result);
         });
     });
 

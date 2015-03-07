@@ -10,6 +10,7 @@ It's built with the following tech:
 - Express
 - React
 - React-router
+- Reflux
 - Bootstrap
 - Knex+Postgresql
 - Jest
