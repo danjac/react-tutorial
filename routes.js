@@ -1,8 +1,35 @@
 var moment = require('moment'),
+    jwt = require('jsonwebtoken'),
     _ = require('lodash'),
+    {auth} = require('./middleware'),
     validators = require('./src/js/validators');
 
 const pageSize = 10;
+
+var authenticate = function(db) {
+    return function(req, res, next) {
+        var unauthenticated = function() {
+            if (required) {
+                return res.sendStatus(401);
+            } 
+            return next();
+        }
+
+        if (!req.authToken) {
+            return unauthenticated();
+        }
+        db("users")
+            .where("id", req.authToken.id)
+            .first().then(function(user) {
+                if (!user) {
+                    return unauthenticated();
+                }
+                req.user = user;
+                next();
+            });
+    };
+};
+
 
 var getPosts = function(db, page, orderBy){
     // tbd: return a total count of posts
@@ -31,99 +58,98 @@ var getPosts = function(db, page, orderBy){
 };
 
 
-module.exports = {
-    index: function(req, res) {
-        getPosts(req.db, 1, "score").then(function(posts) {
+module.exports = function(app, db) {
+
+    var auth = authenticate(db);
+
+    app.get("/", function(req, res) {
+        getPosts(db, 1, "score").then(function(posts) {
             res.reactify("/", {
                 popularPosts: posts,
             });
         });
-    },
+    });
 
-    latest: function(req, res) {
-        getPosts(req.db, 1, "id").then(function(posts) {
+    app.get("/latest/", function(req, res) {
+        getPosts(db, 1, "id").then(function(posts) {
             res.reactify("/latest", {
                 latestPosts: posts,
             });
         });
-    },
+    });
 
-    login: function(req, res) {
+    app.get("/login/", function(req, res) {
         res.reactify("/login");
-    },
+    });
 
-    submit: function(req, res) {
+    app.get("/submit/", function(req, res) {
         res.reactify("/submit");
-    },
+    });
 
-    api: {
-
-        auth: function (req, res) {
+    app.get("/api/auth/", [auth], function (req, res) {
             return res.json(req.user);
-        },
+    });
 
-        login: function(req, res) {
-            req.db("users")
-                .where("name", req.body.identity)
-                .orWhere("email", req.body.identity)
-                .first().then(function(user) {
-                    if (!user || user.password !== req.body.password) {
-                        res.sendStatus(401);
-                        return;
-                    } 
+    app.post("/api/login/", function(req, res) {
+        db("users")
+            .where("name", req.body.identity)
+            .orWhere("email", req.body.identity)
+            .first().then(function(user) {
+                if (!user || user.password !== req.body.password) {
+                    res.sendStatus(401);
+                    return;
+                } 
 
-                    var token = req.jwt.sign({ id: user.id }, process.env.SECRET_KEY, {
-                        expiresInMinutes: 60 * 24
-                    });
-
-                    res.json({
-                        token: token,
-                        user: user
-                    });
-
+                var token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, {
+                    expiresInMinutes: 60 * 24
                 });
-        },
 
-        getPosts: function(req, res) {
-            var page = parseInt(req.query.page || 1);
-            getPosts(req.db, page, req.query.orderBy).then(function(posts) {
-                res.json(posts);
+                res.json({
+                    token: token,
+                    user: user
+                });
+
             });
-        },
+    });
 
-        submitPost: function(req, res) {
-            var title = req.body.title,
-                url = req.body.url,
-                errors = validators.newPost(title, url);
+    app.get("/api/posts/", function(req, res) {
+        var page = parseInt(req.query.page || 1);
+        getPosts(db, page, req.query.orderBy).then(function(posts) {
+            res.json(posts);
+        });
+    });
 
-            if (!_.isEmpty(errors)) {
-                return res.json(400, errors);
-            }
+    app.post("/api/submit/", [auth], function(req, res) {
+        var title = req.body.title,
+            url = req.body.url,
+            errors = validators.newPost(title, url);
 
-            req.db("posts")
-                .returning("id")
-                .insert({
-                    title: title,
-                    url: url,
-                    user_id: req.user.id,
-                    created_at: moment.utc()
-                }).then(function(ids) {
-                    return req.db("posts").where("id", ids[0]).first()
-                }).then(function(post) {
-                    res.json(post);
-                });
-        },
+        if (!_.isEmpty(errors)) {
+            return res.json(400, errors);
+        }
 
-        deletePost: function(req, res) {
-            req.db("posts")
-                .where({
-                    id: req.params.id,
-                    user_id: req.user.id
-                }).del().then(function(){
-                    res.sendStatus(200);
-                });
-        },
+        db("posts")
+            .returning("id")
+            .insert({
+                title: title,
+                url: url,
+                user_id: req.user.id,
+                created_at: moment.utc()
+            }).then(function(ids) {
+                return db("posts").where("id", ids[0]).first();
+            }).then(function(post) {
+                res.json(post);
+            });
+    });
 
-    }
+    app.delete("/api/:id", [auth], function(req, res) {
+        db("posts")
+            .where({
+                id: req.params.id,
+                user_id: req.user.id
+            }).del().then(function(){
+                res.sendStatus(200);
+            });
+    });
 
 };

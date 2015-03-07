@@ -1,6 +1,3 @@
-require('node-jsx').install()
-require('dotenv').load()
-
 var express = require('express'),
     http = require('http'),
     path = require('path'),
@@ -9,11 +6,16 @@ var express = require('express'),
     expressJwt = require('express-jwt'),
     React = require('react'),
     Router = require('react-router'),
-    jsxRoutes = require('./src/js/Routes'),
     routes = require('./routes.js'),
-    {authenticate, reactify, jwtToken, dbConnection} = require('./middleware');
+    {reactify} = require('./middleware');
+
+// import JSX
+require('node-jsx').install();
+var jsxRoutes = require('./src/js/Routes');
 
 var app = express();
+
+require('dotenv').load()
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -42,7 +44,8 @@ if (devMode) {
 
 // database 
 //
-const db = require('knex')({
+
+var db = require('knex')({
     client: 'pg',
     debug: devMode,
     connection: {
@@ -54,26 +57,12 @@ const db = require('knex')({
 
 // Local middleware
 //
-app.use(dbConnection(db));
 app.use(reactify(jsxRoutes));
-app.use(jwtToken(jwt));
 
-const auth = authenticate(db);
-
-// Routes
+// Set up routes
 //
-
-app.get("/", routes.index);
-app.get("/latest", routes.latest);
-app.get("/login", routes.login);
-app.get("/submit", routes.submit);
-
-app.get("/api/auth/", [auth], routes.api.auth);
-app.post("/api/login/", routes.api.login);
-app.get("/api/posts/", routes.api.getPosts);
-app.post("/api/submit/", [auth], routes.api.submitPost);
-app.delete("/api/:id", [auth], routes.api.deletePost);
-
+routes(app, db);
+   
 // run server
 
 const port = 3000;

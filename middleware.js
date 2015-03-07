@@ -3,45 +3,6 @@ var React = require('react'),
 
 module.exports = {
 
-    jwtToken: function(jwt) {
-
-        return function(req, res, next) {
-            req.jwt = jwt;
-            next();
-        };
-    },
-
-    authenticate: function(db) {
-        return function(req, res, next) {
-            var unauthenticated = function() {
-                if (required) {
-                    return res.sendStatus(401);
-                } 
-                return next();
-            }
-
-            if (!req.authToken) {
-                return unauthenticated();
-            }
-            db("users")
-                .where("id", req.authToken.id)
-                .first().then(function(user) {
-                    if (!user) {
-                        return unauthenticated();
-                    }
-                    req.user = user;
-                    next();
-                });
-        };
-    },
-
-    dbConnection: function(db) {
-        return function(req, res, next) {
-            req.db = db;
-            next();
-        };
-    },
-
     reactify: function(routes) {
 
         return function(req, res, next) {
