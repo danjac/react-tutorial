@@ -61,7 +61,7 @@ module.exports = React.createClass({
     render: function(){
 
         var navbar = (
-            <Navbar brand="" className="navbar navbar-inverse" fixedTop={true} fluid={true}>
+            <Navbar brand="React tutorial" className="navbar navbar-inverse" fixedTop={true} fluid={true}>
               <Nav className="navbar-left">
                 <NavItemLink to="popular">Top</NavItemLink>
                 <NavItemLink to="latest">New</NavItemLink>
