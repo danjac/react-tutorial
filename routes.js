@@ -31,7 +31,7 @@ var authenticate = function(db) {
 };
 
 
-var getPosts = function(db, page, orderBy){
+var getPosts = function(db, page, orderBy, username=null){
     // tbd: return a total count of posts
     // { posts: posts, total: total }
     // return as promise
@@ -45,7 +45,7 @@ var getPosts = function(db, page, orderBy){
         isFirst: (page === 1)
     };
 
-    return db.select(
+    var posts = db.select(
         'posts.id',
         'posts.title',
         'posts.url',
@@ -56,19 +56,31 @@ var getPosts = function(db, page, orderBy){
         'users',
         'users.id',
         'posts.user_id'
-    ).orderBy(
+    );
+
+    if (username) {
+        posts = posts.where("users.name", username);
+    }
+
+    posts = posts.orderBy(
         'posts.' + orderBy, 'desc'
     ).limit(pageSize).offset(offset).then(function(posts) {
         return posts;
     }).then(function(posts) {
         result.posts = posts;
-        return db("posts").count("id").first();
+        var total = db("posts").count("id");
+        if (username) {
+            total = total.where("users.name", username);
+        }
+        return total.first();
     }).then(function(total) {
         result.total = parseInt(total.count);
         var numPages = Math.ceil(result.total / pageSize);
         result.isLast = page == numPages;
         return result;
     });
+
+    return posts;
 
 };
 
@@ -89,6 +101,12 @@ module.exports = function(app, db) {
         });
     });
 
+    app.get("/user/:name", function(req, res) {
+        getPosts(db, 1, "score", req.params.name).then(function(result) {
+            res.reactify("/user/" + req.params.name, result);
+        });
+    });
+
     app.get("/login/", function(req, res) {
         res.reactify("/login");
     });
@@ -98,7 +116,7 @@ module.exports = function(app, db) {
     });
 
     app.get("/api/auth/", [auth], function (req, res) {
-            return res.json(req.user);
+        return res.json(req.user);
     });
 
     app.post("/api/login/", function(req, res) {
@@ -106,6 +124,7 @@ module.exports = function(app, db) {
             .where("name", req.body.identity)
             .orWhere("email", req.body.identity)
             .first().then(function(user) {
+                // we'll encrypt this password later of course!
                 if (!user || user.password !== req.body.password) {
                     res.sendStatus(401);
                     return;
@@ -128,6 +147,14 @@ module.exports = function(app, db) {
         getPosts(db, page, req.query.orderBy).then(function(result) {
             res.json(result);
         });
+    });
+
+    app.get("/api/user/:name", function(req, res) {
+        var page = parseInt(req.query.page || 1);
+        getPosts(db, page, req.query.orderBy, req.params.name)
+            .then(function(result) {
+                res.json(result);
+            });
     });
 
     app.post("/api/submit/", [auth], function(req, res) {
