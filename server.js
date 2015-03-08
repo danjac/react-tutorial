@@ -11,7 +11,7 @@ var express = require('express'),
 
 // import JSX
 require('node-jsx').install();
-var jsxRoutes = require('./client/js/Routes');
+var jsxRoutes = require('./client/Routes');
 
 var app = express();
 

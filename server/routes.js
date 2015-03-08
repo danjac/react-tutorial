@@ -2,7 +2,7 @@ var moment = require('moment'),
     jwt = require('jsonwebtoken'),
     _ = require('lodash'),
     bcrypt = require('bcryptjs'),
-    validators = require('../client/js/validators');
+    validators = require('../client/validators');
 
 const pageSize = 10;
 
