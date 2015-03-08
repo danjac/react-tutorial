@@ -70,15 +70,19 @@ module.exports = function(app, db) {
             return posts;
         }).then(function(posts) {
             result.posts = posts;
-            var total = db("posts").count("id");
+            var q = db("posts").count("posts.id");
             if (username) {
-                total = total.where("users.name", username);
+                q = q.innerJoin(
+                        'users',
+                        'users.id',
+                        'posts.user_id'
+                    ).where("users.name", username)
             }
-            return total.first();
+            return q.first();
         }).then(function(total) {
             result.total = parseInt(total.count);
             var numPages = Math.ceil(result.total / pageSize);
-            result.isLast = page == numPages;
+            result.isLast = (!numPages || page == numPages);
             return result;
         });
 

@@ -42,7 +42,7 @@ module.exports = React.createClass({
         if (this.state.user) {
             return (
               <Nav className={className}>
-                <NavItem>{this.state.user.name}</NavItem>
+                <NavItemLink to={this.makeHref("user", {name: this.state.user.name})}>{this.state.user.name}</NavItemLink>
                 <NavItem onClick={actions.logout}>Logout</NavItem>
               </Nav>
             );

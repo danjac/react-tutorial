@@ -1,5 +1,6 @@
 var React = require('react'),
     Reflux = require('reflux'),
+    Router = require('react-router'),
     {Pager, PageItem} = require('react-bootstrap'),
     PostStore = require('../stores/PostStore'),
     actions = require('../actions');
@@ -8,6 +9,7 @@ var React = require('react'),
 module.exports = React.createClass({
 
     mixins: [
+        Router.Navigation,
         Reflux.listenTo(PostStore, 'onUpdate')
     ],
 
@@ -27,8 +29,11 @@ module.exports = React.createClass({
         this.props.fetchPosts(1);
     },
 
+    componentWillReceiveProps: function() {
+        this.props.fetchPosts(1);
+    },
+
     handlePageClick: function(page) {
-        console.log("FETCH POSTS FOR PAGE", page);
         this.props.fetchPosts(page);
     },
     
@@ -69,7 +74,6 @@ module.exports = React.createClass({
 
         var deleteLink = function(post) {
             var handleDelete = function(event) {
-                console.log("deleting...");
                 event.preventDefault();
                 actions.deletePost(post);
             };
@@ -86,12 +90,12 @@ module.exports = React.createClass({
                         return (
                             <li key={post.id}>
                                 <a href={post.url} target="_blank">{post.title}</a><br />
-                                <small><mark><a href="#">{post.author}</a></mark>
+                                <small><mark><a href={this.makeHref("user", {name: post.author})}>{post.author}</a></mark>
                                 {deleteLink(post)} 
                                 </small>
                             </li> 
                         );
-                    })}
+                    }.bind(this))}
                 </ul>
                 {this.renderPager()}
             </div>

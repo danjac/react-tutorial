@@ -7,6 +7,7 @@ actions = Reflux.createActions([
    "dismissAlert",
    "fetchLatestPosts",
    "fetchPopularPosts",
+   "fetchPostsForUser",
    "fetchPostsComplete",
    "login",
    "loginSuccess",
@@ -155,6 +156,17 @@ actions.fetchLatestPosts.preEmit = function(page){
 
 actions.fetchPopularPosts.preEmit = function(page){
     fetchPosts(page, "score");
+};
+
+actions.fetchPostsForUser.preEmit = function(page, name) {
+    request.get('/api/user/' + name)
+        .query({
+            page: page,
+            orderBy: 'score'
+        })
+        .end(function(res) {
+            actions.fetchPostsComplete(page, res.body);
+        });
 };
 
 module.exports = actions;
