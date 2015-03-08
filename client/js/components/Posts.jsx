@@ -1,10 +1,34 @@
 var React = require('react'),
     Reflux = require('reflux'),
     Router = require('react-router'),
-    {Pager, PageItem} = require('react-bootstrap'),
+    {Button, Modal, ModalTrigger, Pager, PageItem} = require('react-bootstrap'),
     PostStore = require('../stores/PostStore'),
     actions = require('../actions');
 
+
+var DeletePostModal = React.createClass({
+
+    handleDelete: function(event) {
+        event.preventDefault();
+        actions.deletePost(this.props.post);
+    },
+
+    render: function() {
+
+        return (
+            <Modal title="Delete post">
+                <div className="modal-body">
+                    Are you sure you want to delete your post?
+                </div>
+                <div className="modal-footer">
+                    <Button onClick={this.props.onRequestHide}>Cancel</Button>
+                    <Button bsStyle="primary" onClick={this.handleDelete}>Delete</Button>
+                </div>
+            </Modal>
+
+        );
+    }
+});
 
 module.exports = React.createClass({
 
@@ -79,12 +103,15 @@ module.exports = React.createClass({
         var {Link} = Router;
 
         var deleteLink = function(post) {
-            var handleDelete = function(event) {
-                event.preventDefault();
-                actions.deletePost(post);
-            };
             if (user && post.author_id === user.id) {
-                return <a onClick={handleDelete}>delete</a>;
+
+                var modal = <DeletePostModal post={post} />;
+
+                return (
+                    <ModalTrigger modal={modal}>
+                        <a href="#">delete</a>
+                    </ModalTrigger>
+                );
             }
             return '';
         }
