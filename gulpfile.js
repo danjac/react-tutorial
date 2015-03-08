@@ -13,7 +13,7 @@ var browserify = require('gulp-browserify'),
     es6ify = require('es6ify');
 
 var staticDir = './public',
-    assetsDir = './src',
+    assetsDir = './client',
     watch = false,
     cssFilter = gulpFilter('*.css'),
     jsFilter = gulpFilter(['*.js', '*.jsx']),

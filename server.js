@@ -6,12 +6,12 @@ var express = require('express'),
     expressJwt = require('express-jwt'),
     React = require('react'),
     Router = require('react-router'),
-    routes = require('./routes.js'),
-    {reactify} = require('./middleware');
+    routes = require('./server/routes.js'),
+    {reactify} = require('./server/middleware');
 
 // import JSX
 require('node-jsx').install();
-var jsxRoutes = require('./src/js/Routes');
+var jsxRoutes = require('./client/js/Routes');
 
 var app = express();
 
@@ -19,7 +19,7 @@ require('dotenv').load()
 
 // all environments
 app.set('port', process.env.PORT || 3000);
-app.set('views', path.join(__dirname, '/views'));
+app.set('views', path.join(__dirname, '/server/views'));
 app.set('view engine', 'ejs');
 
 app.use(require('morgan')('dev'));
