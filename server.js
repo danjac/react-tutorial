@@ -18,7 +18,10 @@ var app = express();
 require('dotenv').load()
 
 // all environments
-app.set('port', process.env.PORT || 3000);
+
+const port = process.env.PORT || 3000
+
+app.set('port', port);
 app.set('views', path.join(__dirname, '/server/views'));
 app.set('view engine', 'ejs');
 
@@ -64,8 +67,6 @@ app.use(reactify(jsxRoutes));
 routes(app, db);
    
 // run server
-
-const port = 3000;
 
 console.log("Running on port", port);
 app.server = http.createServer(app);
