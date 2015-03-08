@@ -13,18 +13,12 @@ var browserify = require('gulp-browserify'),
     es6ify = require('es6ify');
 
 var staticDir = './public',
-    assetsDir = './client',
+    srcDir = './client',
     watch = false,
     cssFilter = gulpFilter('*.css'),
     jsFilter = gulpFilter(['*.js', '*.jsx']),
     fontFilter = gulpFilter(['*.eot', '*.woff', '*.svg', '*.ttf']);
 
-
-var src = {
-    js: assetsDir + '/js',
-    css: assetsDir + '/css',
-    fonts: assetsDir + '/fonts'
-};
 
 var dest = {
     js: staticDir + '/js',
@@ -33,9 +27,8 @@ var dest = {
 };
 
 
-gulp.task('build-js', function() {
-
-    gulp.src(src.js + '/app.js')
+gulp.task('build-src', function() {
+    gulp.src(srcDir + '/app.js')
         .pipe(sourcemaps.init())
         .pipe(babel())
         .pipe(browserify({
@@ -77,23 +70,12 @@ gulp.task('pkg', function() {
         .pipe(gulp.dest(dest.fonts));
 });
 
-gulp.task('build-css', function() {
-    return gulp.src(src.css + '/*.css')
-        .pipe(plumber())
-        .pipe(concat('app.css'))
-        .pipe(minifyCss())
-        .pipe(gulp.dest(dest.css));
-});
-
-
 gulp.task('install', shell.task([
     'bower cache clean',
     'bower install'
 ]));
 
-
 gulp.task('default', function() {
-    gulp.start('install', 'pkg', 'build-css', 'build-js');
-    gulp.watch(src.js + '/**', {}, ['build-js']);
-    gulp.watch(src.css + '/**', {}, ['build-css']);
+    gulp.start('install', 'pkg', 'build-src');
+    gulp.watch(srcDir + '/**', {}, ['build-src']);
 });
