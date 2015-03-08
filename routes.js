@@ -133,7 +133,7 @@ module.exports = function(app, db) {
         db("users")
             .where("name", req.body.identity)
             .orWhere("email", req.body.identity)
-            .first("id", "name", "email").then(function(user) {
+            .first("id", "name", "email", "password").then(function(user) {
                 // we'll encrypt this password later of course!
                 if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
                     res.sendStatus(401);
@@ -141,7 +141,7 @@ module.exports = function(app, db) {
                 } 
                 res.json({
                     token: generateToken(user.id),
-                    user: user
+                    user: _.pick(user, 'id', 'name', 'email')
                 });
 
             });
@@ -241,22 +241,20 @@ module.exports = function(app, db) {
                           nameExists,
                           emailExists
                           ).then(function(errors) {
-            console.log("ERRORS", errors)
             if (!_.isEmpty(errors)) {
                 return res.status(400).json(errors);
             }
-            // encrypt password
-            // generate the user
-            // generate token
-
             db("users")
                 .returning("id")
                 .insert({
                     name: req.body.name,
                     email: req.body.email,
+                    created_at: moment.utc(),
                     password: bcrypt.hashSync(req.body.password, 10) 
             }).then(function(ids) {
-                return db("users").where("id", ids[0]).first("id", "name", "email");
+                return db("users")
+                    .where("id", ids[0])
+                    .first("id", "name", "email");
             }).then(function(user) {
                 var token = generateToken(user.id);
                 return res.json({
