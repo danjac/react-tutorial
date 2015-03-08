@@ -125,13 +125,17 @@ module.exports = function(app, db) {
     });
 
     app.post("/api/login/", function(req, res) {
+        var {identity, password} = req.body;
+        if (!identity || !password) {
+            return res.sendStatus(400);
+        }
         db("users")
-            .where("name", req.body.identity)
-            .orWhere("email", req.body.identity)
+            .where("name", identity)
+            .orWhere("email", identity)
             .first()
             .then(function(user) {
                 // we'll encrypt this password later of course!
-                if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
+                if (!user || !bcrypt.compareSync(password, user.password)) {
                     res.sendStatus(401);
                     return;
                 } 
@@ -231,34 +235,35 @@ module.exports = function(app, db) {
 
     app.post("/api/signup/", function(req, res) {
 
-        validators.signup(req.body.name,
-                          req.body.email, 
-                          req.body.password,
-                          nameExists,
-                          emailExists
-                          ).then(function(errors) {
+        var {name, email, password} = req.body;
+
+        validators.signup(
+            name,
+            email, 
+            password,
+            nameExists,
+            emailExists
+        ).then(function(errors) {
             if (!_.isEmpty(errors)) {
                 return res.status(400).json(errors);
             }
-            db("users")
+            return db("users")
                 .returning("id")
                 .insert({
-                    name: req.body.name,
-                    email: req.body.email,
+                    name: name,
+                    email: email,
                     created_at: moment.utc(),
-                    password: bcrypt.hashSync(req.body.password, 10) 
+                    password: bcrypt.hashSync(password, 10)
             }).then(function(ids) {
                 return db("users")
                     .where("id", ids[0])
                     .first("id", "name", "email");
             }).then(function(user) {
-                var token = jwtToken(user.id);
                 return res.json({
-                    token: token,
+                    token: jwtToken(user.id),
                     user: user
                 });
             });
-
         });
     });
 
