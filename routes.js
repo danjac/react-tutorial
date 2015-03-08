@@ -6,15 +6,16 @@ var moment = require('moment'),
 
 const pageSize = 10;
 
-var generateToken = function(userId){
+var jwtToken = function(userId){
     return jwt.sign({ id: userId }, process.env.SECRET_KEY, {
         expiresInMinutes: 60 * 24
     });
 };
 
 
-var authenticate = function(db) {
-    return function(req, res, next) {
+module.exports = function(app, db) {
+
+    var auth = function(req, res, next) {
 
         var unauthenticated = function() {
             return res.sendStatus(401);
@@ -25,7 +26,8 @@ var authenticate = function(db) {
         }
         db("users")
             .where("id", req.authToken.id)
-            .first("id", "name", "email").then(function(user) {
+            .first("id", "name", "email")
+            .then(function(user) {
                 if (!user) {
                     return unauthenticated();
                 }
@@ -33,81 +35,71 @@ var authenticate = function(db) {
                 next();
             });
     };
-};
 
+    var getPosts = function(page, orderBy, username=null){
 
-var getPosts = function(db, page, orderBy, username=null){
-    // tbd: return a total count of posts
-    // { posts: posts, total: total }
-    // return as promise
+        page = page || 1;
+        orderBy = ["score", "id"].includes(orderBy) ? orderBy : "id";
 
-    page = page || 1;
-    orderBy = ["score", "id"].includes(orderBy) ? orderBy : "id";
+        var offset = ((page - 1) * pageSize);
 
-    var offset = ((page - 1) * pageSize);
+        var result = {
+            isFirst: (page === 1)
+        };
 
-    var result = {
-        isFirst: (page === 1)
+        var posts = db.select(
+            'posts.id',
+            'posts.title',
+            'posts.url',
+            'posts.score',
+            'users.name AS author',
+            'users.id AS author_id'
+        ).from('posts').innerJoin(
+            'users',
+            'users.id',
+            'posts.user_id'
+        );
+
+        if (username) {
+            posts = posts.where("users.name", username);
+        }
+
+        posts = posts.orderBy(
+            'posts.' + orderBy, 'desc'
+        ).limit(pageSize).offset(offset).then(function(posts) {
+            return posts;
+        }).then(function(posts) {
+            result.posts = posts;
+            var total = db("posts").count("id");
+            if (username) {
+                total = total.where("users.name", username);
+            }
+            return total.first();
+        }).then(function(total) {
+            result.total = parseInt(total.count);
+            var numPages = Math.ceil(result.total / pageSize);
+            result.isLast = page == numPages;
+            return result;
+        });
+
+        return posts;
+
     };
 
-    var posts = db.select(
-        'posts.id',
-        'posts.title',
-        'posts.url',
-        'posts.score',
-        'users.name AS author',
-        'users.id AS author_id'
-    ).from('posts').innerJoin(
-        'users',
-        'users.id',
-        'posts.user_id'
-    );
-
-    if (username) {
-        posts = posts.where("users.name", username);
-    }
-
-    posts = posts.orderBy(
-        'posts.' + orderBy, 'desc'
-    ).limit(pageSize).offset(offset).then(function(posts) {
-        return posts;
-    }).then(function(posts) {
-        result.posts = posts;
-        var total = db("posts").count("id");
-        if (username) {
-            total = total.where("users.name", username);
-        }
-        return total.first();
-    }).then(function(total) {
-        result.total = parseInt(total.count);
-        var numPages = Math.ceil(result.total / pageSize);
-        result.isLast = page == numPages;
-        return result;
-    });
-
-    return posts;
-
-};
-
-
-module.exports = function(app, db) {
-
-    var auth = authenticate(db);
-
     app.get("/", function(req, res) {
-        getPosts(db, 1, "score").then(function(result) {
+        getPosts(1, "score").then(function(result) {
             res.reactify("/", result);
         });
     });
 
     app.get("/latest/", function(req, res) {
-        getPosts(db, 1, "id").then(function(result) {
+        getPosts(1, "id").then(function(result) {
             res.reactify("/latest", result);
         });
     });
 
     app.get("/user/:name", function(req, res) {
-        getPosts(db, 1, "score", req.params.name).then(function(result) {
+        getPosts(1, "score", req.params.name).then(function(result) {
             res.reactify("/user/" + req.params.name, result);
         });
     });
@@ -140,7 +132,7 @@ module.exports = function(app, db) {
                     return;
                 } 
                 res.json({
-                    token: generateToken(user.id),
+                    token: jwtToken(user.id),
                     user: _.omit(user, 'password')
                 });
 
@@ -149,14 +141,14 @@ module.exports = function(app, db) {
 
     app.get("/api/posts/", function(req, res) {
         var page = parseInt(req.query.page || 1);
-        getPosts(db, page, req.query.orderBy).then(function(result) {
+        getPosts(page, req.query.orderBy).then(function(result) {
             res.json(result);
         });
     });
 
     app.get("/api/user/:name", function(req, res) {
         var page = parseInt(req.query.page || 1);
-        getPosts(db, page, req.query.orderBy, req.params.name)
+        getPosts(page, req.query.orderBy, req.params.name)
             .then(function(result) {
                 res.json(result);
             });
@@ -256,7 +248,7 @@ module.exports = function(app, db) {
                     .where("id", ids[0])
                     .first("id", "name", "email");
             }).then(function(user) {
-                var token = generateToken(user.id);
+                var token = jwtToken(user.id);
                 return res.json({
                     token: token,
                     user: user
