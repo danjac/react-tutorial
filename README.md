@@ -18,8 +18,8 @@ It's built with the following tech:
 Setup
 -----
 
-1. *npm install*
-1. Create a .env file with the following settings:
+1. **npm install**
+1. Create a *.env* file with the following settings:
 
     NODE_ENV=development
 
@@ -30,7 +30,7 @@ Setup
     SECRET_KEY=seekret
 
 1. Create a *knexfile.js* migrations script (see http://knexjs.org/#Migrations on how to do this)
-1. Run knex migrate:latest
-1. Run babel-node server.js 
+1. **knex migrate:latest**
+1. **Run babel-node server.js**
 1. Open a browser at localhost:3000 and you should be good to go.
 
