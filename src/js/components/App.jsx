@@ -50,6 +50,7 @@ module.exports = React.createClass({
         return (
               <Nav className={className}>
                 <NavItemLink to={this.makeHref("login")}>Login</NavItemLink>
+                <NavItemLink to={this.makeHref("signup")}>Signup</NavItemLink>
               </Nav>
         );
     },

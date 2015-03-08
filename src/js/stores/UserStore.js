@@ -29,6 +29,11 @@ module.exports = Reflux.createStore({
         this.trigger();
     },
 
+    signupSuccess: function(user) {
+        this.user = user;
+        this.trigger();
+    },
+
     logout: function() {
         this.user = null;
         this.trigger();

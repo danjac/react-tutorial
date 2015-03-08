@@ -1,18 +1,24 @@
 var moment = require('moment'),
     jwt = require('jsonwebtoken'),
     _ = require('lodash'),
+    bcrypt = require('bcryptjs'),
     {auth} = require('./middleware'),
     validators = require('./src/js/validators');
 
 const pageSize = 10;
 
+var generateToken = function(userId){
+    return jwt.sign({ id: userId }, process.env.SECRET_KEY, {
+        expiresInMinutes: 60 * 24
+    });
+};
+
+
 var authenticate = function(db) {
     return function(req, res, next) {
+
         var unauthenticated = function() {
-            if (required) {
-                return res.sendStatus(401);
-            } 
-            return next();
+            return res.sendStatus(401);
         }
 
         if (!req.authToken) {
@@ -20,7 +26,7 @@ var authenticate = function(db) {
         }
         db("users")
             .where("id", req.authToken.id)
-            .first().then(function(user) {
+            .first("id", "name", "email").then(function(user) {
                 if (!user) {
                     return unauthenticated();
                 }
@@ -111,6 +117,10 @@ module.exports = function(app, db) {
         res.reactify("/login");
     });
 
+    app.get("/signup/", function(req, res) {
+        res.reactify("/signup");
+    });
+
     app.get("/submit/", function(req, res) {
         res.reactify("/submit");
     });
@@ -123,19 +133,14 @@ module.exports = function(app, db) {
         db("users")
             .where("name", req.body.identity)
             .orWhere("email", req.body.identity)
-            .first().then(function(user) {
+            .first("id", "name", "email").then(function(user) {
                 // we'll encrypt this password later of course!
-                if (!user || user.password !== req.body.password) {
+                if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
                     res.sendStatus(401);
                     return;
                 } 
-
-                var token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, {
-                    expiresInMinutes: 60 * 24
-                });
-
                 res.json({
-                    token: token,
+                    token: generateToken(user.id),
                     user: user
                 });
 
@@ -163,7 +168,7 @@ module.exports = function(app, db) {
             errors = validators.newPost(title, url);
 
         if (!_.isEmpty(errors)) {
-            return res.json(400, errors);
+            return res.status(400).json(errors);
         }
 
         db("posts")
@@ -189,5 +194,79 @@ module.exports = function(app, db) {
                 res.sendStatus(200);
             });
     });
+
+    var nameExists = function(name) {
+        return db("users")
+            .count("id")
+            .where("name", name)
+            .first()
+            .then(function(result){
+                return parseInt(result.count) > 0;
+            });
+    };
+
+    var emailExists = function(email) {
+        return db("users")
+            .count("id")
+            .where("email", email)
+            .first()
+            .then(function(result){
+                return parseInt(result.count) > 0;
+            });
+    };
+
+    app.get("/api/nameexists/", function(req, res) {
+        if (!req.query.name) {
+            return res.sendStatus(400);
+        }
+        nameExists(req.query.name).then(function(exists) {
+            res.json({ exists: exists });
+        });
+    });
+
+    app.get("/api/emailexists/", function(req, res) {
+        if (!req.query.email) {
+            return res.sendStatus(400);
+        }
+        emailExists(req.query.email).then(function(exists) {
+            res.json({ exists: exists });
+        });
+    });
+
+    app.post("/api/signup/", function(req, res) {
+
+        validators.signup(req.body.name,
+                          req.body.email, 
+                          req.body.password,
+                          nameExists,
+                          emailExists
+                          ).then(function(errors) {
+            console.log("ERRORS", errors)
+            if (!_.isEmpty(errors)) {
+                return res.status(400).json(errors);
+            }
+            // encrypt password
+            // generate the user
+            // generate token
+
+            db("users")
+                .returning("id")
+                .insert({
+                    name: req.body.name,
+                    email: req.body.email,
+                    password: bcrypt.hashSync(req.body.password, 10) 
+            }).then(function(ids) {
+                return db("users").where("id", ids[0]).first("id", "name", "email");
+            }).then(function(user) {
+                var token = generateToken(user.id);
+                return res.json({
+                    token: token,
+                    user: user
+                });
+            });
+
+        });
+    });
+
 
 };

@@ -1,5 +1,7 @@
 var Reflux = require('reflux'),
-    request = require('superagent');
+    request = require('superagent'),
+    _ = require('lodash'),
+    validators = require('./validators');
 
 actions = Reflux.createActions([
    "dismissAlert",
@@ -17,18 +19,63 @@ actions = Reflux.createActions([
    "submitPostSuccess",
    "submitPostFailure",
    "deletePost",
-   "deletePostComplete"
+   "deletePostComplete",
+   "signup",
+   "signupSuccess",
+   "signupFailure"
 ]);
  
 
-const AUTH_TOKEN = "authToken";
+const authToken = "authToken";
 
 var bearer = function(request) {
-    var token = window.localStorage.getItem(AUTH_TOKEN);
-    console.log("TOKEN", token);
+    var token = window.localStorage.getItem(authToken);
     if (token) {
         request.set('Authorization', 'Bearer ' + token);
     }
+    return request;
+};
+
+actions.signup.preEmit = function(name, email, password) {
+
+    var nameExists = function(name) {
+        return new Promise(function(resolve, reject) {
+            request.get("/api/nameexists/")
+                .query({ name: name })
+                .end(function(res) {
+                    resolve(res.body.exists);
+                });
+        });
+    };
+
+    var emailExists = function(email) {
+        return new Promise(function(resolve, reject) {
+            request.get("/api/emailexists/")
+                .query({ email: email })
+                .end(function(res) {
+                    resolve(res.body.exists);
+                });
+        });
+    };
+
+    validators.signup(name, email, password, nameExists, emailExists).then(function(errors) {
+        if (!_.isEmpty(errors)) {
+            return actions.signupFailure(errors);
+        }
+        request.post("/api/signup/")
+            .send({
+                name: name,
+                email: email,
+                password: password
+            }).end(function(res) {
+                if (res.badRequest) {
+                    return actions.signupFailure(res.body);
+                }
+
+                window.localStorage.setItem(authToken, res.body.token);
+                actions.signupSuccess(res.body.user);
+            });
+    });
 };
 
 actions.deletePost.preEmit = function(post) {
@@ -57,7 +104,7 @@ actions.submitPost.preEmit = function(title, url) {
 }
 
 actions.logout.preEmit = function() {
-    window.localStorage.removeItem(AUTH_TOKEN);
+    window.localStorage.removeItem(authToken);
 }
 
 actions.login.preEmit = function(identity, password) {
@@ -72,7 +119,7 @@ actions.login.preEmit = function(identity, password) {
                 actions.loginFailure();
                 return;
             }
-            window.localStorage.setItem(AUTH_TOKEN, res.body.token);
+            window.localStorage.setItem(authToken, res.body.token);
             actions.loginSuccess(res.body.user);
         });
 };
@@ -111,5 +158,3 @@ actions.fetchPopularPosts.preEmit = function(page){
 };
 
 module.exports = actions;
-
-

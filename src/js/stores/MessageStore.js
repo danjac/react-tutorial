@@ -49,6 +49,10 @@ module.exports = Reflux.createStore({
 
     loginRequired: function() {
         this.warning("Please login to continue");
+    },
+
+    signupSuccess: function(user) {
+        this.success("Hi " + user.name + "! Welcome to the site!");
     }
 
 });

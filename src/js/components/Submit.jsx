@@ -31,7 +31,7 @@ module.exports = React.createClass({
     },
 
     onSubmitPostSuccess: function() {
-        this.transitionTo("latest");
+        this.transitionTo(this.makeHref("latest"));
     },
 
     handleSubmit: function(event) {
