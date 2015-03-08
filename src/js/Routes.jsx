@@ -11,11 +11,11 @@ var React = require('react'),
 module.exports = (
     <Route handler={App}>
         <DefaultRoute name="popular" handler={Popular} />
-        <Route name="latest" path="latest" handler={Latest} />
-        <Route name="user" path="user/:name" handler={User} />
-        <Route name="login" path="login" handler={Login} />
-        <Route name="signup" path="signup" handler={Signup} />
-        <Route name="submit" path="submit" handler={Submit} />
+        <Route name="latest" path="/latest" handler={Latest} />
+        <Route name="user" path="/user/:name" handler={User} />
+        <Route name="login" path="/login" handler={Login} />
+        <Route name="signup" path="/signup" handler={Signup} />
+        <Route name="submit" path="/submit" handler={Submit} />
     </Route>
 );
 

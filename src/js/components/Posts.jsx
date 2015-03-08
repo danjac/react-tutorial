@@ -25,11 +25,16 @@ module.exports = React.createClass({
         }
     },
 
+
     componentDidMount: function() {
-        this.props.fetchPosts(1);
+        this.hydrate();
     },
 
     componentWillReceiveProps: function() {
+        this.hydrate();
+    },
+
+    hydrate: function() {
         this.props.fetchPosts(1);
     },
 
@@ -71,6 +76,7 @@ module.exports = React.createClass({
 
         var posts = this.state.posts || [];
         var user = this.props.user;
+        var {Link} = Router;
 
         var deleteLink = function(post) {
             var handleDelete = function(event) {
@@ -90,7 +96,7 @@ module.exports = React.createClass({
                         return (
                             <li key={post.id}>
                                 <a href={post.url} target="_blank">{post.title}</a><br />
-                                <small><mark><a href={this.makeHref("user", {name: post.author})}>{post.author}</a></mark>
+                                <small><mark><Link to={this.makeHref("user", {name: post.author})}>{post.author}</Link></mark>
                                 {deleteLink(post)} 
                                 </small>
                             </li> 
