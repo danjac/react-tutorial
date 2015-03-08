@@ -63,10 +63,6 @@ module.exports = React.createClass({
         return errors;
     },
 
-    getInputStyle: function(ref) {
-        if (this.state.errors[ref]) return 'error';
-    },
-
     render: function() {
 
         return (
@@ -76,12 +72,12 @@ module.exports = React.createClass({
                    type="text" 
                    label="Email or username" 
                    help={this.state.errors.identity} 
-                   bsStyle={this.getInputStyle('identity')} />
+                   bsStyle={this.state.errors.identity? 'error': null} />
             <Input ref="password" 
                    type="password" 
                    label="Password" 
                    help={this.state.errors.password} 
-                   bsStyle={this.getInputStyle('password')} />
+                   bsStyle={this.state.errors.password? 'error': null} />
             <Input type="submit" value="Login" />
         </form>
         );

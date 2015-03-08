@@ -48,10 +48,6 @@ module.exports = React.createClass({
         this.setState({ errors: errors });
     },
 
-    getInputStyle: function(ref) {
-        return this.state.errors[ref] ? 'error': undefined;
-    },
-
     render: function() {
         return (
             <form onSubmit={this.handleSubmit}>
@@ -59,13 +55,13 @@ module.exports = React.createClass({
                        type="text" 
                        label="Title" 
                        required
-                       bsStyle={this.getInputStyle('title')} 
+                       bsStyle={this.state.errors.title? 'error': null} 
                        help={this.state.errors.title} />
                 <Input ref="url" 
                        type="text" 
                        label="Link" 
                        required
-                       bsStyle={this.getInputStyle('url')} 
+                       bsStyle={this.state.errors.url? 'error': null} 
                        help={this.state.errors.url} />
                 <Input type="submit" value="Submit post" />
             </form>

@@ -36,13 +36,6 @@ module.exports = React.createClass({
         actions.signup(name, email, password);
     },
 
-    getInputStyle: function(ref) {
-        if (this.state.errors[ref]) {
-            return 'error';
-        }
-        return null;
-    },
-
     render: function() {
 
         return (
@@ -51,19 +44,19 @@ module.exports = React.createClass({
                       type="text" 
                       label="Name" 
                       required
-                      bsStyle={this.getInputStyle("name")}  
+                      bsStyle={this.state.errors.name? 'error': null}  
                       help={this.state.errors.name} />
                <Input ref="email" 
                       type="email" 
                       label="Email address" 
                       required
-                      bsStyle={this.getInputStyle("email")}  
+                      bsStyle={this.state.errors.email? 'error': null}  
                       help={this.state.errors.email} />
                <Input ref="password" 
                       type="password" 
                       label="Password" 
                       required
-                      bsStyle={this.getInputStyle("password")}  
+                      bsStyle={this.state.errors.password? 'error': null}  
                       help={this.state.errors.password} />
                <Input type="submit" value="Signup" />
             </form>
