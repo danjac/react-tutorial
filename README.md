@@ -31,6 +31,6 @@ Setup
 
 1. Create a *knexfile.js* migrations script (see http://knexjs.org/#Migrations on how to do this)
 1. **knex migrate:latest**
-1. **Run babel-node server.js**
-1. Open a browser at localhost:3000 and you should be good to go.
+1. **babel-node server.js**
+1. Open a browser at *localhost:3000* and you should be good to go.
 
