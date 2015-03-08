@@ -50,16 +50,19 @@ module.exports = React.createClass({
                <Input ref="name" 
                       type="text" 
                       label="Name" 
+                      required
                       bsStyle={this.getInputStyle("name")}  
                       help={this.state.errors.name} />
                <Input ref="email" 
                       type="email" 
                       label="Email address" 
+                      required
                       bsStyle={this.getInputStyle("email")}  
                       help={this.state.errors.email} />
                <Input ref="password" 
                       type="password" 
                       label="Password" 
+                      required
                       bsStyle={this.getInputStyle("password")}  
                       help={this.state.errors.password} />
                <Input type="submit" value="Signup" />

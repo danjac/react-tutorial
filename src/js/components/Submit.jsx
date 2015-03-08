@@ -55,8 +55,18 @@ module.exports = React.createClass({
     render: function() {
         return (
             <form onSubmit={this.handleSubmit}>
-                <Input ref="title" type="text" label="Title" bsStyle={this.getInputStyle('title')} help={this.state.errors.title} />
-                <Input ref="url" type="text" label="Link" bsStyle={this.getInputStyle('url')} help={this.state.errors.url} />
+                <Input ref="title" 
+                       type="text" 
+                       label="Title" 
+                       required
+                       bsStyle={this.getInputStyle('title')} 
+                       help={this.state.errors.title} />
+                <Input ref="url" 
+                       type="text" 
+                       label="Link" 
+                       required
+                       bsStyle={this.getInputStyle('url')} 
+                       help={this.state.errors.url} />
                 <Input type="submit" value="Submit post" />
             </form>
         );
