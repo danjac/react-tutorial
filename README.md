@@ -21,13 +21,13 @@ Setup
 1. **npm install**
 1. Create a *.env* file with the following settings:
 
-    NODE_ENV=development
+        NODE_ENV=development
 
-    DB_USER=postgres
-    DB_PASSWORD=mypassword
-    DB_NAME=mydatabasename
+        DB_USER=postgres
+        DB_PASSWORD=mypassword
+        DB_NAME=mydatabasename
 
-    SECRET_KEY=seekret
+        SECRET_KEY=seekret
 
 1. Create a *knexfile.js* migrations script (see http://knexjs.org/#Migrations on how to do this)
 1. **knex migrate:latest**
