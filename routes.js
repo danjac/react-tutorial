@@ -133,7 +133,8 @@ module.exports = function(app, db) {
         db("users")
             .where("name", req.body.identity)
             .orWhere("email", req.body.identity)
-            .first("id", "name", "email", "password").then(function(user) {
+            .first()
+            .then(function(user) {
                 // we'll encrypt this password later of course!
                 if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
                     res.sendStatus(401);
@@ -141,7 +142,7 @@ module.exports = function(app, db) {
                 } 
                 res.json({
                     token: generateToken(user.id),
-                    user: _.pick(user, 'id', 'name', 'email')
+                    user: _.omit(user, 'password')
                 });
 
             });
