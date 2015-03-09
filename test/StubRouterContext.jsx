@@ -1,4 +1,5 @@
 var React = require('react'),
+    _ = require('lodash'),
     func = React.PropTypes.func;
 
 module.exports = function(Component, props, stubs){
@@ -20,7 +21,7 @@ module.exports = function(Component, props, stubs){
     },
 
     getChildContext: function () {
-        return Object.assign({
+        return _.assign({
             makePath: function () {},
             makeHref: function  () {},
             transitionTo: function  () {},
@@ -36,7 +37,7 @@ module.exports = function(Component, props, stubs){
     },
 
     render: function() {
-      return Component.call(props);
+        return <Component {...props} />;
     }
   });
 };

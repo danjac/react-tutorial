@@ -12,14 +12,14 @@ describe('Login component', function() {
             {
                 id: 1,
                 title: 'test',
-                url: 'test',
+                url: 'http://test',
                 author_id: 1,
                 author: 'test'
             },
             {
                 id: 2,
                 title: 'test',
-                url: 'test',
+                url: 'http://test',
                 author_id: 2,
                 author: 'test'
             }
@@ -30,11 +30,15 @@ describe('Login component', function() {
             id: 1,
             name: 'tester'
         };
-        var component = StubRouterContext(Latest, {
+        var Component = StubRouterContext(Latest, {
             posts: posts,
             user: user
         });
-        console.log(component);
+
+        var rendered = TestUtils.renderIntoDocument(<Component />);
+        var node = rendered.getDOMNode();
+        console.log(node)
+
     });
 
 });
