@@ -34,6 +34,7 @@ describe('Login component', function() {
             posts: posts,
             user: user
         });
+        console.log(component);
     });
 
 });
