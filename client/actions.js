@@ -3,7 +3,7 @@ var Reflux = require('reflux'),
     _ = require('lodash'),
     validators = require('./validators');
 
-actions = Reflux.createActions([
+var actions = Reflux.createActions([
    "dismissAlert",
    "fetchLatestPosts",
    "fetchPopularPosts",
