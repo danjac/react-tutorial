@@ -1,6 +1,7 @@
 var React = require('react'),
     Reflux = require('reflux'),
     Router = require('react-router'),
+    _ = require('lodash'),
     {Button, Modal, ModalTrigger, Pager, PageItem} = require('react-bootstrap'),
     PostStore = require('../stores/PostStore'),
     actions = require('../actions');
@@ -16,7 +17,7 @@ var DeletePostModal = React.createClass({
     render: function() {
 
         return (
-            <Modal title="Delete post">
+            <Modal title="Delete post" closeButton={false}>
                 <div className="modal-body">
                     Are you sure you want to delete your post?
                 </div>
@@ -116,16 +117,50 @@ module.exports = React.createClass({
             return '';
         }
 
+        var votingLinks = function(post) {
+            // tbd: check if you've voted
+
+            if (!user || user.id === post.author_id || _.contains(user.votes, post.id)){
+                return '';
+            }
+
+            var handleVoteUp = function(event) { 
+                event.preventDefault();
+                actions.voteUp(post.id) 
+            };
+
+            var handleVoteDown = function(event) { 
+                event.preventDefault();
+                actions.voteDown(post.id) 
+            };
+
+            return (
+                <span>
+                    <a href="#" onClick={handleVoteUp}><i className="glyphicon glyphicon-arrow-up"></i></a>
+                    <a href="#" onClick={handleVoteDown}><i className="glyphicon glyphicon-arrow-down"></i></a>
+                </span>
+            );
+        };
+
         return (
             <div>
                 <ul className="list-unstyled">
                     {posts.map(function(post) {
                         return (
                             <li key={post.id}>
-                                <a href={post.url} target="_blank">{post.title}</a><br />
-                                <small><mark><Link to={this.makeHref("user", {name: post.author})}>{post.author}</Link></mark>
-                                {deleteLink(post)} 
-                                </small>
+                                <div className="row">
+                                    <div className="col-xs-1">
+                                        {votingLinks(post)}
+                                    </div>
+                                    <div className="col-xs-11">
+                                        <a href={post.url} target="_blank">{post.title}</a><br />
+                                        <small>
+                                        <mark><Link to={this.makeHref("user", {name: post.author})}>{post.author}</Link></mark>
+                                        <mark>Score: <b>{post.score}</b></mark>
+                                        {deleteLink(post)} 
+                                        </small>
+                                    </div>
+                                </div>
                             </li> 
                         );
                     }.bind(this))}

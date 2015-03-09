@@ -20,24 +20,44 @@ module.exports = Reflux.createStore({
 
     getUserComplete: function(user) {
         this.user = user;
-        console.log("USERCOMPLETE", this.user);
+        this.user.votes = []; // placeholder
         this.trigger();
     },
 
     loginSuccess: function(user) {
         this.user = user;
+        this.user.votes = []; // placeholder
         this.trigger();
     },
 
     signupSuccess: function(user) {
         this.user = user;
+        this.user.votes = []; // placeholder
         this.trigger();
     },
 
     logout: function() {
         this.user = null;
         this.trigger();
+    },
+
+    tallyVote: function(postId) {
+        if (this.user) {
+            this.user.votes = this.user.votes || []; // placeholder
+        }
+        this.user.votes.push(postId);
+        this.trigger();
+    },
+
+    voteUp: function(postId) {
+        this.tallyVote(postId);
+    },
+
+    voteDown: function(postId) {
+        this.tallyVote(postId);
     }
+
+
 
 });
  

@@ -23,7 +23,9 @@ actions = Reflux.createActions([
    "deletePostComplete",
    "signup",
    "signupSuccess",
-   "signupFailure"
+   "signupFailure",
+   "voteUp",
+   "voteDown"
 ]);
  
 
