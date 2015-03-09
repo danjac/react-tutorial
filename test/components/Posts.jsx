@@ -7,7 +7,7 @@ var React = require('react/addons'),
     TestUtils = React.addons.TestUtils;
 
 describe('Login component', function() {
-    it('should show delete button if user', function() {
+    it('should show correct buttons for a user', function() {
 
         var posts = [
             {
@@ -37,26 +37,23 @@ describe('Login component', function() {
             fetchPosts: function() {}
         });
 
-        var node = TestUtils.renderIntoDocument(<Component />).getDOMNode();
-        var ul = node.getElementsByTagName("ul")[0];
-        var items = ul.getElementsByTagName("li");
+        var component = TestUtils.renderIntoDocument(<Component />);
 
-        var getDeleteLinks = function(links) {
-            return _.filter(links, function(link) {
-                return link.textContent === 'delete';
-            });
-        };
-        
-        // item 1 should have 3 links: url, user, delete
+        // we should have 1 upvote link
         //
 
-        var firstItemLinks = items[0].getElementsByTagName("a");
-        expect(getDeleteLinks(firstItemLinks).length).to.equal(1);
+        var numUpvoteLinks = TestUtils.scryRenderedDOMComponentsWithClass(component, "glyphicon-arrow-up").length;
+        expect(numUpvoteLinks).to.equal(1);
 
-        // item 2 should have just 2 links: url, user
+        // we should have 1 delete link
 
-        var secondItemLinks = items[1].getElementsByTagName("a");
-        expect(getDeleteLinks(secondItemLinks).length).to.equal(0);
+        var node = component.getDOMNode();
+        var links = TestUtils.scryRenderedDOMComponentsWithTag(component, "a");
+        var numDeleteLinks = _.filter(links, function(link) { 
+            return link.props.children === 'delete'; 
+        }).length;
+        expect(numDeleteLinks).to.equal(1);
+
 
     });
 
