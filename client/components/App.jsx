@@ -3,6 +3,7 @@ var  React = require('react'),
      Router = require('react-router'),
      {Alert, Navbar, Nav, NavItem} = require('react-bootstrap'),
      {NavItemLink} = require('react-router-bootstrap'),
+     actions = require('../actions'),
      UserStore = require('../stores/UserStore'),
      MessageStore = require('../stores/MessageStore');
 

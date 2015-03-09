@@ -121,7 +121,7 @@ module.exports = React.createClass({
         var votingLinks = function(post) {
             // tbd: check if you've voted
 
-            if (!user || user.id === post.author_id || _.contains(user.votes, post.id)){
+            if (!user || user.id === post.author_id || _.includes(user.votes, post.id)){
                 return '';
             }
 
