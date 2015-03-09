@@ -60,6 +60,7 @@ module.exports = React.createClass({
     },
 
     hydrate: function() {
+        console.log("PROPS", this.props)
         this.props.fetchPosts(1);
     },
 

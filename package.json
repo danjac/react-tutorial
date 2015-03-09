@@ -26,7 +26,7 @@
     "gulp-shell": "^0.3.0",
     "gulp-sourcemaps": "^1.5.0",
     "gulp-uglify": "^1.1.0",
-    "jsdom": "^4.0.2",
+    "jsdom": "^3.1.2",
     "jsonwebtoken": "^3.2.2",
     "jwt-simple": "^0.2.0",
     "knex": "^0.7.4",
