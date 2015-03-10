@@ -101,8 +101,6 @@ module.exports = React.createClass({
 
     render: function() {
 
-        var posts = this.state.posts || this.props.posts || [];
-
         var user = this.props.user;
         var {Link} = Router;
 
@@ -147,7 +145,7 @@ module.exports = React.createClass({
         return (
             <div>
                 <ul className="list-unstyled">
-                    {posts.map(function(post) {
+                    {this.state.posts.map(function(post) {
                         return (
                             <li key={post.id}>
                                 <div className="row">
