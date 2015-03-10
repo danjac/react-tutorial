@@ -29,9 +29,6 @@ describe('Login component', function() {
 
         ];
 
-        actions.fetchLatestPosts = sinon.spy();
-
-
         var user = {
             id: 1,
             name: 'tester'
@@ -39,6 +36,10 @@ describe('Login component', function() {
         var Component = StubRouterContext(Posts, {
             posts: posts,
             user: user,
+            total: 2,
+            isFirst: true,
+            isLast: true,
+            isServer: true,
             fetchPosts: function() {}
         });
 
