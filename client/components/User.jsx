@@ -2,14 +2,14 @@ var React = require('react'),
     Router = require('react-router'),
     _ = require('lodash'),
     actions = require('../actions'),
-    PostsMixin = require('./PostsMixin');
+    {PostsPage} = require('./Mixins');
 
 
 module.exports = React.createClass({
 
     mixins: [
         Router.State,
-        PostsMixin
+        PostsPage
     ],
 
     getInitialState: function() {

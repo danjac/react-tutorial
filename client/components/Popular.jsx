@@ -1,11 +1,11 @@
 var React = require('react'),
     actions = require('../actions'),
-    PostsMixin = require('./PostsMixin');
+    {PostsPage} = require('./Mixins');
 
 module.exports = React.createClass({
 
     mixins: [
-        PostsMixin
+        PostsPage
     ],
 
     fetchPosts: function(page) {

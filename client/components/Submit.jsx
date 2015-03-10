@@ -3,10 +3,9 @@ var React = require('react'),
     Router = require('react-router'),
     {Input} = require('react-bootstrap'),
     _ = require('lodash'),
-    {Authenticate} = require('../mixins'),
+    {Authenticate} = require('./Mixins'),
     validators = require('../validators'),
     actions = require('../actions');
-
 
 
 module.exports = React.createClass({
