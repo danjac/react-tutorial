@@ -48,15 +48,13 @@ module.exports = React.createClass({
     ],
 
     getInitialState: function() {
-        if (this.props.isServer) {
-            return {
+        return _.defaults(
+            {
                 posts: this.props.posts,
                 total: this.props.total,
                 isFirst: this.props.isFirst,
                 isLast: this.props.isLast
-            }
-        }
-        return PostStore.getDefaultData();
+            }, PostStore.getDefaultData());
     },
 
     componentDidMount: function() {
