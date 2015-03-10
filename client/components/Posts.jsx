@@ -1,4 +1,5 @@
 var React = require('react'),
+    {PropTypes} = React,
     Reflux = require('reflux'),
     Router = require('react-router'),
     _ = require('lodash'),
@@ -17,7 +18,7 @@ var DeletePostModal = React.createClass({
     render: function() {
 
         return (
-            <Modal title="Delete post" closeButton={false}>
+            <Modal title="Delete post" closeButton={false} onRequestHide={null}>
                 <div className="modal-body">
                     Are you sure you want to delete your post?
                 </div>
@@ -33,34 +34,36 @@ var DeletePostModal = React.createClass({
 
 module.exports = React.createClass({
 
+    propTypes: {
+        posts: PropTypes.array,
+        total: PropTypes.number,
+        isFirst: PropTypes.bool,
+        isLast: PropTypes.bool,
+        user: PropTypes.object
+    },
+
     mixins: [
         Router.Navigation,
         Reflux.listenTo(PostStore, 'onUpdate')
     ],
 
     getInitialState: function() {
+        if (this.props.isServer) {
+            return {
+                posts: this.props.posts,
+                total: this.props.total,
+                isFirst: this.props.isFirst,
+                isLast: this.props.isLast
+            }
+        }
         return PostStore.getDefaultData();
     },
 
-    componentWillMount: function() {
-        // by default use props
-        var posts = this.props.posts;
-        if (posts !== undefined) {
-            this.setState({ posts: posts });
-        }
-    },
-
-
     componentDidMount: function() {
-        this.hydrate();
+        this.props.fetchPosts(1);
     },
 
     componentWillReceiveProps: function() {
-        this.hydrate();
-    },
-
-    hydrate: function() {
-        console.log("PROPS", this.props)
         this.props.fetchPosts(1);
     },
 
@@ -100,7 +103,8 @@ module.exports = React.createClass({
 
     render: function() {
 
-        var posts = this.state.posts || [];
+        var posts = this.state.posts || this.props.posts || [];
+
         var user = this.props.user;
         var {Link} = Router;
 
@@ -119,7 +123,6 @@ module.exports = React.createClass({
         }
 
         var votingLinks = function(post) {
-            // tbd: check if you've voted
 
             if (!user || user.id === post.author_id || _.includes(user.votes, post.id)){
                 return '';

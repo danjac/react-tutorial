@@ -12,8 +12,6 @@ module.exports = React.createClass({
     },
 
     render: function() {
-        return <Posts posts={this.props.posts} 
-                      fetchPosts={this.fetchPosts} 
-                      user={this.props.user} />
+        return <Posts fetchPosts={this.fetchPosts} {...this.props} />;
     }
 });

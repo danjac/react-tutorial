@@ -1,14 +1,16 @@
 var React = require('react/addons'),
     Router = require('react-router'),
-    Posts = require('../../client/components/Posts'),
-    StubRouterContext = require('../StubRouterContext'),
+    sinon = require('sinon'),
     {expect} = require('chai'),
     _ = require('lodash'),
-    TestUtils = React.addons.TestUtils;
+    TestUtils = React.addons.TestUtils,
+    Posts = require('../../client/components/Posts'),
+    StubRouterContext = require('../StubRouterContext');
 
 describe('Login component', function() {
-    it('should show correct buttons for a user', function() {
 
+    it('should show correct buttons for a user', function() {
+        var actions = require('../../client/actions');
         var posts = [
             {
                 id: 1,
@@ -26,6 +28,9 @@ describe('Login component', function() {
             }
 
         ];
+
+        actions.fetchLatestPosts = sinon.spy();
+
 
         var user = {
             id: 1,

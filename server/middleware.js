@@ -12,6 +12,8 @@ module.exports = {
                 props = props || {};
                 opts = opts = {};
 
+                props.isServer = true;
+
                 var router = Router.create({
                     routes: routes,
                     location: route,

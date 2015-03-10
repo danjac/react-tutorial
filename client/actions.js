@@ -142,12 +142,14 @@ actions.getUser.preEmit = function() {
 
 var fetchPosts = function(page, orderBy) {
 
+
     request.get('/api/posts/')
         .query({
             page: page,
             orderBy: orderBy
         }) 
-        .end(function(res) {
+        .end(function(res) {        
+            console.log("OK")
             actions.fetchPostsComplete(page, res.body);
         });
 };
