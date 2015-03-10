@@ -50,7 +50,7 @@ module.exports = React.createClass({
      
     handleLastPageClick: function(event) {
         event.preventDefault();
-        if (this.state.isFirst) {
+        if (this.props.isFirst) {
             return;
         }
         this.handlePageClick(this.props.page - 1);
@@ -58,7 +58,7 @@ module.exports = React.createClass({
 
     handleNextPageClick: function(event) {
         event.preventDefault();
-        if (this.state.isLast) {
+        if (this.props.isLast) {
             return;
         }
         this.handlePageClick(this.props.page + 1);
