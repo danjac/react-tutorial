@@ -41,20 +41,20 @@ module.exports = Reflux.createStore({
         this.trigger();
     },
 
-    tallyVote: function(postId) {
+    tallyVote: function(post) {
         if (this.user) {
             this.user.votes = this.user.votes || []; // placeholder
         }
-        this.user.votes.push(postId);
+        this.user.votes.push(post.id);
         this.trigger();
     },
 
-    voteUp: function(postId) {
-        this.tallyVote(postId);
+    voteUp: function(post) {
+        this.tallyVote(post);
     },
 
-    voteDown: function(postId) {
-        this.tallyVote(postId);
+    voteDown: function(post) {
+        this.tallyVote(post);
     }
 
 

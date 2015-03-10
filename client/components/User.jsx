@@ -7,9 +7,25 @@ module.exports = React.createClass({
 
     mixins: [Router.State],
 
-    fetchPosts: function(page) {
-        actions.fetchPostsForUser(page, this.getParams().name);
+    getInitialState: function() {
+        return {
+            name: this.getParams().name
+        };
     },
+
+    fetchPosts: function(page) {
+        actions.fetchPostsForUser(page, this.state.name);
+    },
+
+
+    componentWillReceiveProps: function(nextProps) {
+        var name = this.getParams().name;
+        if (name != this.state.name){
+            this.setState({ name: name});
+            actions.fetchPostsForUser(1, name);
+        }
+    },
+
 
     render: function() {
         return <Posts fetchPosts={this.fetchPosts} {...this.props} />;

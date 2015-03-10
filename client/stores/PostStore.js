@@ -31,6 +31,27 @@ module.exports = Reflux.createStore({
         this._trigger();
     },
 
+    adjustScore: function(id, amount) {
+
+        var posts = _.forEach(this.posts, function(post) {
+            if (post.id == id){
+                post.score += amount;
+            }
+        });
+
+        this.posts = posts;
+        this._trigger();
+    },
+
+    voteUp: function(post) {
+        this.adjustScore(post.id, 1);
+    },
+
+    voteDown: function(post) {
+        this.adjustScore(post.id, -1);
+    },
+
+
     fetchPostsComplete: function(page, result) {
         this.page = page;
         this.posts = result.posts;

@@ -61,14 +61,10 @@ module.exports = React.createClass({
         this.props.fetchPosts(1);
     },
 
-    componentWillReceiveProps: function() {
-        this.props.fetchPosts(1);
-    },
-
     handlePageClick: function(page) {
         this.props.fetchPosts(page);
     },
-    
+     
     handleLastPageClick: function(event) {
         event.preventDefault();
         if (this.state.isFirst) {
@@ -126,12 +122,12 @@ module.exports = React.createClass({
 
             var handleVoteUp = function(event) { 
                 event.preventDefault();
-                actions.voteUp(post.id) 
+                actions.voteUp(post);
             };
 
             var handleVoteDown = function(event) { 
                 event.preventDefault();
-                actions.voteDown(post.id) 
+                actions.voteDown(post); 
             };
 
             return (
