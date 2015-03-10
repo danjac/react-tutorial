@@ -13,7 +13,7 @@ It's built with the following tech:
 - Reflux
 - Bootstrap
 - Knex+Postgresql
-- Jest
+- Mocha
 
 Setup
 -----
