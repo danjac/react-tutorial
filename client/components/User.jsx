@@ -1,11 +1,16 @@
 var React = require('react'),
     Router = require('react-router'),
-    Posts = require('./Posts'),
-    actions = require('../actions');
+    _ = require('lodash'),
+    actions = require('../actions'),
+    PostsMixin = require('./PostsMixin');
+
 
 module.exports = React.createClass({
 
-    mixins: [Router.State],
+    mixins: [
+        Router.State,
+        PostsMixin
+    ],
 
     getInitialState: function() {
         return {
@@ -17,17 +22,12 @@ module.exports = React.createClass({
         actions.fetchPostsForUser(page, this.state.name);
     },
 
-
     componentWillReceiveProps: function(nextProps) {
         var name = this.getParams().name;
         if (name != this.state.name){
             this.setState({ name: name});
             actions.fetchPostsForUser(1, name);
         }
-    },
-
-
-    render: function() {
-        return <Posts fetchPosts={this.fetchPosts} {...this.props} />;
     }
+
 });

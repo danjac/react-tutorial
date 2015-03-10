@@ -1,15 +1,15 @@
 var React = require('react'),
-    Posts = require('./Posts'),
-    actions = require('../actions');
-
+    actions = require('../actions'),
+    PostsMixin = require('./PostsMixin');
 
 module.exports = React.createClass({
 
+    mixins: [
+        PostsMixin
+    ],
+
     fetchPosts: function(page) {
         actions.fetchLatestPosts(page);
-    },
-
-    render: function() {
-        return <Posts fetchPosts={this.fetchPosts} {...this.props} />;
     }
+
 });

@@ -1,10 +1,8 @@
 var React = require('react'),
     {PropTypes} = React,
-    Reflux = require('reflux'),
     Router = require('react-router'),
     _ = require('lodash'),
     {Button, Modal, ModalTrigger, Pager, PageItem} = require('react-bootstrap'),
-    PostStore = require('../stores/PostStore'),
     actions = require('../actions');
 
 
@@ -41,25 +39,10 @@ module.exports = React.createClass({
         isLast: PropTypes.bool,
         user: PropTypes.object
     },
-
     mixins: [
-        Router.Navigation,
-        Reflux.listenTo(PostStore, 'onUpdate')
+        Router.Navigation
     ],
 
-    getInitialState: function() {
-        return _.defaults(
-            {
-                posts: this.props.posts,
-                total: this.props.total,
-                isFirst: this.props.isFirst,
-                isLast: this.props.isLast
-            }, PostStore.getDefaultData());
-    },
-
-    componentDidMount: function() {
-        this.props.fetchPosts(1);
-    },
 
     handlePageClick: function(page) {
         this.props.fetchPosts(page);
@@ -70,7 +53,7 @@ module.exports = React.createClass({
         if (this.state.isFirst) {
             return;
         }
-        this.handlePageClick(this.state.page - 1);
+        this.handlePageClick(this.props.page - 1);
     },
 
     handleNextPageClick: function(event) {
@@ -78,18 +61,14 @@ module.exports = React.createClass({
         if (this.state.isLast) {
             return;
         }
-        this.handlePageClick(this.state.page + 1);
-    },
-
-    onUpdate: function(data) {
-        this.setState(data);
+        this.handlePageClick(this.props.page + 1);
     },
 
     renderPager: function () {
         return (
             <Pager>
-                <PageItem previous onClick={this.handleLastPageClick} disabled={this.state.isFirst}>&larr; Previous</PageItem>
-                <PageItem next onClick={this.handleNextPageClick} disabled={this.state.isLast}>&rarr; Next</PageItem>
+                <PageItem previous onClick={this.handleLastPageClick} disabled={this.props.isFirst}>&larr; Previous</PageItem>
+                <PageItem next onClick={this.handleNextPageClick} disabled={this.props.isLast}>&rarr; Next</PageItem>
             </Pager>
         );
 
@@ -141,7 +120,7 @@ module.exports = React.createClass({
         return (
             <div>
                 <ul className="list-unstyled">
-                    {this.state.posts.map(function(post) {
+                    {this.props.posts.map(function(post) {
                         return (
                             <li key={post.id}>
                                 <div className="row">
