@@ -29,7 +29,9 @@ var dest = {
 
 gulp.task('build-src', function() {
     gulp.src(srcDir + '/app.js')
+        .pipe(plumber())
         .pipe(sourcemaps.init())
+        .pipe(concat('app.js'))
         .pipe(babel())
         .pipe(browserify({
             cache: {},
@@ -43,9 +45,7 @@ gulp.task('build-src', function() {
             extensions: ['.js', '.jsx']
         }))
         .pipe(uglify())
-        .pipe(plumber())
-        .pipe(concat('app.js'))
-        .pipe(sourcemaps.write())
+        .pipe(sourcemaps.write(dest.js))
         .pipe(gulp.dest(dest.js));
 
 });
