@@ -76,10 +76,9 @@ module.exports = React.createClass({
 
     render: function() {
 
-        var user = this.props.user;
         var {Link} = Router;
 
-        var deleteLink = function(post) {
+        var deleteLink = function(post, user) {
             if (user && post.author_id === user.id) {
 
                 var modal = <DeletePostModal post={post} />;
@@ -93,7 +92,7 @@ module.exports = React.createClass({
             return '';
         }
 
-        var votingLinks = function(post) {
+        var votingLinks = function(post, user) {
 
             if (!user || user.id === post.author_id || _.includes(user.votes, post.id)){
                 return '';
@@ -125,14 +124,14 @@ module.exports = React.createClass({
                             <li key={post.id}>
                                 <div className="row">
                                     <div className="col-xs-1">
-                                        {votingLinks(post)}
+                                        {votingLinks(post, this.props.user)}
                                     </div>
                                     <div className="col-xs-11">
                                         <a href={post.url} target="_blank">{post.title}</a><br />
                                         <small>
                                         <mark><Link to={this.makeHref("user", {name: post.author})}>{post.author}</Link></mark>
                                         <mark>Score: <b>{post.score}</b></mark>
-                                        {deleteLink(post)} 
+                                        {deleteLink(post, this.props.user)} 
                                         </small>
                                     </div>
                                 </div>
