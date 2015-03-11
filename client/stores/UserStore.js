@@ -20,7 +20,9 @@ module.exports = Reflux.createStore({
 
     getUserComplete: function(user) {
         this.user = user;
-        this.user.votes = []; // placeholder
+        if (this.user) { 
+            this.user.votes = []; // placeholder
+        }
         this.trigger();
     },
 

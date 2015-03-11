@@ -3,15 +3,52 @@ var React = require('react/addons'),
     sinon = require('sinon'),
     {expect} = require('chai'),
     _ = require('lodash'),
+    Immutable = require('immutable'),
     TestUtils = React.addons.TestUtils,
     Posts = require('../../client/components/Posts'),
     StubRouterContext = require('../StubRouterContext');
 
-describe('Login component', function() {
+describe('Posts component', function() {
+
+    it('should show no buttons for an anonymous user', function(){
+        var posts = Immutable.List([
+            {
+                id: 1,
+                title: 'test',
+                url: 'http://test',
+                author_id: 1,
+                author: 'test'
+            }
+        ]);
+
+        var Component = StubRouterContext(Posts, {
+            posts: posts,
+            user: null,
+            total: 1,
+            isFirst: true,
+            isLast: true,
+            isServer: true,
+            fetchPosts: function() {}
+        });
+
+        var component = TestUtils.renderIntoDocument(<Component />);
+
+        var numUpvoteLinks = TestUtils.scryRenderedDOMComponentsWithClass(component, "glyphicon-arrow-up").length;
+        expect(numUpvoteLinks).to.equal(0);
+
+        // we should have 1 delete link
+
+        var node = component.getDOMNode();
+        var links = TestUtils.scryRenderedDOMComponentsWithTag(component, "a");
+        var numDeleteLinks = _.filter(links, function(link) { 
+            return link.props.children === 'delete'; 
+        }).length;
+        expect(numDeleteLinks).to.equal(0);
+ 
+    });
 
     it('should show correct buttons for a user', function() {
-        var actions = require('../../client/actions');
-        var posts = [
+        var posts = Immutable.List([
             {
                 id: 1,
                 title: 'test',
@@ -27,7 +64,7 @@ describe('Login component', function() {
                 author: 'test'
             }
 
-        ];
+        ]);
 
         var user = {
             id: 1,

@@ -2,6 +2,7 @@ var moment = require('moment'),
     jwt = require('jsonwebtoken'),
     _ = require('lodash'),
     bcrypt = require('bcryptjs'),
+    Immutable = require('immutable'),
     validators = require('../client/validators');
 
 const pageSize = 10;
@@ -69,7 +70,7 @@ module.exports = function(app, db) {
         ).limit(pageSize).offset(offset).then(function(posts) {
             return posts;
         }).then(function(posts) {
-            result.posts = posts;
+            result.posts = Immutable.List(posts);
             var q = db("posts").count("posts.id");
             if (username) {
                 q = q.innerJoin(

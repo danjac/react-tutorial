@@ -33,7 +33,7 @@ var DeletePostModal = React.createClass({
 module.exports = React.createClass({
 
     propTypes: {
-        posts: PropTypes.array,
+        posts: PropTypes.object,
         total: PropTypes.number,
         isFirst: PropTypes.bool,
         isLast: PropTypes.bool,
@@ -77,8 +77,9 @@ module.exports = React.createClass({
     render: function() {
 
         var {Link} = Router;
+        var user = this.props.user;
 
-        var deleteLink = function(post, user) {
+        var deleteLink = function(post) {
             if (user && post.author_id === user.id) {
 
                 var modal = <DeletePostModal post={post} />;
@@ -92,7 +93,7 @@ module.exports = React.createClass({
             return '';
         }
 
-        var votingLinks = function(post, user) {
+        var votingLinks = function(post) {
 
             if (!user || user.id === post.author_id || _.includes(user.votes, post.id)){
                 return '';
@@ -122,22 +123,18 @@ module.exports = React.createClass({
                     {this.props.posts.map(function(post) {
                         return (
                             <li key={post.id}>
-                                <div className="row">
-                                    <div className="col-xs-1">
-                                        {votingLinks(post, this.props.user)}
-                                    </div>
-                                    <div className="col-xs-11">
-                                        <a href={post.url} target="_blank">{post.title}</a><br />
-                                        <small>
-                                        <mark><Link to={this.makeHref("user", {name: post.author})}>{post.author}</Link></mark>
-                                        <mark>Score: <b>{post.score}</b></mark>
-                                        {deleteLink(post, this.props.user)} 
-                                        </small>
-                                    </div>
-                                </div>
+                                <a href={post.url} target="_blank">{post.title}</a>
+                                {votingLinks(post)}<br />
+                                <small>
+                                    <mark>
+                                        <Link to={this.makeHref("user", {name: post.author})}>{post.author}</Link>
+                                    </mark>
+                                    <mark>Score: <b>{post.score}</b></mark>
+                                    {deleteLink(post)} 
+                                </small>
                             </li> 
                         );
-                    }.bind(this))}
+                    }.bind(this)).toJS()}
                 </ul>
                 {this.renderPager()}
             </div>

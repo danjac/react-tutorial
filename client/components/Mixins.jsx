@@ -1,6 +1,5 @@
 var React = require('react'),
     Reflux = require('reflux'),
-    _ = require('lodash'),
     Posts = require('./Posts'),
     actions = require('../actions'),
     UserStore = require('../stores/UserStore'),
@@ -26,7 +25,7 @@ module.exports = {
         ],
 
         getInitialState: function() {
-            return _.defaults(this.props, PostStore.getDefaultData());
+            return PostStore.getDefaultData(this.props);
         },
 
         componentDidMount: function() {
