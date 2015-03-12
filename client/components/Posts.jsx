@@ -117,21 +117,32 @@ module.exports = React.createClass({
             );
         };
 
+        var links = function(post) {
+            return (
+                <span>
+                    {deleteLink(post)}
+                    {votingLinks(post)}
+                </span>
+            );
+        };
+
         return (
             <div>
                 <ul className="list-unstyled">
                     {this.props.posts.map(function(post) {
                         return (
                             <li key={post.id}>
-                                <a href={post.url} target="_blank">{post.title}</a>
-                                {votingLinks(post)}<br />
-                                <small>
-                                    <mark>
-                                        <Link to={this.makeHref("user", {name: post.author})}>{post.author}</Link>
-                                    </mark>
-                                    <mark>Score: <b>{post.score}</b></mark>
-                                    {deleteLink(post)} 
-                                </small>
+                                <b><a href={post.url} target="_blank">{post.title}</a></b>
+                                <div>
+
+                                    <small>
+                                        <mark>
+                                            <Link to={this.makeHref("user", {name: post.author})}>{post.author}</Link>
+                                            &nbsp; Score: <b>{post.score}</b>
+                                            &nbsp; {links(post)} 
+                                        </mark>
+                                    </small>
+                                </div>
                             </li> 
                         );
                     }.bind(this)).toJS()}

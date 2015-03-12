@@ -63,11 +63,11 @@ module.exports = React.createClass({
     render: function(){
 
         var navbar = (
-            <Navbar brand="React tutorial" className="navbar navbar-inverse" fixedTop={true} fluid={true}>
+            <Navbar brand="ReactNews" className="navbar navbar-inverse" fixedTop={true} fluid={true}>
               <Nav className="navbar-left">
                 <NavItemLink to={this.makeHref("popular")}>Top</NavItemLink>
                 <NavItemLink to={this.makeHref("latest")}>New</NavItemLink>
-                <NavItemLink to={this.makeHref("submit")}>Submit a post</NavItemLink>
+                <NavItemLink to={this.makeHref("submit")}>Submit</NavItemLink>
               </Nav>
               {this.getRightNav()}
             </Navbar>

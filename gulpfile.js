@@ -10,6 +10,7 @@ var browserify = require('gulp-browserify'),
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify'),
     sourcemaps = require('gulp-sourcemaps'),
+    browserSync = require('browser-sync'),
     es6ify = require('es6ify');
 
 var staticDir = './public',
@@ -26,6 +27,12 @@ var dest = {
     fonts: staticDir + '/fonts'
 };
 
+
+gulp.task('serve', function() {
+    browserSync({
+        proxy: 'http://localhost:3000'
+    });
+});
 
 gulp.task('build-src', function() {
     gulp.src(srcDir + '/app.js')
@@ -75,7 +82,7 @@ gulp.task('install', shell.task([
     'bower install'
 ]));
 
-gulp.task('default', function() {
+gulp.task('default', ['serve'], function() {
     gulp.start('install', 'pkg', 'build-src');
-    gulp.watch(srcDir + '/**', {}, ['build-src']);
+    gulp.watch(srcDir + '/**', {}, ['build-src', browserSync.reload]);
 });

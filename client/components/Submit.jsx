@@ -48,6 +48,7 @@ module.exports = React.createClass({
     },
 
     render: function() {
+
         return (
             <form onSubmit={this.handleSubmit}>
                 <Input ref="title" 
@@ -59,6 +60,7 @@ module.exports = React.createClass({
                 <Input ref="url" 
                        type="text" 
                        label="Link" 
+                       placeholder="Enter a valid URL starting with http:// or https://"
                        required
                        bsStyle={this.state.errors.url? 'error': null} 
                        help={this.state.errors.url} />
