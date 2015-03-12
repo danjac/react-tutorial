@@ -8,7 +8,7 @@ module.exports = Reflux.createStore({
 
     listenables: actions,
     
-    init: function() {
+    init() {
         this.posts = Immutable.List();
         this.page = 1;
         this.total = 0;
@@ -16,7 +16,7 @@ module.exports = Reflux.createStore({
         this.isLast = true;
     },
 
-    _trigger: function() {
+    _trigger() {
         this.trigger({
             posts: this.posts,
             page: this.page,
@@ -25,18 +25,18 @@ module.exports = Reflux.createStore({
         });
     },
 
-    indexOf: function(post) {
+    indexOf(post) {
         return this.posts.findIndex(function(p) {
             return p.id === post.id;
         });
     },
 
-    deletePost: function(post) {
+    deletePost(post) {
         this.posts = this.posts.delete(this.indexOf(post));
         this._trigger();
     },
 
-    adjustScore: function(post, amount) {
+    adjustScore(post, amount) {
         this.posts = this.posts.update(this.indexOf(post), function(post) {
             post.score += amount;
             return post;
@@ -44,16 +44,16 @@ module.exports = Reflux.createStore({
         this._trigger();
     },
 
-    voteUp: function(post) {
+    voteUp(post) {
         this.adjustScore(post, 1);
     },
 
-    voteDown: function(post) {
+    voteDown(post) {
         this.adjustScore(post, -1);
     },
 
 
-    fetchPostsComplete: function(page, result) {
+    fetchPostsComplete(page, result) {
         this.page = page;
         this.posts = Immutable.List(result.posts);
         this.isFirst = result.isFirst;
@@ -62,7 +62,7 @@ module.exports = Reflux.createStore({
         this._trigger();
     },
 
-    getDefaultData: function(defaults) {
+    getDefaultData(defaults) {
         defaults =  _.defaults(
             defaults || {}, {
                 posts: this.posts,

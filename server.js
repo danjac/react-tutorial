@@ -10,16 +10,16 @@ var express = require('express'),
     {reactify} = require('./server/middleware');
 
 // import JSX
-require('node-jsx').install();
+//require('node-jsx').install();
 var jsxRoutes = require('./client/Routes');
 
 var app = express();
 
-require('dotenv').load()
+require('dotenv').load();
 
 // all environments
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 5000
 
 app.set('port', port);
 app.set('views', path.join(__dirname, '/server/views'));

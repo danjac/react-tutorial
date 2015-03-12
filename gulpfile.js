@@ -1,7 +1,5 @@
 var browserify = require('gulp-browserify'),
-    babel = require('gulp-babel'),
     bowerFiles = require('main-bower-files'),
-    watchify = require('watchify'),
     gulp = require('gulp'),
     plumber = require('gulp-plumber'),
     shell = require('gulp-shell'),
@@ -10,14 +8,13 @@ var browserify = require('gulp-browserify'),
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify'),
     sourcemaps = require('gulp-sourcemaps'),
-    browserSync = require('browser-sync'),
-    es6ify = require('es6ify');
+    browserSync = require('browser-sync');
 
 var staticDir = './public',
     srcDir = './client',
     watch = false,
     cssFilter = gulpFilter('*.css'),
-    jsFilter = gulpFilter(['*.js', '*.jsx']),
+    jsFilter = gulpFilter('*.js'),
     fontFilter = gulpFilter(['*.eot', '*.woff', '*.svg', '*.ttf']);
 
 
@@ -30,7 +27,7 @@ var dest = {
 
 gulp.task('serve', function() {
     browserSync({
-        proxy: 'http://localhost:3000'
+        proxy: 'http://localhost:5000'
     });
 });
 
@@ -39,7 +36,6 @@ gulp.task('build-src', function() {
         .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(concat('app.js'))
-        .pipe(babel())
         .pipe(browserify({
             cache: {},
             packageCache: {},
@@ -47,7 +43,7 @@ gulp.task('build-src', function() {
             transform: [
                 "reactify",
                 "envify",
-                es6ify.configure(/.jsx/)
+                "babelify"
             ],
             extensions: ['.js', '.jsx']
         }))

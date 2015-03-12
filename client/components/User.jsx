@@ -12,17 +12,17 @@ module.exports = React.createClass({
         PostsPage
     ],
 
-    getInitialState: function() {
+    getInitialState() {
         return {
             name: this.getParams().name
         };
     },
 
-    fetchPosts: function(page) {
+    fetchPosts(page) {
         actions.fetchPostsForUser(page, this.state.name);
     },
 
-    componentWillReceiveProps: function(nextProps) {
+    componentWillReceiveProps(nextProps) {
         var name = this.getParams().name;
         if (name != this.state.name){
             this.setState({ name: name});

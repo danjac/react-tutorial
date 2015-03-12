@@ -3,11 +3,11 @@ var React = require('react'),
 
 module.exports = {
 
-    reactify: function(routes) {
+    reactify(routes) {
 
-        return function(req, res, next) {
+        return (req, res, next) => {
 
-            res.reactify = function(route, props, opts){
+            res.reactify = (route, props, opts) => {
 
                 props = props || {};
                 opts = opts = {};
@@ -15,12 +15,10 @@ module.exports = {
                 var router = Router.create({
                     routes: routes,
                     location: route,
-                    onError: function(err) {
-                        next(err);
-                    },
-                    onAbort: function(abortReason) {
+                    onError: (err) => next(err),
+                    onAbort: (abortReason) => {
                         if (abortReason.constructor.name === 'Redirect') {
-                            var url = router.makePath(
+                            let url = router.makePath(
                                 abortReason.to, 
                                 abortReason.params, 
                                 abortReason.query
@@ -32,7 +30,7 @@ module.exports = {
                     }
                 });
 
-                router.run(function(Handler, state) {
+                router.run((Handler, state) => {
                     res.render(opts.template || 'index', {
                         markup: React.renderToString(Handler(props)),
                         data: JSON.stringify(props)

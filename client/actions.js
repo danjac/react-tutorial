@@ -31,7 +31,7 @@ var actions = Reflux.createActions([
 
 const authToken = "authToken";
 
-var bearer = function(request) {
+const bearer = (request) => {
     var token = window.localStorage.getItem(authToken);
     if (token) {
         request.set('Authorization', 'Bearer ' + token);
@@ -39,29 +39,26 @@ var bearer = function(request) {
     return request;
 };
 
-actions.signup.preEmit = function(name, email, password) {
+actions.signup.preEmit = (name, email, password) => {
 
-    var nameExists = function(name) {
-        return new Promise(function(resolve, reject) {
+    var nameExists = (name) => {
+        return new Promise((resolve, reject) => {
             request.get("/api/nameexists/")
                 .query({ name: name })
-                .end(function(res) {
-                    resolve(res.body.exists);
-                });
+                .end((res) => resolve(res.body.exists));
         });
     };
 
-    var emailExists = function(email) {
-        return new Promise(function(resolve, reject) {
+    var emailExists = (email) => {
+        return new Promise((resolve, reject) => {
             request.get("/api/emailexists/")
                 .query({ email: email })
-                .end(function(res) {
-                    resolve(res.body.exists);
-                });
+                .end((res) => resolve(res.body.exists));
         });
     };
 
-    validators.signup(name, email, password, nameExists, emailExists).then(function(errors) {
+    validators.signup(name, email, password, nameExists, emailExists)
+        .then((errors) => {
         if (!_.isEmpty(errors)) {
             return actions.signupFailure(errors);
         }
@@ -70,7 +67,7 @@ actions.signup.preEmit = function(name, email, password) {
                 name: name,
                 email: email,
                 password: password
-            }).end(function(res) {
+            }).end((res) => {
                 if (res.badRequest) {
                     return actions.signupFailure(res.body);
                 }
@@ -81,94 +78,81 @@ actions.signup.preEmit = function(name, email, password) {
     });
 };
 
-actions.deletePost.preEmit = function(post) {
+actions.deletePost.preEmit = (post) => {
     request.del("/api/" + post.id)
         .use(bearer)
-        .end(function() {
-            actions.deletePostComplete(post);
-        });
+        .end(() =>  actions.deletePostComplete(post));
 };
 
-actions.submitPost.preEmit = function(title, url) {
+actions.submitPost.preEmit = (title, url) => {
     request.post("/api/submit/")
         .use(bearer)
         .send({
             title: title,
             url: url
         })
-        .end(function(res) {
+        .end((res) => {
             if (res.unauthorized || res.badRequest) {
                 // we probably want a generic "unauthed" action
-                actions.submitPostFailure();
-                return; 
+                return actions.submitPostFailure();
             }
             actions.submitPostSuccess(res.body);
         });
 }
 
-actions.logout.preEmit = function() {
+actions.logout.preEmit = () => {
     window.localStorage.removeItem(authToken);
 }
 
-actions.login.preEmit = function(identity, password) {
+actions.login.preEmit = (identity, password) => {
 
     request.post('/api/login/')
         .send({
             identity: identity,
             password: password
         })
-        .end(function(res) {
+        .end((res) => {
             if (res.unauthorized) {
-                actions.loginFailure();
-                return;
+                return actions.loginFailure();
             }
             window.localStorage.setItem(authToken, res.body.token);
             actions.loginSuccess(res.body.user);
         });
 };
 
-actions.getUser.preEmit = function() {
+actions.getUser.preEmit = () => {
 
     request.get("/api/auth/")
         .use(bearer)
-        .end(function(res) {
+        .end((res) => {
             if (res.unauthorized) {
-                actions.getUserComplete(null);
-                return;
+                return actions.getUserComplete(null);
             }
             actions.getUserComplete(res.body);
         });
 };
 
-var fetchPosts = function(page, orderBy) {
+const fetchPosts = (page, orderBy) => {
 
     request.get('/api/posts/')
         .query({
             page: page,
             orderBy: orderBy
         }) 
-        .end(function(res) {        
-            actions.fetchPostsComplete(page, res.body);
-        });
+        .end((res) =>  actions.fetchPostsComplete(page, res.body));
 };
 
-actions.fetchLatestPosts.preEmit = function(page){
-    fetchPosts(page, "id");
-};
+actions.fetchLatestPosts.preEmit = (page) => fetchPosts(page, "id");
 
-actions.fetchPopularPosts.preEmit = function(page){
-    fetchPosts(page, "score");
-};
+actions.fetchPopularPosts.preEmit = (page) =>  fetchPosts(page, "score");
 
-actions.fetchPostsForUser.preEmit = function(page, name) {
+actions.fetchPostsForUser.preEmit = (page, name) => {
     request.get('/api/user/' + name)
         .query({
             page: page,
             orderBy: 'score'
         })
-        .end(function(res) {
-            actions.fetchPostsComplete(page, res.body);
-        });
+        .end((res) => actions.fetchPostsComplete(page, res.body));
 };
 
 module.exports = actions;

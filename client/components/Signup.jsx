@@ -12,21 +12,21 @@ module.exports = React.createClass({
         Reflux.listenTo(actions.signupSuccess, "onSignupSuccess")
     ],
 
-    getInitialState: function() {
+    getInitialState () {
         return {
             errors: {}
         };
     },
 
-    onSignupSuccess: function() {
+    onSignupSuccess () {
         this.transitionTo(this.makeHref("submit"));
     },
 
-    onSignupFailure: function(errors) {
+    onSignupFailure (errors) {
         this.setState({ errors: errors });
     },
 
-    handleSubmit: function(event) {
+    handleSubmit (event) {
         event.preventDefault();
         
         var name = this.refs.name.getValue(),
@@ -36,7 +36,7 @@ module.exports = React.createClass({
         actions.signup(name, email, password);
     },
 
-    render: function() {
+    render () {
 
         return (
             <form onSubmit={this.handleSubmit}>

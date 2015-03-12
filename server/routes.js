@@ -7,14 +7,14 @@ var moment = require('moment'),
 
 const pageSize = 10;
 
-var jwtToken = function(userId){
+var jwtToken = (userId) => {
     return jwt.sign({ id: userId }, process.env.SECRET_KEY, {
         expiresInMinutes: 60 * 24
     });
 };
 
 
-module.exports = function(app, db) {
+module.exports = (app, db) => {
 
     var auth = function(req, res, next) {
 
@@ -28,7 +28,7 @@ module.exports = function(app, db) {
         db("users")
             .where("id", req.authToken.id)
             .first("id", "name", "email")
-            .then(function(user) {
+            .then((user) => {
                 if (!user) {
                     return unauthenticated();
                 }
@@ -37,7 +37,7 @@ module.exports = function(app, db) {
             });
     };
 
-    var getPosts = function(page, orderBy, username=null){
+    var getPosts = (page, orderBy, username=null) => {
 
         page = page || 1;
         orderBy = ["score", "id"].includes(orderBy) ? orderBy : "id";
@@ -68,9 +68,9 @@ module.exports = function(app, db) {
 
         posts = posts.orderBy(
             'posts.' + orderBy, 'desc'
-        ).limit(pageSize).offset(offset).then(function(posts) {
+        ).limit(pageSize).offset(offset).then((posts) => {
             return posts;
-        }).then(function(posts) {
+        }).then((posts) => {
             result.posts = Immutable.List(posts);
             var q = db("posts").count("posts.id");
             if (username) {
@@ -92,33 +92,34 @@ module.exports = function(app, db) {
 
     };
 
-    app.get("/", function(req, res) {
+    app.get("/", (req, res) =>  {
         getPosts(1, "score").then(function(result) {
             res.reactify("/", result);
         });
     });
 
-    app.get("/latest/", function(req, res) {
+    app.get("/latest/", (req, res) =>  {
         getPosts(1, "id").then(function(result) {
             res.reactify("/latest", result);
         });
     });
 
-    app.get("/user/:name", function(req, res) {
-        getPosts(1, "score", req.params.name).then(function(result) {
-            res.reactify("/user/" + req.params.name, result);
-        });
+    app.get("/user/:name", (req, res) =>  {
+        getPosts(1, "score", req.params.name)
+            .then((result) => {
+                res.reactify("/user/" + req.params.name, result);
+            });
     });
 
-    app.get("/login/", function(req, res) {
+    app.get("/login/", (req, res) =>  {
         res.reactify("/login");
     });
 
-    app.get("/signup/", function(req, res) {
+    app.get("/signup/", (req, res) =>  {
         res.reactify("/signup");
     });
 
-    app.get("/submit/", function(req, res) {
+    app.get("/submit/", (req, res) =>  {
         res.reactify("/submit");
     });
 
@@ -126,7 +127,7 @@ module.exports = function(app, db) {
         return res.json(req.user);
     });
 
-    app.post("/api/login/", function(req, res) {
+    app.post("/api/login/", (req, res) =>  {
         var {identity, password} = req.body;
         if (!identity || !password) {
             return res.sendStatus(400);
@@ -149,14 +150,14 @@ module.exports = function(app, db) {
             });
     });
 
-    app.get("/api/posts/", function(req, res) {
+    app.get("/api/posts/", (req, res) =>  {
         var page = parseInt(req.query.page || 1);
         getPosts(page, req.query.orderBy).then(function(result) {
             res.json(result);
         });
     });
 
-    app.get("/api/user/:name", function(req, res) {
+    app.get("/api/user/:name", (req, res) =>  {
         var page = parseInt(req.query.page || 1);
         getPosts(page, req.query.orderBy, req.params.name)
             .then(function(result) {
@@ -164,7 +165,7 @@ module.exports = function(app, db) {
             });
     });
 
-    app.post("/api/submit/", [auth], function(req, res) {
+    app.post("/api/submit/", [auth], (req, res) =>  {
         var title = req.body.title,
             url = req.body.url,
             errors = validators.newPost(title, url);
@@ -187,7 +188,7 @@ module.exports = function(app, db) {
             });
     });
 
-    app.delete("/api/:id", [auth], function(req, res) {
+    app.delete("/api/:id", [auth], (req, res) =>  {
         db("posts")
             .where({
                 id: req.params.id,
@@ -217,7 +218,7 @@ module.exports = function(app, db) {
             });
     };
 
-    app.get("/api/nameexists/", function(req, res) {
+    app.get("/api/nameexists/", (req, res) =>  {
         if (!req.query.name) {
             return res.sendStatus(400);
         }
@@ -226,7 +227,7 @@ module.exports = function(app, db) {
         });
     });
 
-    app.get("/api/emailexists/", function(req, res) {
+    app.get("/api/emailexists/", (req, res) =>  {
         if (!req.query.email) {
             return res.sendStatus(400);
         }
@@ -235,7 +236,7 @@ module.exports = function(app, db) {
         });
     });
 
-    app.post("/api/signup/", function(req, res) {
+    app.post("/api/signup/", (req, res) =>  {
 
         var {name, email, password} = req.body;
 

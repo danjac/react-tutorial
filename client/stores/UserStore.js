@@ -6,19 +6,19 @@ module.exports = Reflux.createStore({
 
     listenables: actions,
 
-    init: function() {
+    init() {
         this.user = null;
     },
 
-    getDefaultData: function() {
+    getDefaultData() {
         return this.user;
     },
 
-    isLoggedIn: function() {
+    isLoggedIn() {
         return !_.isEmpty(this.user);
     },
 
-    getUserComplete: function(user) {
+    getUserComplete(user){
         this.user = user;
         if (this.user) { 
             this.user.votes = []; // placeholder
@@ -26,24 +26,24 @@ module.exports = Reflux.createStore({
         this.trigger();
     },
 
-    loginSuccess: function(user) {
+    loginSuccess(user) {
         this.user = user;
         this.user.votes = []; // placeholder
         this.trigger();
     },
 
-    signupSuccess: function(user) {
+    signupSuccess(user) {
         this.user = user;
         this.user.votes = []; // placeholder
         this.trigger();
     },
 
-    logout: function() {
+    logout() {
         this.user = null;
         this.trigger();
     },
 
-    tallyVote: function(post) {
+    tallyVote(post) {
         if (this.user) {
             this.user.votes = this.user.votes || []; // placeholder
         }
@@ -51,15 +51,13 @@ module.exports = Reflux.createStore({
         this.trigger();
     },
 
-    voteUp: function(post) {
+    voteUp(post) {
         this.tallyVote(post);
     },
 
-    voteDown: function(post) {
+    voteDown(post) {
         this.tallyVote(post);
     }
-
-
 
 });
  

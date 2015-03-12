@@ -17,23 +17,23 @@ module.exports = React.createClass({
         Reflux.listenTo(actions.submitPostFailure, "onSubmitPostFailure")
     ],
 
-    getInitialState: function() {
+    getInitialState() {
         return {
             errors: {}
         }
     },
 
-    onSubmitPostFailure: function(errors) {
+    onSubmitPostFailure(errors) {
         if (!_.isEmpty(errors)) {
             this.setState({ errors: errors });
         }
     },
 
-    onSubmitPostSuccess: function() {
+    onSubmitPostSuccess() {
         this.transitionTo(this.makeHref("latest"));
     },
 
-    handleSubmit: function(event) {
+    handleSubmit(event) {
         event.preventDefault();
         var title = this.refs.title.getValue(),
             url = this.refs.url.getValue();
@@ -47,7 +47,7 @@ module.exports = React.createClass({
         this.setState({ errors: errors });
     },
 
-    render: function() {
+    render() {
 
         return (
             <form onSubmit={this.handleSubmit}>

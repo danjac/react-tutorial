@@ -8,7 +8,7 @@ module.exports = React.createClass({
         PostsPage
     ],
 
-    fetchPosts: function(page) {
+    fetchPosts(page) {
         actions.fetchLatestPosts(page);
     }
 

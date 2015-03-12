@@ -5,53 +5,53 @@ module.exports = Reflux.createStore({
 
     listenables: actions,
     
-    init: function() {
+    init() {
         this.messages = [];
     },
 
-    getDefaultData: function() {
+    getDefaultData() {
         return this.messages;
     },
 
-    addMessage: function(level, msg) {
+    addMessage(level, msg) {
         this.messages.push({ level: level, text: msg });
         this.trigger();
     },
 
-    dismissAlert: function(index) {
+    dismissAlert(index) {
         this.messages.splice(index, 1);
         this.trigger();
     },
 
-    success: function(msg){
+    success(msg){
         this.addMessage("success", msg);
     },
 
-    warning: function(msg){
+    warning(msg){
         this.addMessage("warning", msg);
     },
 
-    loginSuccess: function(user) {
+    loginSuccess(user) {
         this.success("Welcome back, " + user.name);
     },
 
-    loginFailure: function() {
+    loginFailure() {
         this.warning("Sorry, you have entered incorrect login info");
     },
 
-    logout: function() {
+    logout() {
         this.success("Bye for now");
     },
 
-    submitPostSuccess: function() {
+    submitPostSuccess() {
         this.success("Thank you for your post!");
     },
 
-    loginRequired: function() {
+    loginRequired() {
         this.warning("Please login to continue");
     },
 
-    signupSuccess: function(user) {
+    signupSuccess(user) {
         this.success("Hi " + user.name + "! Welcome to the site!");
     }
 

@@ -1,5 +1,6 @@
 var  React = require('react'),
-     Reflux = require('reflux'), {RouteHandler} = require('react-router'), 
+     Reflux = require('reflux'), 
+     {RouteHandler} = require('react-router'), 
      Router = require('react-router'),
      {Alert, Navbar, Nav, NavItem} = require('react-bootstrap'),
      {NavItemLink} = require('react-router-bootstrap'),
@@ -17,28 +18,28 @@ module.exports = React.createClass({
         Reflux.listenTo(actions.logout, 'onLogout')
     ],
 
-    getInitialState: function() {
+    getInitialState() {
         return {
             messages: MessageStore.getDefaultData(),
             user: UserStore.getDefaultData(),
         }
     },
 
-    onLogout: function() {
+    onLogout() {
         // reload this page: we should use transitionTo, 
         // but that doesn't call the willTransitionTo authentication.
         window.location.href = this.getPath();
     },
 
-    onMessagesUpdate: function() {
+    onMessagesUpdate() {
         this.setState({ messages: MessageStore.getDefaultData() });
     },
 
-    onUserUpdate: function() {
+    onUserUpdate() {
         this.setState({ user: UserStore.getDefaultData() });
     },
 
-    getRightNav: function () {
+    getRightNav() {
         var className = "navbar-right";
         if (this.state.user) {
             return (
@@ -56,11 +57,11 @@ module.exports = React.createClass({
         );
     },
 
-    componentDidMount: function () {
+    componentDidMount() {
         actions.getUser();
     },
 
-    render: function(){
+    render() {
 
         var navbar = (
             <Navbar brand="ReactNews" className="navbar navbar-inverse" fixedTop={true} fluid={true}>
@@ -78,8 +79,8 @@ module.exports = React.createClass({
         return (
             <div className="container-fluid">
                 {navbar}
-                {messages.map(function(msg, index) {
-                    var onDismiss = function(){
+                {messages.map((msg, index) => {
+                    var onDismiss = () => {
                         actions.dismissAlert(index);
                     };
                     return <Alert onDismiss={onDismiss} key={index} dismissAfter={3000} bsStyle={msg.level}>{msg.text}</Alert>;

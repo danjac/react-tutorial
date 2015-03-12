@@ -4,6 +4,6 @@ var  React = require('react'),
 
 var data = JSON.parse(document.getElementById("initData").innerHTML);
 
-Router.run(Routes, Router.HistoryLocation, function(Handler) {
+Router.run(Routes, Router.HistoryLocation, (Handler) => {
     React.render(<Handler { ...data}/>, document.body);
 });

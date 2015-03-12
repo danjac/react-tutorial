@@ -15,25 +15,25 @@ module.exports = React.createClass({
         Reflux.listenTo(UserStore, 'onLoginSuccess'),
     ],
 
-    getInitialState: function() {
+    getInitialState() {
         return {
             errors: {}
         }
     },
 
-    redirect: function() {
+    redirect() {
         var nextPath = this.getQuery().nextPath || "/";
         this.transitionTo(nextPath);
     },
     
-    onLoginSuccess: function() {
+    onLoginSuccess() {
         var user = UserStore.getDefaultData();
         if (user) {
             this.redirect();
         }
     },
 
-    handleSubmit: function(event) {
+    handleSubmit(event) {
         event.preventDefault();
 
         var identity = this.refs.identity.getValue(),
@@ -49,7 +49,7 @@ module.exports = React.createClass({
 
     },
 
-    validate: function(identity, password) {
+    validate(identity, password) {
         var errors = {};
 
         if (!validator.isLength(identity, 1)) {
@@ -63,7 +63,7 @@ module.exports = React.createClass({
         return errors;
     },
 
-    render: function() {
+    render() {
 
         return (
 

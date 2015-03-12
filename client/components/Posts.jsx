@@ -9,12 +9,12 @@ var React = require('react'),
 
 var DeletePostModal = React.createClass({
 
-    handleDelete: function(event) {
+    handleDelete (event) {
         event.preventDefault();
         actions.deletePost(this.props.post);
     },
 
-    render: function() {
+    render() {
 
         return (
             <Modal title="Delete post" closeButton={false} onRequestHide={null}>
@@ -40,16 +40,16 @@ module.exports = React.createClass({
         isLast: PropTypes.bool,
         user: PropTypes.object
     },
+
     mixins: [
         Router.Navigation
     ],
 
-
-    handlePageClick: function(page) {
+    handlePageClick(page) {
         this.props.fetchPosts(page);
     },
      
-    handleLastPageClick: function(event) {
+    handleLastPageClick(event) {
         event.preventDefault();
         if (this.props.isFirst) {
             return;
@@ -57,7 +57,7 @@ module.exports = React.createClass({
         this.handlePageClick(this.props.page - 1);
     },
 
-    handleNextPageClick: function(event) {
+    handleNextPageClick(event) {
         event.preventDefault();
         if (this.props.isLast) {
             return;
@@ -65,22 +65,21 @@ module.exports = React.createClass({
         this.handlePageClick(this.props.page + 1);
     },
 
-    renderPager: function () {
+    renderPager() {
         return (
             <Pager>
                 <PageItem previous onClick={this.handleLastPageClick} disabled={this.props.isFirst}>&larr; Previous</PageItem>
                 <PageItem next onClick={this.handleNextPageClick} disabled={this.props.isLast}>&rarr; Next</PageItem>
             </Pager>
         );
-
     },
 
-    render: function() {
+    render() {
 
         var {Link} = Router;
         var user = this.props.user;
 
-        var deleteLink = function(post) {
+        var deleteLink = (post) => {
             if (user && post.author_id === user.id) {
 
                 var modal = <DeletePostModal post={post} />;
@@ -94,18 +93,18 @@ module.exports = React.createClass({
             return '';
         }
 
-        var votingLinks = function(post) {
+        var votingLinks = (post) => {
 
             if (!user || user.id === post.author_id || _.includes(user.votes, post.id)){
                 return '';
             }
 
-            var handleVoteUp = function(event) { 
+            var handleVoteUp = (event) => { 
                 event.preventDefault();
                 actions.voteUp(post);
             };
 
-            var handleVoteDown = function(event) { 
+            var handleVoteDown = (event) => { 
                 event.preventDefault();
                 actions.voteDown(post); 
             };
@@ -118,7 +117,7 @@ module.exports = React.createClass({
             );
         };
 
-        var links = function(post) {
+        var links = (post) => {
             return (
                 <span>
                     {deleteLink(post)}
@@ -130,7 +129,7 @@ module.exports = React.createClass({
         return (
             <div>
                 <ul className="list-unstyled">
-                    {this.props.posts.map(function(post) {
+                    {this.props.posts.map((post) => {
                         return (
                             <li key={post.id}>
                                 <b><a href={post.url} target="_blank">{post.title}</a></b>
@@ -146,7 +145,7 @@ module.exports = React.createClass({
                                 </div>
                             </li> 
                         );
-                    }.bind(this)).toJS()}
+                    }).toJS()}
                 </ul>
                 {this.renderPager()}
             </div>

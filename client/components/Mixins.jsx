@@ -9,7 +9,7 @@ module.exports = {
     
     Authenticate: {
         statics: {
-            willTransitionTo: function(transition) {
+            willTransitionTo (transition) {
                 if (!UserStore.isLoggedIn()){
                     var nextPath = transition.path;
                     transition.redirect("/login", {}, { nextPath: nextPath });
@@ -24,19 +24,19 @@ module.exports = {
             Reflux.listenTo(PostStore, 'onUpdate')
         ],
 
-        getInitialState: function() {
+        getInitialState () {
             return PostStore.getDefaultData(this.props);
         },
 
-        componentDidMount: function() {
+        componentDidMount () {
             this.fetchPosts(1);
         },
 
-        onUpdate: function(data) {
+        onUpdate (data) {
             this.setState(data);
         },
 
-        render: function() {
+        render () {
             return <Posts fetchPosts={this.fetchPosts} 
                           user={this.props.user}
                           total={this.state.total}

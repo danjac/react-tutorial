@@ -2,15 +2,15 @@ var validator = require('validator');
 
 module.exports = {
 
-    signup: function(name, email, password, nameExists, emailExists) {
+    signup(name, email, password, nameExists, emailExists) {
         var errors = {};
         
-        var validateName = function(name) {
-            return new Promise(function(resolve, reject) {
+        var validateName = (name) => {
+            return new Promise((resolve, reject) => {
                 if (!validator.isLength(name, 10, 60)) {
                     return resolve("Your name must be between 10 and 60 characters");
                 } 
-                nameExists(name).then(function(exists) {
+                nameExists(name).then((exists) => {
                     if (exists) {
                         return resolve("This name has already been selected");
                     }
@@ -19,12 +19,12 @@ module.exports = {
             });
         };
 
-        var validateEmail = function(email) {
-            return new Promise(function(resolve, reject) {
+        var validateEmail = (email) => {
+            return new Promise((resolve, reject) => {
                 if (!validator.isEmail(email)) {
                     return resolve("Please enter a valid email address");
                 } 
-                emailExists(email).then(function(exists) {
+                emailExists(email).then((exists) => {
                     if (exists) {
                         return resolve("This email has already been selected");
                     }
@@ -33,20 +33,20 @@ module.exports = {
             });
         };
 
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
 
             var errors = {};
-            validateName(name).then(function(error) {
+            validateName(name).then((error) => {
                 if (error) {
                     errors.name = error;
                 }
-            }).then(function() {
+            }).then(() => {
                 return validateEmail(email);
-            }).then(function(error) {
+            }).then((error) => {
                 if (error) {
                     errors.email = error;
                 }
-            }).then(function() {
+            }).then(() => {
                 if (!validator.isLength(password, 6)) {
                     errors.password ="Your password must be at least 6 characters long";
                 }
@@ -55,7 +55,7 @@ module.exports = {
         });
     },
 
-    newPost: function(title, url) {
+    newPost(title, url) {
         var errors = {};
         if (!validator.isLength(title, 10, 200)){
             errors.title = "Title of your post must be between 10 and 200 characters";
