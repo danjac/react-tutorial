@@ -7,7 +7,7 @@ var React = require('react'),
     actions = require('../actions');
 
 
-var DeletePostModal = React.createClass({
+const DeletePostModal = React.createClass({
 
     handleDelete (event) {
         event.preventDefault();
@@ -31,6 +31,80 @@ var DeletePostModal = React.createClass({
     }
 });
 
+const PostListItem = React.createClass({
+
+    propTypes: {
+        post: PropTypes.object,
+        user: PropTypes.object
+    },
+
+    mixins: [
+        Router.Navigation
+    ],
+
+    handleVoteUp(event) {
+        event.preventDefault();
+        actions.voteDown(this.props.post); 
+    },
+
+    handleVoteDown(event) { 
+        event.preventDefault();
+        actions.voteDown(this.props.post); 
+    },
+
+    deleteLink() {
+        const user = this.props.user,
+              post = this.props.post;
+        if (user && post.author_id === user.id) {
+            let modal = <DeletePostModal post={post} />;
+            return (
+                <ModalTrigger modal={modal}>
+                    <a href="#">delete</a>
+                </ModalTrigger>
+            );
+        }
+        return '';
+    },
+
+    votingLinks() {
+        const user = this.props.user,
+              post = this.props.post;
+
+        if (!user || user.id === post.author_id || _.includes(user.votes, post.id)){
+            return '';
+        }
+
+        return (
+            <span>
+                <a href="#" onClick={this.handleVoteUp}><i className="glyphicon glyphicon-arrow-up"></i></a>
+                <a href="#" onClick={this.handleVoteDown}><i className="glyphicon glyphicon-arrow-down"></i></a>
+            </span>
+        );
+        
+    },
+
+    render() {
+        const {Link} = Router, 
+              post = this.props.post;
+        return (
+            <li key={post.id}>
+                <b><a href={post.url} target="_blank">{post.title}</a></b>
+                <div>
+                    <small>
+                        <mark>
+                            <Link to={this.makeHref("user", {name: post.author})}>{post.author}</Link>
+                            &nbsp; Score: <b>{post.score}</b>
+                            &nbsp; Posted: <b>{moment(post.created_at).fromNow()}</b>
+                            &nbsp; {this.deleteLink()} {this.votingLinks()}
+                        </mark>
+                    </small>
+                </div>
+            </li> 
+        );
+    }
+
+});
+
 module.exports = React.createClass({
 
     propTypes: {
@@ -40,10 +114,6 @@ module.exports = React.createClass({
         isLast: PropTypes.bool,
         user: PropTypes.object
     },
-
-    mixins: [
-        Router.Navigation
-    ],
 
     handlePageClick(page) {
         this.props.fetchPosts(page);
@@ -75,76 +145,11 @@ module.exports = React.createClass({
     },
 
     render() {
-
-        var {Link} = Router;
-        var user = this.props.user;
-
-        var deleteLink = (post) => {
-            if (user && post.author_id === user.id) {
-
-                var modal = <DeletePostModal post={post} />;
-
-                return (
-                    <ModalTrigger modal={modal}>
-                        <a href="#">delete</a>
-                    </ModalTrigger>
-                );
-            }
-            return '';
-        }
-
-        var votingLinks = (post) => {
-
-            if (!user || user.id === post.author_id || _.includes(user.votes, post.id)){
-                return '';
-            }
-
-            var handleVoteUp = (event) => { 
-                event.preventDefault();
-                actions.voteUp(post);
-            };
-
-            var handleVoteDown = (event) => { 
-                event.preventDefault();
-                actions.voteDown(post); 
-            };
-
-            return (
-                <span>
-                    <a href="#" onClick={handleVoteUp}><i className="glyphicon glyphicon-arrow-up"></i></a>
-                    <a href="#" onClick={handleVoteDown}><i className="glyphicon glyphicon-arrow-down"></i></a>
-                </span>
-            );
-        };
-
-        var links = (post) => {
-            return (
-                <span>
-                    {deleteLink(post)}
-                    {votingLinks(post)}
-                </span>
-            );
-        };
-
         return (
             <div>
                 <ul className="list-unstyled">
                     {this.props.posts.map((post) => {
-                        return (
-                            <li key={post.id}>
-                                <b><a href={post.url} target="_blank">{post.title}</a></b>
-                                <div>
-                                    <small>
-                                        <mark>
-                                            <Link to={this.makeHref("user", {name: post.author})}>{post.author}</Link>
-                                            &nbsp; Score: <b>{post.score}</b>
-                                            &nbsp; Posted: <b>{moment(post.created_at).fromNow()}</b>
-                                            &nbsp; {links(post)} 
-                                        </mark>
-                                    </small>
-                                </div>
-                            </li> 
-                        );
+                        return <PostListItem post={post} user={this.props.user} />;
                     }).toJS()}
                 </ul>
                 {this.renderPager()}
