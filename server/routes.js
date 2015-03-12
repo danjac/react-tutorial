@@ -53,6 +53,7 @@ module.exports = function(app, db) {
             'posts.title',
             'posts.url',
             'posts.score',
+            'posts.created_at',
             'users.name AS author',
             'users.id AS author_id'
         ).from('posts').innerJoin(

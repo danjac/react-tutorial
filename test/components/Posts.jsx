@@ -1,6 +1,7 @@
 var React = require('react/addons'),
     Router = require('react-router'),
     sinon = require('sinon'),
+    moment = require('moment'),
     {expect} = require('chai'),
     _ = require('lodash'),
     Immutable = require('immutable'),
@@ -17,7 +18,8 @@ describe('Posts component', function() {
                 title: 'test',
                 url: 'http://test',
                 author_id: 1,
-                author: 'test'
+                author: 'test',
+                created_at: moment.utc()
             }
         ]);
 
@@ -54,6 +56,7 @@ describe('Posts component', function() {
                 title: 'test',
                 url: 'http://test',
                 author_id: 1,
+                created_at: moment.utc(),
                 author: 'test'
             },
             {
@@ -61,6 +64,7 @@ describe('Posts component', function() {
                 title: 'test',
                 url: 'http://test',
                 author_id: 2,
+                created_at: moment.utc(),
                 author: 'test'
             }
 

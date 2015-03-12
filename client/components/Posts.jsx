@@ -2,6 +2,7 @@ var React = require('react'),
     {PropTypes} = React,
     Router = require('react-router'),
     _ = require('lodash'),
+    moment = require('moment'),
     {Button, Modal, ModalTrigger, Pager, PageItem} = require('react-bootstrap'),
     actions = require('../actions');
 
@@ -134,11 +135,11 @@ module.exports = React.createClass({
                             <li key={post.id}>
                                 <b><a href={post.url} target="_blank">{post.title}</a></b>
                                 <div>
-
                                     <small>
                                         <mark>
                                             <Link to={this.makeHref("user", {name: post.author})}>{post.author}</Link>
                                             &nbsp; Score: <b>{post.score}</b>
+                                            &nbsp; Posted: <b>{moment(post.created_at).fromNow()}</b>
                                             &nbsp; {links(post)} 
                                         </mark>
                                     </small>
