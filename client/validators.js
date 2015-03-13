@@ -1,6 +1,7 @@
 import validator from 'validator';
+import Immutable from 'immutable';
 
-const validateName = (name) => {
+const validateName = (name, nameExists) => {
     return new Promise((resolve, reject) => {
         if (!validator.isLength(name, 10, 60)) {
             return resolve("Your name must be between 10 and 60 characters");
@@ -14,7 +15,7 @@ const validateName = (name) => {
     });
 };
 
-const validateEmail = (email) => {
+const validateEmail = (email, emailExists) => {
     return new Promise((resolve, reject) => {
         if (!validator.isEmail(email)) {
             return resolve("Please enter a valid email address");
@@ -31,24 +32,24 @@ const validateEmail = (email) => {
 export default {
 
     signup(name, email, password, nameExists, emailExists) {
-        var errors = {};
-        
+
         return new Promise((resolve, reject) => {
 
-            var errors = {};
-            validateName(name).then((error) => {
+            var errors = Immutable.Map();
+
+            validateName(name, nameExists).then((error) => {
                 if (error) {
-                    errors.name = error;
+                    errors = errors.set("name", error)
                 }
             }).then(() => {
-                return validateEmail(email);
+                return validateEmail(email, emailExists);
             }).then((error) => {
                 if (error) {
-                    errors.email = error;
+                    errors = errors.set("email", error)
                 }
             }).then(() => {
                 if (!validator.isLength(password, 6)) {
-                    errors.password ="Your password must be at least 6 characters long";
+                    errors = errors.set("password", "Your password must be at least 6 characters long");
                 }
                 resolve(errors);
             });
@@ -56,12 +57,12 @@ export default {
     },
 
     newPost(title, url) {
-        var errors = {};
+        const errors = Immutable.Map();
         if (!validator.isLength(title, 10, 200)){
-            errors.title = "Title of your post must be between 10 and 200 characters";
+            errors.set("title", "Title of your post must be between 10 and 200 characters");
         }
         if (!validator.isURL(url)) {
-            errors.url = "You must provide a valid URL";
+            errors.set("url", "You must provide a valid URL");
         }
         return errors;
     }

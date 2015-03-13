@@ -1,6 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import Router from 'react-router';
+import Immutable from 'immutable';
 import {Input} from 'react-bootstrap';
 import actions from '../actions';
 
@@ -14,7 +15,7 @@ export default React.createClass({
 
     getInitialState () {
         return {
-            errors: {}
+            errors: Immutable.Map()
         };
     },
 
@@ -44,20 +45,20 @@ export default React.createClass({
                       type="text" 
                       label="Name" 
                       required
-                      bsStyle={this.state.errors.name? 'error': null}  
-                      help={this.state.errors.name} />
+                      bsStyle={this.state.errors.has("name")? 'error': null}  
+                      help={this.state.errors.get("name", "")} />
                <Input ref="email" 
                       type="email" 
                       label="Email address" 
                       required
-                      bsStyle={this.state.errors.email? 'error': null}  
-                      help={this.state.errors.email} />
+                      bsStyle={this.state.errors.has("email")? 'error': null}  
+                      help={this.state.errors.get("email", "")} />
                <Input ref="password" 
                       type="password" 
                       label="Password" 
                       required
-                      bsStyle={this.state.errors.password? 'error': null}  
-                      help={this.state.errors.password} />
+                      bsStyle={this.state.errors.has("password")? 'error': null}  
+                      help={this.state.errors.get("password", "")} />
                <Input type="submit" value="Signup" />
             </form>
         );

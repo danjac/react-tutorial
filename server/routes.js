@@ -162,7 +162,7 @@ export default (app, db) => {
             url = req.body.url,
             errors = validators.newPost(title, url);
 
-        if (!_.isEmpty(errors)) {
+        if (!errors.isEmpty()) {
             return res.status(400).json(errors);
         }
 
@@ -237,7 +237,7 @@ export default (app, db) => {
             nameExists,
             emailExists
         ).then((errors) => {
-            if (!_.isEmpty(errors)) {
+            if (!errors.isEmpty()) {
                 return res.status(400).json(errors);
             }
             return db("users")

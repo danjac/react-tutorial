@@ -1,5 +1,6 @@
 import Reflux from 'reflux';
 import request from 'superagent';
+import Immutable from 'immutable';
 import _ from 'lodash';
 import validators from './validators';
 
@@ -32,7 +33,7 @@ const actions = Reflux.createActions([
 const authToken = "authToken";
 
 const bearer = (request) => {
-    var token = window.localStorage.getItem(authToken);
+    const token = window.localStorage.getItem(authToken);
     if (token) {
         request.set('Authorization', 'Bearer ' + token);
     }
@@ -59,9 +60,11 @@ actions.signup.preEmit = (name, email, password) => {
 
     validators.signup(name, email, password, nameExists, emailExists)
         .then((errors) => {
-        if (!_.isEmpty(errors)) {
+
+        if (!errors.isEmpty()) {
             return actions.signupFailure(errors);
         }
+
         request.post("/api/signup/")
             .send({
                 name: name,
@@ -69,7 +72,7 @@ actions.signup.preEmit = (name, email, password) => {
                 password: password
             }).end((res) => {
                 if (res.badRequest) {
-                    return actions.signupFailure(res.body);
+                    return actions.signupFailure(Immutable.Map(res.body));
                 }
 
                 window.localStorage.setItem(authToken, res.body.token);
@@ -93,8 +96,7 @@ actions.submitPost.preEmit = (title, url) => {
         })
         .end((res) => {
             if (res.unauthorized || res.badRequest) {
-                // we probably want a generic "unauthed" action
-                return actions.submitPostFailure();
+                return actions.submitPostFailure(Immutable.Map(res.body));
             }
             actions.submitPostSuccess(res.body);
         });

@@ -2,7 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import Router from 'react-router';
 import {Input} from 'react-bootstrap';
-import _ from 'lodash';
+import Immutable from 'immutable';
 import {Authenticate} from './Mixins';
 import validators from '../validators';
 import actions from '../actions';
@@ -18,12 +18,12 @@ export default React.createClass({
 
     getInitialState() {
         return {
-            errors: {}
+            errors: Immutable.Map()
         }
     },
 
     onSubmitPostFailure(errors) {
-        if (!_.isEmpty(errors)) {
+        if (!errors.isEmpty()) {
             this.setState({ errors: errors });
         }
     },
@@ -34,12 +34,11 @@ export default React.createClass({
 
     handleSubmit(event) {
         event.preventDefault();
-        var title = this.refs.title.getValue(),
-            url = this.refs.url.getValue();
+        const title = this.refs.title.getValue(),
+              url = this.refs.url.getValue(),
+              errors = validators.newPost(title, url);
 
-        var errors = validators.newPost(title, url);
-
-        if (_.isEmpty(errors)){
+        if (errors.isEmpty()){
             actions.submitPost(title, url);
         }
 
@@ -54,15 +53,15 @@ export default React.createClass({
                        type="text" 
                        label="Title" 
                        required
-                       bsStyle={this.state.errors.title? 'error': null} 
-                       help={this.state.errors.title} />
+                       bsStyle={this.state.errors.has("title")? 'error': null} 
+                       help={this.state.errors.get("title", "")} />
                 <Input ref="url" 
                        type="text" 
                        label="Link" 
                        placeholder="Enter a valid URL starting with http:// or https://"
                        required
-                       bsStyle={this.state.errors.url? 'error': null} 
-                       help={this.state.errors.url} />
+                       bsStyle={this.state.errors.has("url")? 'error': null} 
+                       help={this.state.errors.get("url", "")} />
                 <Input type="submit" value="Submit post" />
             </form>
         );
