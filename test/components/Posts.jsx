@@ -10,10 +10,10 @@ import StubRouterContext from '../StubRouterContext';
 
 const TestUtils = React.addons.TestUtils;
 
-describe('Posts component', function() {
+describe('Posts component', () => {
 
-    it('should show no buttons for an anonymous user', function(){
-        var posts = Immutable.List([
+    it('should show no buttons for an anonymous user', () => {
+        const posts = Immutable.List([
             {
                 id: 1,
                 title: 'test',
@@ -24,34 +24,33 @@ describe('Posts component', function() {
             }
         ]);
 
-        var Component = StubRouterContext(Posts, {
+        const Component = StubRouterContext(Posts, {
             posts: posts,
             user: null,
             total: 1,
             isFirst: true,
             isLast: true,
             isServer: true,
-            fetchPosts: function() {}
+            fetchPosts: () => {}
         });
 
-        var component = TestUtils.renderIntoDocument(<Component />);
+        const component = TestUtils.renderIntoDocument(<Component />);
 
-        var numUpvoteLinks = TestUtils.scryRenderedDOMComponentsWithClass(component, "glyphicon-arrow-up").length;
+        const numUpvoteLinks = TestUtils.scryRenderedDOMComponentsWithClass(component, "glyphicon-arrow-up").length;
         expect(numUpvoteLinks).to.equal(0);
 
         // we should have 1 delete link
 
-        var node = component.getDOMNode();
-        var links = TestUtils.scryRenderedDOMComponentsWithTag(component, "a");
-        var numDeleteLinks = _.filter(links, function(link) { 
-            return link.props.children === 'delete'; 
-        }).length;
+        const node = component.getDOMNode();
+        const links = TestUtils.scryRenderedDOMComponentsWithTag(component, "a");
+        const numDeleteLinks = links.filter((link) => link.props.children === 'delete').length;
+
         expect(numDeleteLinks).to.equal(0);
  
     });
 
-    it('should show correct buttons for a user', function() {
-        var posts = Immutable.List([
+    it('should show correct buttons for a user', () => {
+        const posts = Immutable.List([
             {
                 id: 1,
                 title: 'test',
@@ -71,37 +70,34 @@ describe('Posts component', function() {
 
         ]);
 
-        var user = {
+        const user = {
             id: 1,
             name: 'tester'
         };
-        var Component = StubRouterContext(Posts, {
+        const Component = StubRouterContext(Posts, {
             posts: posts,
             user: user,
             total: 2,
             isFirst: true,
             isLast: true,
             isServer: true,
-            fetchPosts: function() {}
+            fetchPosts: () => {}
         });
 
-        var component = TestUtils.renderIntoDocument(<Component />);
+        const component = TestUtils.renderIntoDocument(<Component />);
 
         // we should have 1 upvote link
         //
 
-        var numUpvoteLinks = TestUtils.scryRenderedDOMComponentsWithClass(component, "glyphicon-arrow-up").length;
+        const numUpvoteLinks = TestUtils.scryRenderedDOMComponentsWithClass(component, "glyphicon-arrow-up").length;
         expect(numUpvoteLinks).to.equal(1);
 
         // we should have 1 delete link
 
-        var node = component.getDOMNode();
-        var links = TestUtils.scryRenderedDOMComponentsWithTag(component, "a");
-        var numDeleteLinks = _.filter(links, function(link) { 
-            return link.props.children === 'delete'; 
-        }).length;
+        const node = component.getDOMNode();
+        const links = TestUtils.scryRenderedDOMComponentsWithTag(component, "a");
+        const numDeleteLinks = links.filter((link) => link.props.children === 'delete').length;
         expect(numDeleteLinks).to.equal(1);
-
 
     });
 
