@@ -5,10 +5,7 @@ export function reactify(routes) {
 
     return (req, res, next) => {
 
-        res.reactify = (route, props, opts) => {
-
-            props = props || {};
-            opts = opts = {};
+        res.reactify = (route, props={}, opts={}) => {
 
             const router = Router.create({
                 routes: routes,
