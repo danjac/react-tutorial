@@ -111,12 +111,14 @@ export default React.createClass({
     propTypes: {
         posts: PropTypes.object,
         total: PropTypes.number,
+        page: PropTypes.number,
         isFirst: PropTypes.bool,
         isLast: PropTypes.bool,
         user: PropTypes.object
     },
 
     handlePageClick(page) {
+        console.log("handlepageclick", page)
         this.props.fetchPosts(page);
     },
      

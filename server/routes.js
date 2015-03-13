@@ -45,7 +45,8 @@ export default (app, db) => {
         const offset = ((page - 1) * pageSize);
 
         var result = {
-            isFirst: (page === 1)
+            isFirst: (page === 1),
+            page: page
         };
 
         var posts = db.select(

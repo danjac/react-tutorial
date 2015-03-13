@@ -134,6 +134,7 @@ actions.getUser.preEmit = () => {
 
 const fetchPosts = (page, orderBy) => {
 
+    console.log("PAGE", page)
     request.get('/api/posts/')
         .query({
             page: page,
@@ -143,7 +144,6 @@ const fetchPosts = (page, orderBy) => {
 };
 
 actions.fetchLatestPosts.preEmit = (page) => fetchPosts(page, "id");
-
 actions.fetchPopularPosts.preEmit = (page) =>  fetchPosts(page, "score");
 
 actions.fetchPostsForUser.preEmit = (page, name) => {
