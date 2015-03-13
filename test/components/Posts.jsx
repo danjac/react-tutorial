@@ -1,13 +1,14 @@
-var React = require('react/addons'),
-    Router = require('react-router'),
-    sinon = require('sinon'),
-    moment = require('moment'),
-    {expect} = require('chai'),
-    _ = require('lodash'),
-    Immutable = require('immutable'),
-    TestUtils = React.addons.TestUtils,
-    Posts = require('../../client/components/Posts'),
-    StubRouterContext = require('../StubRouterContext');
+import React from 'react/addons';
+import Router from 'react-router';
+import sinon from 'sinon';
+import moment from 'moment';
+import {expect} from 'chai';
+import _ from 'lodash';
+import Immutable from 'immutable';
+import Posts from '../../client/components/Posts';
+import StubRouterContext from '../StubRouterContext';
+
+const TestUtils = React.addons.TestUtils;
 
 describe('Posts component', function() {
 

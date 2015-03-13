@@ -1,9 +1,10 @@
 import React, {PropTypes} from 'react';
-import Router from 'react-router';
+import Router, {Link} from 'react-router';
 import _ from 'lodash';
 import moment from 'moment';
 import {Button, Modal, ModalTrigger, Pager, PageItem} from 'react-bootstrap';
 import actions from '../actions';
+
 
 const DeletePostModal = React.createClass({
 
@@ -29,6 +30,7 @@ const DeletePostModal = React.createClass({
     }
 });
 
+
 const PostListItem = React.createClass({
 
     propTypes: {
@@ -42,7 +44,7 @@ const PostListItem = React.createClass({
 
     handleVoteUp(event) {
         event.preventDefault();
-        actions.voteDown(this.props.post); 
+        actions.voteUp(this.props.post); 
     },
 
     handleVoteDown(event) { 
@@ -82,8 +84,9 @@ const PostListItem = React.createClass({
     },
 
     render() {
-        const {Link} = Router, 
-              post = this.props.post;
+
+        const post = this.props.post;
+
         return (
             <li>
                 <b><a href={post.url} target="_blank">{post.title}</a></b>

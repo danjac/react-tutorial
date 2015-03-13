@@ -1,12 +1,14 @@
 import Reflux from 'reflux';
+import Immutable from 'immutable';
 import actions from '../actions';
+
 
 export default Reflux.createStore({
 
     listenables: actions,
     
     init() {
-        this.messages = [];
+        this.messages = Immutable.List();
     },
 
     getDefaultData() {
@@ -14,12 +16,12 @@ export default Reflux.createStore({
     },
 
     addMessage(level, msg) {
-        this.messages.push({ level: level, text: msg });
+        this.messages = this.messages.push({ level: level, text: msg });
         this.trigger();
     },
 
     dismissAlert(index) {
-        this.messages.splice(index, 1);
+        this.messages = this.messages.delete(index);
         this.trigger();
     },
 
@@ -41,6 +43,10 @@ export default Reflux.createStore({
 
     logout() {
         this.success("Bye for now");
+    },
+
+    deletePostComplete(post) {
+        this.success(`Your post ${post.title} has been deleted!`)            
     },
 
     submitPostSuccess() {

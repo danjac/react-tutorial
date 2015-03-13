@@ -73,17 +73,15 @@ export default React.createClass({
             </Navbar>
         );
 
-        var messages = this.state.messages || [];
-
         return (
             <div className="container-fluid">
                 {navbar}
-                {messages.map((msg, index) => {
-                    var onDismiss = () => {
-                        actions.dismissAlert(index);
-                    };
-                    return <Alert onDismiss={onDismiss} key={index} dismissAfter={3000} bsStyle={msg.level}>{msg.text}</Alert>;
-                })}
+                {this.state.messages.map((msg, index) => {
+                    return <Alert onDismiss={() => actions.dismissAlert(index)} 
+                                  key={index} 
+                                  dismissAfter={3000} 
+                                  bsStyle={msg.level}>{msg.text}</Alert>;
+                }).toJS()}
                <RouteHandler user={this.state.user} {...this.props} /> 
             </div>
         );

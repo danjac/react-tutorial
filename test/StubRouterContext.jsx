@@ -1,8 +1,9 @@
-var React = require('react'),
-    _ = require('lodash'),
-    func = React.PropTypes.func;
+import React from 'react';
+import _ from 'lodash';
+  
+const func = React.PropTypes.func;
 
-module.exports = function(Component, props, stubs){
+export default function(Component, props, stubs){
 
   return React.createClass({
 
@@ -20,23 +21,23 @@ module.exports = function(Component, props, stubs){
       isActive: func
     },
 
-    getChildContext: function () {
+    getChildContext() {
         return _.assign({
-            makePath: function () {},
-            makeHref: function  () {},
-            transitionTo: function  () {},
-            replaceWith: function  () {},
-            goBack: function  () {},
-            getCurrentPath: function  () {},
-            getCurrentRoutes: function  () {},
-            getCurrentPathname: function  () {},
-            getCurrentParams: function  () {},
-            getCurrentQuery: function  () {},
-            isActive: function  () {}
+            makePath: () => {},
+            makeHref: () => {},
+            transitionTo: () => {},
+            replaceWith: () => {},
+            goBack: () => {},
+            getCurrentPath: () => {},
+            getCurrentRoutes: () => {},
+            getCurrentPathname: () => {},
+            getCurrentParams: () => {},
+            getCurrentQuery: () => {},
+            isActive: () => {}
       }, stubs);
     },
 
-    render: function() {
+    render() {
         return <Component {...props} />;
     }
   });
