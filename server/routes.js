@@ -16,9 +16,9 @@ const jwtToken = (userId) => {
 
 export default (app, db) => {
 
-    var auth = function(req, res, next) {
+    const auth = (req, res, next) => {
 
-        var unauthenticated = function() {
+        const unauthenticated = () => {
             return res.sendStatus(401);
         }
 
@@ -37,12 +37,12 @@ export default (app, db) => {
             });
     };
 
-    var getPosts = (page, orderBy, username=null) => {
+    const getPosts = (page, orderBy, username=null) => {
 
         page = page || 1;
         orderBy = ["score", "id"].includes(orderBy) ? orderBy : "id";
 
-        var offset = ((page - 1) * pageSize);
+        const offset = ((page - 1) * pageSize);
 
         var result = {
             isFirst: (page === 1)
@@ -81,10 +81,10 @@ export default (app, db) => {
                     ).where("users.name", username)
             }
             return q.first();
-        }).then(function(total) {
+        }).then((total) => {
             result.total = parseInt(total.count);
-            var numPages = Math.ceil(result.total / pageSize);
-            result.isLast = (!numPages || page == numPages);
+            const numPages = Math.ceil(result.total / pageSize);
+            result.isLast = (!numPages || page === numPages);
             return result;
         });
 
@@ -93,15 +93,11 @@ export default (app, db) => {
     };
 
     app.get("/", (req, res) =>  {
-        getPosts(1, "score").then(function(result) {
-            res.reactify("/", result);
-        });
+        getPosts(1, "score").then((result) => res.reactify("/", result));
     });
 
     app.get("/latest/", (req, res) =>  {
-        getPosts(1, "id").then(function(result) {
-            res.reactify("/latest", result);
-        });
+        getPosts(1, "id").then((result) => res.reactify("/latest", result));
     });
 
     app.get("/user/:name", (req, res) =>  {
@@ -123,12 +119,12 @@ export default (app, db) => {
         res.reactify("/submit");
     });
 
-    app.get("/api/auth/", [auth], function (req, res) {
+    app.get("/api/auth/", [auth], (req, res) => {
         return res.json(req.user);
     });
 
     app.post("/api/login/", (req, res) =>  {
-        var {identity, password} = req.body;
+        const {identity, password} = req.body;
         if (!identity || !password) {
             return res.sendStatus(400);
         }
@@ -136,7 +132,7 @@ export default (app, db) => {
             .where("name", identity)
             .orWhere("email", identity)
             .first()
-            .then(function(user) {
+            .then((user) => {
                 // we'll encrypt this password later of course!
                 if (!user || !bcrypt.compareSync(password, user.password)) {
                     res.sendStatus(401);
@@ -151,18 +147,13 @@ export default (app, db) => {
     });
 
     app.get("/api/posts/", (req, res) =>  {
-        var page = parseInt(req.query.page || 1);
-        getPosts(page, req.query.orderBy).then(function(result) {
-            res.json(result);
-        });
+        const page = parseInt(req.query.page || 1);
+        getPosts(page, req.query.orderBy).then((result) => res.json(result));
     });
 
     app.get("/api/user/:name", (req, res) =>  {
-        var page = parseInt(req.query.page || 1);
-        getPosts(page, req.query.orderBy, req.params.name)
-            .then(function(result) {
-                res.json(result);
-            });
+        const page = parseInt(req.query.page || 1);
+        getPosts(page, req.query.orderBy, req.params.name).then((result) => res.json(result));
     });
 
     app.post("/api/submit/", [auth], (req, res) =>  {
@@ -181,9 +172,9 @@ export default (app, db) => {
                 url: url,
                 user_id: req.user.id,
                 created_at: moment.utc()
-            }).then(function(ids) {
+            }).then((ids) => {
                 return db("posts").where("id", ids[0]).first();
-            }).then(function(post) {
+            }).then((post) => {
                 res.json(post);
             });
     });
@@ -193,27 +184,25 @@ export default (app, db) => {
             .where({
                 id: req.params.id,
                 user_id: req.user.id
-            }).del().then(function(){
-                res.sendStatus(200);
-            });
+            }).del().then(() => res.sendStatus(200));
     });
 
-    var nameExists = function(name) {
+    const nameExists = (name) => {
         return db("users")
             .count("id")
             .where("name", name)
             .first()
-            .then(function(result){
+            .then((result) => {
                 return parseInt(result.count) > 0;
             });
     };
 
-    var emailExists = function(email) {
+    const emailExists = (email) => {
         return db("users")
             .count("id")
             .where("email", email)
             .first()
-            .then(function(result){
+            .then((result) => {
                 return parseInt(result.count) > 0;
             });
     };
@@ -222,7 +211,7 @@ export default (app, db) => {
         if (!req.query.name) {
             return res.sendStatus(400);
         }
-        nameExists(req.query.name).then(function(exists) {
+        nameExists(req.query.name).then((exists) => {
             res.json({ exists: exists });
         });
     });
@@ -231,14 +220,14 @@ export default (app, db) => {
         if (!req.query.email) {
             return res.sendStatus(400);
         }
-        emailExists(req.query.email).then(function(exists) {
+        emailExists(req.query.email).then((exists) => {
             res.json({ exists: exists });
         });
     });
 
     app.post("/api/signup/", (req, res) =>  {
 
-        var {name, email, password} = req.body;
+        const {name, email, password} = req.body;
 
         validators.signup(
             name,
@@ -246,7 +235,7 @@ export default (app, db) => {
             password,
             nameExists,
             emailExists
-        ).then(function(errors) {
+        ).then((errors) => {
             if (!_.isEmpty(errors)) {
                 return res.status(400).json(errors);
             }
@@ -257,11 +246,11 @@ export default (app, db) => {
                     email: email,
                     created_at: moment.utc(),
                     password: bcrypt.hashSync(password, 10)
-            }).then(function(ids) {
+            }).then((ids) => {
                 return db("users")
                     .where("id", ids[0])
                     .first("id", "name", "email");
-            }).then(function(user) {
+            }).then((user) => {
                 return res.json({
                     token: jwtToken(user.id),
                     user: user
@@ -269,6 +258,5 @@ export default (app, db) => {
             });
         });
     });
-
 
 };
