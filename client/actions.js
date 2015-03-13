@@ -135,8 +135,7 @@ actions.getUser.preEmit = () => {
 };
 
 const fetchPosts = (page, orderBy) => {
-
-    console.log("PAGE", page)
+  
     request.get('/api/posts/')
         .query({
             page: page,

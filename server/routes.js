@@ -13,7 +13,6 @@ const jwtToken = (userId) => {
     });
 };
 
-
 export default (app, db) => {
 
     const auth = (req, res, next) => {

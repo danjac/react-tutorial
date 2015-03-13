@@ -57,12 +57,12 @@ export default {
     },
 
     newPost(title, url) {
-        const errors = Immutable.Map();
+        var errors = Immutable.Map();
         if (!validator.isLength(title, 10, 200)){
-            errors.set("title", "Title of your post must be between 10 and 200 characters");
+            errors = errors.set("title", "Title of your post must be between 10 and 200 characters");
         }
         if (!validator.isURL(url)) {
-            errors.set("url", "You must provide a valid URL");
+            errors = errors.set("url", "You must provide a valid URL");
         }
         return errors;
     }
