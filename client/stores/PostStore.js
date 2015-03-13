@@ -1,10 +1,10 @@
-var Reflux = require('reflux'),
-    request = require('superagent'),
-    Immutable = require('immutable'),
-    _ = require('lodash'),
-    actions = require('../actions');
+import Reflux from 'reflux';
+import request from 'superagent';
+import Immutable from 'immutable';
+import _ from 'lodash';
+import actions from '../actions';
 
-module.exports = Reflux.createStore({
+export default Reflux.createStore({
 
     listenables: actions,
     
@@ -26,9 +26,7 @@ module.exports = Reflux.createStore({
     },
 
     indexOf(post) {
-        return this.posts.findIndex(function(p) {
-            return p.id === post.id;
-        });
+        return this.posts.findIndex((p) => p.id === post.id);
     },
 
     deletePost(post) {
@@ -37,7 +35,7 @@ module.exports = Reflux.createStore({
     },
 
     adjustScore(post, amount) {
-        this.posts = this.posts.update(this.indexOf(post), function(post) {
+        this.posts = this.posts.update(this.indexOf(post), (post) => {
             post.score += amount;
             return post;
         });

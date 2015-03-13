@@ -1,7 +1,7 @@
-var Reflux = require('reflux'),
-    actions = require('../actions');
+import Reflux from 'reflux';
+import actions from '../actions';
 
-module.exports = Reflux.createStore({
+export default Reflux.createStore({
 
     listenables: actions,
     

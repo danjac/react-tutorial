@@ -1,8 +1,8 @@
-var React = require('react'),
-    actions = require('../actions'),
-    {PostsPage} = require('./Mixins');
+import React from 'react';
+import actions from '../actions';
+import {PostsPage} from './Mixins';
 
-module.exports = React.createClass({
+export default React.createClass({
 
     mixins: [
         PostsPage

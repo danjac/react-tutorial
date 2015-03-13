@@ -1,14 +1,13 @@
-var React = require('react'),
-    Reflux = require('reflux'),
-    Router = require('react-router'),
-    {Input} = require('react-bootstrap'),
-    _ = require('lodash'),
-    {Authenticate} = require('./Mixins'),
-    validators = require('../validators'),
-    actions = require('../actions');
+import React from 'react';
+import Reflux from 'reflux';
+import Router from 'react-router';
+import {Input} from 'react-bootstrap';
+import _ from 'lodash';
+import {Authenticate} from './Mixins';
+import validators from '../validators';
+import actions from '../actions';
 
-
-module.exports = React.createClass({
+export default React.createClass({
 
     mixins: [
         Router.Navigation,

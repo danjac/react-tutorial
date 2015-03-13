@@ -1,20 +1,20 @@
-var moment = require('moment'),
-    jwt = require('jsonwebtoken'),
-    _ = require('lodash'),
-    bcrypt = require('bcryptjs'),
-    Immutable = require('immutable'),
-    validators = require('../client/validators');
+import moment from 'moment';
+import jwt from 'jsonwebtoken';
+import _ from 'lodash';
+import bcrypt from 'bcryptjs';
+import Immutable from 'immutable';
+import validators from '../client/validators';
 
 const pageSize = 10;
 
-var jwtToken = (userId) => {
+const jwtToken = (userId) => {
     return jwt.sign({ id: userId }, process.env.SECRET_KEY, {
         expiresInMinutes: 60 * 24
     });
 };
 
 
-module.exports = (app, db) => {
+export default (app, db) => {
 
     var auth = function(req, res, next) {
 

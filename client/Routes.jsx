@@ -1,14 +1,15 @@
-var React = require('react'),
-    {DefaultRoute, Route} = require('react-router'),
-    App = require('./components/App'),
-    Popular = require('./components/Popular'),
-    Latest = require('./components/Latest'),
-    User = require('./components/User'),
-    Login = require('./components/Login'),
-    Signup = require('./components/Signup'),
-    Submit = require('./components/Submit');
+import React from 'react';
+import {DefaultRoute, Route} from 'react-router';
+
+import App from './components/App';
+import Popular from './components/Popular';
+import Latest from './components/Latest';
+import User from './components/User';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import Submit from './components/Submit';
  
-module.exports = (
+export default (
     <Route handler={App}>
         <DefaultRoute name="popular" handler={Popular} />
         <Route name="latest" path="/latest" handler={Latest} />

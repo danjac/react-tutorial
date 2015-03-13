@@ -1,11 +1,12 @@
-var React = require('react'),
-    Reflux = require('reflux'),
-    Posts = require('./Posts'),
-    actions = require('../actions'),
-    UserStore = require('../stores/UserStore'),
-    PostStore = require('../stores/PostStore');
+import React from 'react';
+import Reflux from 'reflux';
+import Posts from './Posts';
+import actions from '../actions';
+import UserStore from '../stores/UserStore';
+import PostStore from '../stores/PostStore';
 
-module.exports = {
+
+export default {
     
     Authenticate: {
         statics: {

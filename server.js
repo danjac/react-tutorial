@@ -1,21 +1,21 @@
-var express = require('express'),
-    http = require('http'),
-    path = require('path'),
-    errorHandler= require('errorhandler'),
-    jwt = require('jsonwebtoken'),
-    expressJwt = require('express-jwt'),
-    React = require('react'),
-    Router = require('react-router'),
-    routes = require('./server/routes.js'),
-    {reactify} = require('./server/middleware');
+import express from 'express';
+import http from 'http';
+import path from 'path';
+import errorHandler from 'errorhandler';
+import morgan from 'morgan';
+import bodyParser from 'body-parser';
+import methodOverride from 'method-override';
+import serveStatic from 'serve-static';import jwt from 'jsonwebtoken';
+import expressJwt from 'express-jwt';
+import dotenv from 'dotenv';
+import knex from 'knex';
+import routes from './server/routes';
+import {reactify} from './server/middleware';
+import jsxRoutes from './client/Routes';
 
-// import JSX
-//require('node-jsx').install();
-var jsxRoutes = require('./client/Routes');
+dotenv.load();
 
-var app = express();
-
-require('dotenv').load();
+const app = express();
 
 // all environments
 
@@ -25,10 +25,10 @@ app.set('port', port);
 app.set('views', path.join(__dirname, '/server/views'));
 app.set('view engine', 'ejs');
 
-app.use(require('morgan')('dev'));
-app.use(require('body-parser').json());
-app.use(require('method-override')());
-app.use(require('serve-static')(path.join(__dirname, '/public')));
+app.use(morgan('dev'));
+app.use(bodyParser.json());
+app.use(methodOverride());
+app.use(serveStatic(path.join(__dirname, '/public')));
 
 app.use(expressJwt({
     secret: process.env.SECRET_KEY,
@@ -48,7 +48,7 @@ if (devMode) {
 // database 
 //
 
-var db = require('knex')({
+const db = knex({
     client: 'pg',
     debug: devMode,
     connection: {

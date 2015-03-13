@@ -1,14 +1,13 @@
-var  React = require('react'),
-     Reflux = require('reflux'), 
-     {RouteHandler} = require('react-router'), 
-     Router = require('react-router'),
-     {Alert, Navbar, Nav, NavItem} = require('react-bootstrap'),
-     {NavItemLink} = require('react-router-bootstrap'),
-     actions = require('../actions'),
-     UserStore = require('../stores/UserStore'),
-     MessageStore = require('../stores/MessageStore');
+import React from 'react';
+import Reflux from 'reflux';
+import Router, {RouteHandler} from 'react-router';
+import {Alert, Navbar, Nav, NavItem}  from 'react-bootstrap';
+import {NavItemLink} from 'react-router-bootstrap';
+import actions from '../actions';
+import UserStore from '../stores/UserStore';
+import MessageStore from '../stores/MessageStore';
 
-module.exports = React.createClass({
+export default React.createClass({
 
     mixins: [
         Router.Navigation,

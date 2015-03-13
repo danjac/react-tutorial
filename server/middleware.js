@@ -1,44 +1,41 @@
-var React = require('react'),
-    Router = require('react-router');
+import React from 'react';
+import Router from 'react-router';
 
-module.exports = {
+export function reactify(routes) {
 
-    reactify(routes) {
+    return (req, res, next) => {
 
-        return (req, res, next) => {
+        res.reactify = (route, props, opts) => {
 
-            res.reactify = (route, props, opts) => {
+            props = props || {};
+            opts = opts = {};
 
-                props = props || {};
-                opts = opts = {};
-
-                var router = Router.create({
-                    routes: routes,
-                    location: route,
-                    onError: (err) => next(err),
-                    onAbort: (abortReason) => {
-                        if (abortReason.constructor.name === 'Redirect') {
-                            let url = router.makePath(
-                                abortReason.to, 
-                                abortReason.params, 
-                                abortReason.query
-                            );
-                            res.redirect(url);
-                        } else {
-                            next(abortReason);
-                        }
+            const router = Router.create({
+                routes: routes,
+                location: route,
+                onError: (err) => next(err),
+                onAbort: (abortReason) => {
+                    if (abortReason.constructor.name === 'Redirect') {
+                        const url = router.makePath(
+                            abortReason.to, 
+                            abortReason.params, 
+                            abortReason.query
+                        );
+                        res.redirect(url);
+                    } else {
+                        next(abortReason);
                     }
-                });
+                }
+            });
 
-                router.run((Handler, state) => {
-                    res.render(opts.template || 'index', {
-                        markup: React.renderToString(Handler(props)),
-                        data: JSON.stringify(props)
-                    });
+            router.run((Handler, state) => {
+                res.render(opts.template || 'index', {
+                    markup: React.renderToString(Handler(props)),
+                    data: JSON.stringify(props)
                 });
-            };
-
-            next();
+            });
         };
-    }
+
+        next();
+    };
 };

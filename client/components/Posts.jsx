@@ -1,11 +1,9 @@
-var React = require('react'),
-    {PropTypes} = React,
-    Router = require('react-router'),
-    _ = require('lodash'),
-    moment = require('moment'),
-    {Button, Modal, ModalTrigger, Pager, PageItem} = require('react-bootstrap'),
-    actions = require('../actions');
-
+import React, {PropTypes} from 'react';
+import Router from 'react-router';
+import _ from 'lodash';
+import moment from 'moment';
+import {Button, Modal, ModalTrigger, Pager, PageItem} from 'react-bootstrap';
+import actions from '../actions';
 
 const DeletePostModal = React.createClass({
 
@@ -80,14 +78,14 @@ const PostListItem = React.createClass({
                 <a href="#" onClick={this.handleVoteDown}><i className="glyphicon glyphicon-arrow-down"></i></a>
             </span>
         );
-        
+
     },
 
     render() {
         const {Link} = Router, 
               post = this.props.post;
         return (
-            <li key={post.id}>
+            <li>
                 <b><a href={post.url} target="_blank">{post.title}</a></b>
                 <div>
                     <small>
@@ -105,7 +103,7 @@ const PostListItem = React.createClass({
 
 });
 
-module.exports = React.createClass({
+export default React.createClass({
 
     propTypes: {
         posts: PropTypes.object,
@@ -144,12 +142,13 @@ module.exports = React.createClass({
         );
     },
 
+
     render() {
         return (
             <div>
                 <ul className="list-unstyled">
                     {this.props.posts.map((post) => {
-                        return <PostListItem post={post} user={this.props.user} />;
+                        return <PostListItem key={post.id} post={post} user={this.props.user} />;
                     }).toJS()}
                 </ul>
                 {this.renderPager()}

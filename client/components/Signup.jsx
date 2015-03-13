@@ -1,10 +1,10 @@
-var React = require('react'),
-    Reflux = require('reflux'),
-    Router = require('react-router'),
-    {Input} = require('react-bootstrap'),
-    actions = require('../actions');
+import React from 'react';
+import Reflux from 'reflux';
+import Router from 'react-router';
+import {Input} from 'react-bootstrap';
+import actions from '../actions';
 
-module.exports = React.createClass({
+export default React.createClass({
 
     mixins: [
         Router.Navigation,
@@ -29,9 +29,9 @@ module.exports = React.createClass({
     handleSubmit (event) {
         event.preventDefault();
         
-        var name = this.refs.name.getValue(),
-            email = this.refs.email.getValue(),
-            password = this.refs.password.getValue();
+        const name = this.refs.name.getValue(),
+              email = this.refs.email.getValue(),
+              password = this.refs.password.getValue();
 
         actions.signup(name, email, password);
     },

@@ -1,9 +1,9 @@
-var Reflux = require('reflux'),
-    request = require('superagent'),
-    _ = require('lodash'),
-    validators = require('./validators');
+import Reflux from 'reflux';
+import request from 'superagent';
+import _ from 'lodash';
+import validators from './validators';
 
-var actions = Reflux.createActions([
+const actions = Reflux.createActions([
    "dismissAlert",
    "fetchLatestPosts",
    "fetchPopularPosts",
@@ -41,7 +41,7 @@ const bearer = (request) => {
 
 actions.signup.preEmit = (name, email, password) => {
 
-    var nameExists = (name) => {
+    const nameExists = (name) => {
         return new Promise((resolve, reject) => {
             request.get("/api/nameexists/")
                 .query({ name: name })
@@ -49,7 +49,7 @@ actions.signup.preEmit = (name, email, password) => {
         });
     };
 
-    var emailExists = (email) => {
+    const emailExists = (email) => {
         return new Promise((resolve, reject) => {
             request.get("/api/emailexists/")
                 .query({ email: email })
@@ -155,4 +155,4 @@ actions.fetchPostsForUser.preEmit = (page, name) => {
         .end((res) => actions.fetchPostsComplete(page, res.body));
 };
 
-module.exports = actions;
+export default actions;

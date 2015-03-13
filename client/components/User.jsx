@@ -1,11 +1,10 @@
-var React = require('react'),
-    Router = require('react-router'),
-    _ = require('lodash'),
-    actions = require('../actions'),
-    {PostsPage} = require('./Mixins');
+import React from 'react';
+import Router from 'react-router';
+import _ from 'lodash';
+import actions from '../actions';
+import {PostsPage} from './Mixins';
 
-
-module.exports = React.createClass({
+export default React.createClass({
 
     mixins: [
         Router.State,
@@ -23,7 +22,7 @@ module.exports = React.createClass({
     },
 
     componentWillReceiveProps(nextProps) {
-        var name = this.getParams().name;
+        const name = this.getParams().name;
         if (name != this.state.name){
             this.setState({ name: name});
             actions.fetchPostsForUser(1, name);
