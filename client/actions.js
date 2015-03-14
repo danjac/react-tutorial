@@ -40,6 +40,19 @@ const bearer = (request) => {
     return request;
 };
 
+
+actions.voteUp.preEmit = (post) => {
+  request.put("/api/upvote/" + post.id)
+    .use(bearer)
+    .end();
+};
+
+actions.voteDown.preEmit = (post) => {
+  request.put("/api/downvote/" + post.id)
+    .use(bearer)
+    .end();
+};
+
 actions.signup.preEmit = (name, email, password) => {
 
     const nameExists = (name) => {
@@ -135,7 +148,7 @@ actions.getUser.preEmit = () => {
 };
 
 const fetchPosts = (page, orderBy) => {
-  
+
     request.get('/api/posts/')
         .query({
             page: page,

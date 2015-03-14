@@ -26,7 +26,7 @@ export default (app, db) => {
         }
         db("users")
             .where("id", req.authToken.id)
-            .first("id", "name", "email")
+            .first("id", "name", "email", "votes")
             .then((user) => {
                 if (!user) {
                     return unauthenticated();
@@ -133,10 +133,8 @@ export default (app, db) => {
             .orWhere("email", identity)
             .first()
             .then((user) => {
-                // we'll encrypt this password later of course!
                 if (!user || !bcrypt.compareSync(password, user.password)) {
-                    res.sendStatus(401);
-                    return;
+                    return res.sendStatus(401);
                 } 
                 res.json({
                     token: jwtToken(user.id),
@@ -156,10 +154,49 @@ export default (app, db) => {
         getPosts(page, req.query.orderBy, req.params.name).then((result) => res.json(result));
     });
 
+    const vote = (req, res, amount) => {
+
+        db.transaction((trx) => {
+
+            db("posts")
+                .transacting(trx)
+                .where("id", req.params.id)
+                .whereRaw("user_id != ?", [req.user.id])
+                //.whereNot("user_id", req.id) -> add this post 0.7.5?
+                .whereNotIn("id", req.user.votes)
+                .increment('score', amount)
+                .then(() => {
+
+                    let votes = req.user.votes;
+                    votes.push(req.params.id);
+
+                    db("users")
+                        .transacting(trx)
+                        .where("id", req.user.id)
+                        .update({
+                            updated_at: moment.utc(),
+                            votes: '{' + votes.join() + '}'
+                        })
+                        .then(trx.commit)
+                        .catch(trx.rollback);
+
+                });
+
+        }).then(() => res.sendStatus(200));
+    };
+
+    app.put("/api/upvote/:id", [auth], (req, res) => {
+        vote(req, res, 1);
+    });
+
+    app.put("/api/downvote/:id", [auth], (req, res) => {
+        vote(req, res, -1);
+    });
+
     app.post("/api/submit/", [auth], (req, res) =>  {
-        var title = req.body.title,
-            url = req.body.url,
-            errors = validators.newPost(title, url);
+        const title = req.body.title,
+              url = req.body.url,
+              errors = validators.newPost(title, url);
 
         if (!errors.isEmpty()) {
             return res.status(400).json(errors);

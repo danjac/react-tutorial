@@ -33,7 +33,7 @@
     "jsdom": "^3.1.2",
     "jsonwebtoken": "^3.2.2",
     "jwt-simple": "^0.2.0",
-    "knex": "^0.7.4",
+    "knex": "^0.7.6",
     "lodash": "^3.5.0",
     "main-bower-files": "^2.5.0",
     "method-override": "^2.3.1",

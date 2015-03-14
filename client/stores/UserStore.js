@@ -20,21 +20,16 @@ export default Reflux.createStore({
 
     getUserComplete(user){
         this.user = user;
-        if (this.user) { 
-            this.user.votes = []; // placeholder
-        }
         this.trigger();
     },
 
     loginSuccess(user) {
         this.user = user;
-        this.user.votes = []; // placeholder
         this.trigger();
     },
 
     signupSuccess(user) {
         this.user = user;
-        this.user.votes = []; // placeholder
         this.trigger();
     },
 
@@ -44,9 +39,6 @@ export default Reflux.createStore({
     },
 
     tallyVote(post) {
-        if (this.user) {
-            this.user.votes = this.user.votes || []; // placeholder
-        }
         this.user.votes.push(post.id);
         this.trigger();
     },
