@@ -2,7 +2,6 @@ import Reflux from 'reflux';
 import request from 'superagent';
 import Immutable from 'immutable';
 import _ from 'lodash';
-import validators from './validators';
 
 const actions = Reflux.createActions([
    "dismissAlert",
@@ -54,44 +53,18 @@ actions.voteDown.preEmit = (post) => {
 };
 
 actions.signup.preEmit = (name, email, password) => {
-
-    const nameExists = (name) => {
-        return new Promise((resolve, reject) => {
-            request.get("/api/nameexists/")
-                .query({ name: name })
-                .end((res) => resolve(res.body.exists));
+    request.post("/api/signup/")
+        .send({
+            name: name,
+            email: email,
+            password: password
+        }).end((res) => {
+            if (res.badRequest) {
+                return actions.signupFailure(Immutable.Map(res.body));
+            }
+            window.localStorage.setItem(authToken, res.body.token);
+            actions.signupSuccess(res.body.user);
         });
-    };
-
-    const emailExists = (email) => {
-        return new Promise((resolve, reject) => {
-            request.get("/api/emailexists/")
-                .query({ email: email })
-                .end((res) => resolve(res.body.exists));
-        });
-    };
-
-    validators.signup(name, email, password, nameExists, emailExists)
-        .then((errors) => {
-
-        if (!errors.isEmpty()) {
-            return actions.signupFailure(errors);
-        }
-
-        request.post("/api/signup/")
-            .send({
-                name: name,
-                email: email,
-                password: password
-            }).end((res) => {
-                if (res.badRequest) {
-                    return actions.signupFailure(Immutable.Map(res.body));
-                }
-
-                window.localStorage.setItem(authToken, res.body.token);
-                actions.signupSuccess(res.body.user);
-            });
-    });
 };
 
 actions.deletePost.preEmit = (post) => {

@@ -4,6 +4,7 @@ import Router from 'react-router';
 import Immutable from 'immutable';
 import {Input} from 'react-bootstrap';
 import actions from '../actions';
+import validators from '../validators';
 
 export default React.createClass({
 
@@ -32,7 +33,13 @@ export default React.createClass({
         
         const name = this.refs.name.getValue(),
               email = this.refs.email.getValue(),
-              password = this.refs.password.getValue();
+              password = this.refs.password.getValue(),
+              errors = validators.signup(name, email, password);
+
+        if (!errors.isEmpty()){
+            this.setState({ errors: errors });
+            return;
+        }
 
         actions.signup(name, email, password);
     },

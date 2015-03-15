@@ -70,7 +70,11 @@ routes(app, db);
 // handle errors
 app.use((err, req, res, next) => {
     if (err.status){
-        return res.status(err.status).send(err.message);
+        var resp = res.status(err.status);
+        if (err.payload){
+            return resp.json(err.payload);
+        } 
+        return resp.send(err.message);
     }
     next(err);
 })

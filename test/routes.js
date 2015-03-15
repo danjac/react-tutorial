@@ -2,11 +2,12 @@ import request from 'supertest';
 import express from 'express';
 import dotenv from 'dotenv';
 import knex from 'knex';
+import expressJwt from 'express-jwt';
 import {expect} from 'chai';
 
 import jsxRoutes from '../client/Routes';
 import {reactify} from '../server/middleware';
-import routes from '../server/routes';
+import routes, {jwtToken} from '../server/routes';
 
 dotenv.load();
 
@@ -32,6 +33,13 @@ const app = express();
 
 app.use(reactify(jsxRoutes));
 
+app.use(expressJwt({
+    secret: process.env.SECRET_KEY,
+    credentialsRequired: false,
+    requestProperty: 'authToken'
+}).unless({ path: ["/public"]}));
+
+
 app.set('views', __dirname + '/../server/views');
 app.set('view engine', 'ejs');
 
@@ -46,7 +54,7 @@ describe("GET /", () => {
 	});
 
 	afterEach((done) => {
-			db.migrate.rollback(config).then(() => done());
+		db.migrate.rollback(config).then(() => done());
 	});
 
 	it('should render a list of posts', (done) => {

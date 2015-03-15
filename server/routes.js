@@ -245,55 +245,47 @@ export default (app, db) => {
             });
     };
 
-    app.get("/api/nameexists/", (req, res) =>  {
-        if (!req.query.name) {
-            return res.sendStatus(400);
-        }
-        nameExists(req.query.name).then((exists) => {
-            res.json({ exists: exists });
-        });
-    });
-
-    app.get("/api/emailexists/", (req, res) =>  {
-        if (!req.query.email) {
-            return res.sendStatus(400);
-        }
-        emailExists(req.query.email).then((exists) => {
-            res.json({ exists: exists });
-        });
-    });
-
-    app.post("/api/signup/", (req, res) =>  {
+    app.post("/api/signup/", (req, res, next) =>  {
 
         const {name, email, password} = req.body;
 
-        validators.signup(
-            name,
-            email, 
-            password,
-            nameExists,
-            emailExists
-        ).then((errors) => {
-            if (!errors.isEmpty()) {
-                return res.status(400).json(errors);
-            }
-            return db("users")
-                .returning("id")
-                .insert({
-                    name: name,
-                    email: email,
-                    password: bcrypt.hashSync(password, 10)
-            }).then((ids) => {
+        var errMap = validators.signup(name, email, password);
+
+        nameExists(name)
+            .then((exists) => {
+                if (exists) {
+                    errMap = errMap.set("name", "This username already exists");
+                };
+                return emailExists(email);
+            })
+            .then((exists) => {
+                if (exists) {
+                    errMap = errMap.set("email", "This email address already exists");
+                }
+                if (!errMap.isEmpty()) {
+                    throw new errors.ValidationFailure(errMap);
+                }
+            })
+            .then(() => {
+               return db("users")
+                    .returning("id")
+                    .insert({
+                        name: name,
+                        email: email,
+                        password: bcrypt.hashSync(password, 10)
+                    });
+            })
+            .then((ids) => {
                 return db("users")
                     .where("id", ids[0])
                     .first("id", "name", "email");
-            }).then((user) => {
-                return res.json({
+            })
+            .then((user) => {
+                res.json({
                     token: jwtToken(user.id),
                     user: user
                 });
-            });
+            }, (err) => next(err));
         });
-    });
 
 };
