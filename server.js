@@ -67,6 +67,14 @@ app.use(reactify(jsxRoutes));
 //
 routes(app, db);
    
+// handle errors
+app.use((err, req, res, next) => {
+    if (err.status){
+        return res.status(err.status).send(err.message);
+    }
+    next(err);
+})
+
 // run server
 
 console.log("Running on port", port);

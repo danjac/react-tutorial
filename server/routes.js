@@ -4,6 +4,13 @@ import bcrypt from 'bcryptjs';
 import Immutable from 'immutable';
 import validators from '../client/validators';
 
+class NotAllowed extends Error {
+    constructor(message) {
+        this.message = message;
+        this.status = 403;
+    }
+};
+
 const pageSize = 10;
 
 const jwtToken = (userId) => {
@@ -155,8 +162,6 @@ export default (app, db) => {
 
     const vote = (req, res, next, amount) => {
 
-        let notAllowed = false;
-
         db.transaction((trx) => {
 
             db("posts")
@@ -169,8 +174,7 @@ export default (app, db) => {
                 .then((result) => {
 
                     if (result !== 1) {
-                        notAllowed = true;
-                        throw new Error("You can't vote on this post!");
+                        throw new NotAllowed("You cannot vote on this post!");
                     }
 
                     req.user.votes.push(req.params.id);
@@ -185,13 +189,7 @@ export default (app, db) => {
                 .then(trx.commit, trx.rollback);
 
         }).then(() => res.sendStatus(200),
-                (err) => {
-                   if (notAllowed) {
-                        res.status(403).send(err.message);
-                   } else {
-                        next(err);
-                   }
-                });
+                (err) => next(err));
     };
 
     app.put("/api/upvote/:id", [auth], (req, res, next) => {
