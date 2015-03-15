@@ -165,20 +165,26 @@ export default (app, db) => {
                 //.whereNot("user_id", req.id) -> add this post 0.7.5?
                 .whereNotIn("id", req.user.votes)
                 .increment('score', amount)
-                .then(() => {
+                .then((result) => {
+
+                    if (result !== 1) {
+                        throw new Error("You can't vote on this post!");
+                    }
+
                     req.user.votes.push(req.params.id);
-                    db("users")
+
+                    return db("users")
                         .transacting(trx)
                         .where("id", req.user.id)
                         .update({
                             updated_at: moment.utc(),
                             votes: req.user.votes
-                        })
-                        .then(trx.commit)
-                        .catch(trx.rollback)
-                });
+                        });
+                })
+                .then(trx.commit, trx.rollback);
 
-        }).then(() => res.sendStatus(200));
+        }).then(() => res.sendStatus(200),
+                () => res.sendStatus(403));
     };
 
     app.put("/api/upvote/:id", [auth], (req, res) => {
@@ -217,7 +223,11 @@ export default (app, db) => {
             .where({
                 id: req.params.id,
                 user_id: req.user.id
-            }).del().then(() => res.sendStatus(200));
+            }).del().then((result) => {
+                console.log("RESULT", result)
+                const status = result === 1 ? 200 : 403;
+                res.sendStatus(status);
+            });
     });
 
     const nameExists = (name) => {
