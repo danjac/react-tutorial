@@ -166,7 +166,6 @@ export default (app, db) => {
                 .whereNotIn("id", req.user.votes)
                 .increment('score', amount)
                 .then(() => {
-
                     let votes = req.user.votes;
                     votes.push(req.params.id);
 
@@ -175,11 +174,11 @@ export default (app, db) => {
                         .where("id", req.user.id)
                         .update({
                             updated_at: moment.utc(),
-                            votes: '{' + votes.join() + '}'
+                            votes: votes
+                            //votes: '{' + votes.join() + '}'
                         })
                         .then(trx.commit)
-                        .catch(trx.rollback);
-
+                        .catch(trx.rollback)
                 });
 
         }).then(() => res.sendStatus(200));
