@@ -3,20 +3,7 @@ import _ from 'lodash';
 import bcrypt from 'bcryptjs';
 import Immutable from 'immutable';
 import validators from '../client/validators';
-
-class NotAuthenticated extends Error {
-    constructor(message) {
-        this.message = message;
-        this.status = 401;
-    }
-};
-
-class NotAllowed extends Error {
-    constructor(message) {
-        this.message = message;
-        this.status = 403;
-    }
-};
+import * as errors from './errors';
 
 const pageSize = 10;
 
@@ -30,7 +17,7 @@ export default (app, db) => {
 
     const auth = (req, res, next) => {
 
-        const err = new NotAuthenticated("You are not signed in");
+        const err = new errors.NotAuthenticated("You are not signed in");
 
         if (!req.authToken) {
             return next(err);
@@ -179,7 +166,7 @@ export default (app, db) => {
                 .then((result) => {
 
                     if (result !== 1) {
-                        throw new NotAllowed("You cannot vote on this post!");
+                        throw new errors.NotAllowed("You cannot vote on this post!");
                     }
 
                     req.user.votes.push(req.params.id);
