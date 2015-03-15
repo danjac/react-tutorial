@@ -46,7 +46,7 @@ describe("GET /", () => {
 	});
 
 	afterEach((done) => {
-		db.migrate.rollback(config).then(() => done());
+			db.migrate.rollback(config).then(() => done());
 	});
 
 	it('should render a list of posts', (done) => {
