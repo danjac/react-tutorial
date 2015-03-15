@@ -53,6 +53,7 @@
     "serve-static": "^1.9.1",
     "sinon": "^1.13.0",
     "superagent": "^0.21.0",
+    "supertest": "^0.15.0",
     "validator": "^3.33.0",
     "watchify": "^2.4.0",
     "webpack": "^1.7.2",

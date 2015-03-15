@@ -70,11 +70,9 @@ const PostListItem = React.createClass({
         const user = this.props.user,
               post = this.props.post;
 
-        /*
         if (!user || user.id === post.author_id || _.includes(user.votes, post.id)){
             return '';
-        }*/
-        
+        }
 
         return (
             <span>
