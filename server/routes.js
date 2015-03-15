@@ -1,4 +1,3 @@
-import moment from 'moment';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import bcrypt from 'bcryptjs';
@@ -156,7 +155,7 @@ export default (app, db) => {
 
     const vote = (req, res, next, amount) => {
 
-        var notAllowed = false;
+        let notAllowed = false;
 
         db.transaction((trx) => {
 
@@ -180,7 +179,6 @@ export default (app, db) => {
                         .transacting(trx)
                         .where("id", req.user.id)
                         .update({
-                            updated_at: moment.utc(),
                             votes: req.user.votes
                         });
                 })
@@ -218,8 +216,7 @@ export default (app, db) => {
             .insert({
                 title: title,
                 url: url,
-                user_id: req.user.id,
-                created_at: moment.utc()
+                user_id: req.user.id
             }).then((ids) => {
                 return db("posts").where("id", ids[0]).first();
             }).then((post) => {
@@ -295,7 +292,6 @@ export default (app, db) => {
                 .insert({
                     name: name,
                     email: email,
-                    created_at: moment.utc(),
                     password: bcrypt.hashSync(password, 10)
             }).then((ids) => {
                 return db("users")
