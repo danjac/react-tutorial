@@ -224,7 +224,6 @@ export default (app, db) => {
                 id: req.params.id,
                 user_id: req.user.id
             }).del().then((result) => {
-                console.log("RESULT", result)
                 const status = result === 1 ? 200 : 403;
                 res.sendStatus(status);
             });
