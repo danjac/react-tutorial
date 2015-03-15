@@ -27,7 +27,7 @@ export default React.createClass({
     onLogout() {
         // reload this page: we should use transitionTo, 
         // but that doesn't call the willTransitionTo authentication.
-        window.location.href = this.getPath();
+        this.transitionTo("popular");
     },
 
     onMessagesUpdate() {

@@ -154,7 +154,9 @@ export default (app, db) => {
         getPosts(page, req.query.orderBy, req.params.name).then((result) => res.json(result));
     });
 
-    const vote = (req, res, amount) => {
+    const vote = (req, res, next, amount) => {
+
+        var notAllowed = false;
 
         db.transaction((trx) => {
 
@@ -168,6 +170,7 @@ export default (app, db) => {
                 .then((result) => {
 
                     if (result !== 1) {
+                        notAllowed = true;
                         throw new Error("You can't vote on this post!");
                     }
 
@@ -184,15 +187,21 @@ export default (app, db) => {
                 .then(trx.commit, trx.rollback);
 
         }).then(() => res.sendStatus(200),
-                () => res.sendStatus(403));
+                (err) => {
+                   if (notAllowed) {
+                        res.status(403).send(err.message);
+                   } else {
+                        next(err);
+                   }
+                });
     };
 
-    app.put("/api/upvote/:id", [auth], (req, res) => {
-        vote(req, res, 1);
+    app.put("/api/upvote/:id", [auth], (req, res, next) => {
+        vote(req, res, next, 1);
     });
 
-    app.put("/api/downvote/:id", [auth], (req, res) => {
-        vote(req, res, -1);
+    app.put("/api/downvote/:id", [auth], (req, res, next) => {
+        vote(req, res, next, -1);
     });
 
     app.post("/api/submit/", [auth], (req, res) =>  {
