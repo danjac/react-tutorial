@@ -166,16 +166,13 @@ export default (app, db) => {
                 .whereNotIn("id", req.user.votes)
                 .increment('score', amount)
                 .then(() => {
-                    let votes = req.user.votes;
-                    votes.push(req.params.id);
-
+                    req.user.votes.push(req.params.id);
                     db("users")
                         .transacting(trx)
                         .where("id", req.user.id)
                         .update({
                             updated_at: moment.utc(),
-                            votes: votes
-                            //votes: '{' + votes.join() + '}'
+                            votes: req.user.votes
                         })
                         .then(trx.commit)
                         .catch(trx.rollback)
