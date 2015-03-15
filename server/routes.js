@@ -4,6 +4,13 @@ import bcrypt from 'bcryptjs';
 import Immutable from 'immutable';
 import validators from '../client/validators';
 
+class NotAuthenticated extends Error {
+    constructor(message) {
+        this.message = message;
+        this.status = 401;
+    }
+};
+
 class NotAllowed extends Error {
     constructor(message) {
         this.message = message;
@@ -23,19 +30,17 @@ export default (app, db) => {
 
     const auth = (req, res, next) => {
 
-        const unauthenticated = () => {
-            return res.sendStatus(401);
-        }
+        const err = new NotAuthenticated("You are not signed in");
 
         if (!req.authToken) {
-            return unauthenticated();
+            return next(err);
         }
         db("users")
             .where("id", req.authToken.id)
             .first("id", "name", "email", "votes")
             .then((user) => {
                 if (!user) {
-                    return unauthenticated();
+                    return next(err);
                 }
                 req.user = user;
                 next();
