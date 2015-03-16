@@ -8,6 +8,7 @@ var browserify = require('gulp-browserify'),
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify'),
     sourcemaps = require('gulp-sourcemaps'),
+    notify = require('gulp-notify'),
     browserSync = require('browser-sync');
 
 var staticDir = './public',
@@ -33,7 +34,10 @@ gulp.task('serve', function() {
 
 gulp.task('build-src', function() {
     gulp.src(srcDir + '/app.js')
-        .pipe(plumber())
+        .pipe(notify({message: "Build started"}))
+        .pipe(plumber({
+            errorHandler: notify.onError("Error: <%= error.message %>")
+        }))
         .pipe(sourcemaps.init())
         .pipe(concat('app.js'))
         .pipe(browserify({
@@ -49,7 +53,10 @@ gulp.task('build-src', function() {
         }))
         .pipe(uglify())
         .pipe(sourcemaps.write(dest.js))
-        .pipe(gulp.dest(dest.js));
+        .pipe(gulp.dest(dest.js))
+        .pipe(notify({
+            message: 'Build complete'
+        }));
 
 });
 

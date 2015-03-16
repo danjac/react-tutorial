@@ -31,7 +31,7 @@ export default (app, db) => {
                 }
                 req.user = user;
                 next();
-            });
+            }, (err) => next(err));
     };
 
     const getPosts = (page, orderBy, username=null) => {
@@ -64,7 +64,7 @@ export default (app, db) => {
             posts = posts.where("users.name", username);
         }
 
-        posts = posts.orderBy(
+        return posts.orderBy(
             'posts.' + orderBy, 'desc'
         ).limit(pageSize).offset(offset).then((posts) => {
             return posts;
@@ -85,8 +85,6 @@ export default (app, db) => {
             result.isLast = (!numPages || page === numPages);
             return result;
         });
-
-        return posts;
 
     };
 
@@ -121,7 +119,7 @@ export default (app, db) => {
         return res.json(req.user);
     });
 
-    app.post("/api/login/", (req, res) =>  {
+    app.post("/api/login/", (req, res, next) =>  {
         const {identity, password} = req.body;
         if (!identity || !password) {
             return res.sendStatus(400);
@@ -139,17 +137,19 @@ export default (app, db) => {
                     user: _.omit(user, 'password')
                 });
 
-            });
+            }, (err) => next(err));
     });
 
-    app.get("/api/posts/", (req, res) =>  {
+    app.get("/api/posts/", (req, res, next) =>  {
         const page = parseInt(req.query.page || 1);
-        getPosts(page, req.query.orderBy).then((result) => res.json(result));
+        getPosts(page, req.query.orderBy)
+            .then((result) => res.json(result), (err) => next(err));
     });
 
-    app.get("/api/user/:name", (req, res) =>  {
+    app.get("/api/user/:name", (req, res, next) =>  {
         const page = parseInt(req.query.page || 1);
-        getPosts(page, req.query.orderBy, req.params.name).then((result) => res.json(result));
+        getPosts(page, req.query.orderBy, req.params.name)
+            .then((result) => res.json(result), (err) => next(err));
     });
 
     const vote = (req, res, next, amount) => {
@@ -192,7 +192,7 @@ export default (app, db) => {
         vote(req, res, next, -1);
     });
 
-    app.post("/api/submit/", [auth], (req, res) =>  {
+    app.post("/api/submit/", [auth], (req, res, next) =>  {
         const title = req.body.title,
               url = req.body.url,
               errors = validators.newPost(title, url);
@@ -208,13 +208,17 @@ export default (app, db) => {
                 url: url,
                 user_id: req.user.id
             }).then((ids) => {
-                return db("posts").where("id", ids[0]).first();
-            }).then((post) => {
-                res.json(post);
-            });
+                res.json({
+                    id: ids[0],
+                    title: title,
+                    url: url,
+                    author: req.user.name,
+                    author_id: req.user.id
+                });
+            }, (err) => next(err));
     });
 
-    app.delete("/api/:id", [auth], (req, res) =>  {
+    app.delete("/api/:id", [auth], (req, res, next) =>  {
         db("posts")
             .where({
                 id: req.params.id,
@@ -222,7 +226,7 @@ export default (app, db) => {
             }).del().then((result) => {
                 const status = result === 1 ? 200 : 403;
                 res.sendStatus(status);
-            });
+            }, (err) => next(err));
     });
 
     const nameExists = (name) => {
@@ -276,16 +280,15 @@ export default (app, db) => {
                     });
             })
             .then((ids) => {
-                return db("users")
-                    .where("id", ids[0])
-                    .first("id", "name", "email");
-            })
-            .then((user) => {
+                const userId = ids[0];
                 res.json({
-                    token: jwtToken(user.id),
-                    user: user
+                    token: jwtToken(userId),
+                    user: {
+                        id: userId,
+                        name: name,
+                        email: email
+                    }
                 });
             }, (err) => next(err));
         });
-
 };
