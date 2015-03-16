@@ -53,6 +53,7 @@ actions.voteDown.preEmit = (post) => {
 };
 
 actions.signup.preEmit = (name, email, password) => {
+
     request.post("/api/signup/")
         .send({
             name: name,
@@ -60,7 +61,7 @@ actions.signup.preEmit = (name, email, password) => {
             password: password
         }).end((res) => {
             if (res.badRequest) {
-                return actions.signupFailure(Immutable.Map(res.body));
+                return actions.signupFailure(res.body);
             }
             window.localStorage.setItem(authToken, res.body.token);
             actions.signupSuccess(res.body.user);

@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import bcrypt from 'bcryptjs';
+import moment from 'moment';
 import Immutable from 'immutable';
-import validators from '../client/validators';
+import * as validators from '../client/validators';
 import * as errors from './errors';
 
 const pageSize = 10;
@@ -197,13 +198,8 @@ export default (app, db) => {
     });
 
     app.post("/api/submit/", [auth], (req, res, next) =>  {
-        const title = req.body.title,
-              url = req.body.url,
-              errors = validators.newPost(title, url);
 
-        if (!errors.isEmpty()) {
-            return res.status(400).json(errors);
-        }
+        let {title:title, url: url} = new validators.NewPost().check(req.body);
 
         db("posts")
             .returning("id")
@@ -218,7 +214,8 @@ export default (app, db) => {
                     title: title,
                     url: url,
                     author: req.user.name,
-                    author_id: req.user.id
+                    author_id: req.user.id,
+                    created_at: moment.utc()
                 });
             }, (err) => next(err));
     });
@@ -241,7 +238,10 @@ export default (app, db) => {
             .where("name", name)
             .first()
             .then((result) => {
-                return parseInt(result.count) > 0;
+                if (parseInt(result.count) > 0){
+                    return [name, "This username already exists!"]
+                }
+                return [name, null]
             });
     };
 
@@ -251,38 +251,31 @@ export default (app, db) => {
             .where("email", email)
             .first()
             .then((result) => {
-                return parseInt(result.count) > 0;
+                if (parseInt(result.count) > 0){
+                    return [email, "This email address already exists!"]
+                }
+                return [email, null]
             });
     };
 
     app.post("/api/signup/", (req, res, next) =>  {
 
-        const {name, email, password} = req.body;
+        var formData = null;
 
-        var errMap = validators.signup(name, email, password);
+        const validator = new validators.Signup();
 
-        nameExists(name)
-            .then((exists) => {
-                if (exists) {
-                    errMap = errMap.set("name", "This username already exists");
-                };
-                return emailExists(email);
-            })
-            .then((exists) => {
-                if (exists) {
-                    errMap = errMap.set("email", "This email address already exists");
-                }
-                if (!errMap.isEmpty()) {
-                    throw new errors.ValidationFailure(errMap);
-                }
-            })
-            .then(() => {
-               return db("users")
+        validator.validateAsync("name", nameExists);
+        validator.validateAsync("email", emailExists);
+
+        validator.checkAsync(req.body)
+            .then((data) => {
+                formData = data;
+                return db("users")
                     .returning("id")
                     .insert({
-                        name: name,
-                        email: email,
-                        password: bcrypt.hashSync(password, 10)
+                        name: formData.name,
+                        email: formData.email,
+                        password: bcrypt.hashSync(formData.password, 10)
                     });
             })
             .then((ids) => {
@@ -291,8 +284,9 @@ export default (app, db) => {
                     token: jwtToken(userId),
                     user: {
                         id: userId,
-                        name: name,
-                        email: email
+                        name: formData.name,
+                        email: formData.email,
+                        created_at: moment.utc()
                     }
                 });
             }, (err) => next(err));

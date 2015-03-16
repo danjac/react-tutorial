@@ -54,6 +54,7 @@ gulp.task('build-src', function() {
         .pipe(uglify())
         .pipe(sourcemaps.write(dest.js))
         .pipe(gulp.dest(dest.js))
+        .pipe(browserSync.reload({stream:true}))
         .pipe(notify({
             message: 'Build complete'
         }));

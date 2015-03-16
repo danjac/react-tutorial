@@ -1,10 +1,10 @@
 import React from 'react';
 import Reflux from 'reflux';
 import Router from 'react-router';
-import Immutable from 'immutable';
 import {Input} from 'react-bootstrap';
 import actions from '../actions';
-import validators from '../validators';
+import * as validators from '../validators';
+
 
 export default React.createClass({
 
@@ -16,7 +16,7 @@ export default React.createClass({
 
     getInitialState () {
         return {
-            errors: Immutable.Map()
+            errors: {}
         };
     },
 
@@ -30,19 +30,21 @@ export default React.createClass({
 
     handleSubmit (event) {
         event.preventDefault();
-        
-        const name = this.refs.name.getValue(),
-              email = this.refs.email.getValue(),
-              password = this.refs.password.getValue(),
-              errors = validators.signup(name, email, password);
 
-        if (!errors.isEmpty()){
-            this.setState({ errors: errors });
-            return;
-        }
+        const refs = {
+            name: this.refs.name.getValue(),
+            email: this.refs.email.getValue(),
+            password: this.refs.password.getValue()
+        };
 
-        actions.signup(name, email, password);
+        try {
+            let data = new validators.Signup().check(refs);
+            actions.signup(data.name, data.email, data.password);
+        } catch (e) {
+            this.setState({ errors: e.errors });
+        } 
     },
+
 
     render () {
 
@@ -52,20 +54,20 @@ export default React.createClass({
                       type="text" 
                       label="Name" 
                       required
-                      bsStyle={this.state.errors.has("name")? 'error': null}  
-                      help={this.state.errors.get("name", "")} />
+                      bsStyle={this.state.errors.name? 'error': null}  
+                      help={this.state.errors.name} />
                <Input ref="email" 
                       type="email" 
                       label="Email address" 
                       required
-                      bsStyle={this.state.errors.has("email")? 'error': null}  
-                      help={this.state.errors.get("email", "")} />
+                      bsStyle={this.state.errors.email? 'error': null}  
+                      help={this.state.errors.email} />
                <Input ref="password" 
                       type="password" 
                       label="Password" 
                       required
-                      bsStyle={this.state.errors.has("password")? 'error': null}  
-                      help={this.state.errors.get("password", "")} />
+                      bsStyle={this.state.errors.password? 'error': null}  
+                      help={this.state.errors.password} />
                <Input type="submit" value="Signup" />
             </form>
         );
