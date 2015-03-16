@@ -54,7 +54,8 @@ export default (app, db) => {
             'posts.created_at',
             'users.name AS author',
             'users.id AS author_id'
-        ).from('posts').innerJoin(
+        )
+        .from('posts').innerJoin(
             'users',
             'users.id',
             'posts.user_id'
@@ -66,9 +67,11 @@ export default (app, db) => {
 
         return posts.orderBy(
             'posts.' + orderBy, 'desc'
-        ).limit(pageSize).offset(offset).then((posts) => {
+        )
+        .limit(pageSize).offset(offset).then((posts) => {
             return posts;
-        }).then((posts) => {
+        })
+        .then((posts) => {
             result.posts = Immutable.List(posts);
             var q = db("posts").count("posts.id");
             if (username) {
@@ -79,7 +82,8 @@ export default (app, db) => {
                     ).where("users.name", username)
             }
             return q.first();
-        }).then((total) => {
+        })
+        .then((total) => {
             result.total = parseInt(total.count);
             const numPages = Math.ceil(result.total / pageSize);
             result.isLast = (!numPages || page === numPages);
@@ -180,8 +184,8 @@ export default (app, db) => {
                 })
                 .then(trx.commit, trx.rollback);
 
-        }).then(() => res.sendStatus(200),
-                (err) => next(err));
+        })
+        .then(() => res.sendStatus(200), (err) => next(err));
     };
 
     app.put("/api/upvote/:id", [auth], (req, res, next) => {
@@ -207,7 +211,8 @@ export default (app, db) => {
                 title: title,
                 url: url,
                 user_id: req.user.id
-            }).then((ids) => {
+            })
+            .then((ids) => {
                 res.json({
                     id: ids[0],
                     title: title,
@@ -223,10 +228,11 @@ export default (app, db) => {
             .where({
                 id: req.params.id,
                 user_id: req.user.id
-            }).del().then((result) => {
+            })
+            .del().then((result) => {
                 const status = result === 1 ? 200 : 403;
                 res.sendStatus(status);
-            }, (err) => next(err));
+                }, (err) => next(err));
     });
 
     const nameExists = (name) => {
