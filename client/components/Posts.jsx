@@ -1,4 +1,5 @@
 import React, {PropTypes} from 'react';
+import {PureRenderMixin} from 'react/addons';
 import Router, {Link} from 'react-router';
 import _ from 'lodash';
 import moment from 'moment';
@@ -7,6 +8,8 @@ import actions from '../actions';
 
 
 const DeletePostModal = React.createClass({
+
+    mixins: [PureRenderMixin],
 
     handleDelete (event) {
         event.preventDefault();
@@ -39,7 +42,8 @@ const PostListItem = React.createClass({
     },
 
     mixins: [
-        Router.Navigation
+        Router.Navigation,
+        PureRenderMixin
     ],
 
     handleVoteUp(event) {
@@ -107,6 +111,8 @@ const PostListItem = React.createClass({
 });
 
 export default React.createClass({
+
+    mixins: [PureRenderMixin],
 
     propTypes: {
         posts: PropTypes.object,
