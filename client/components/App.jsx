@@ -1,6 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import Router, {RouteHandler} from 'react-router';
+import Router, {RouteHandler, Link} from 'react-router';
 import {Alert, Navbar, Nav, NavItem}  from 'react-bootstrap';
 import {NavItemLink} from 'react-router-bootstrap';
 import actions from '../actions';
@@ -60,10 +60,11 @@ export default React.createClass({
 
     render() {
 
+        var brand = <Link to={this.makeHref("popular")}>ReactNews</Link>;
+
         var navbar = (
-            <Navbar brand="ReactNews" className="navbar navbar-inverse" fixedTop={true} fluid={true}>
+            <Navbar brand={brand} className="navbar navbar-inverse" fixedTop={true} fluid={true}>
               <Nav className="navbar-left">
-                <NavItemLink to={this.makeHref("popular")}>top</NavItemLink>
                 <NavItemLink to={this.makeHref("latest")}>new</NavItemLink>
                 <NavItemLink to={this.makeHref("submit")}>submit</NavItemLink>
               </Nav>

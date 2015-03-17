@@ -144,7 +144,7 @@ export default (app, db) => {
             .sum("score")
             .first()
             .then((result) => {
-               req.user.totalScore = parseInt(result.sum);
+               req.user.totalScore = parseInt(result.sum || 0);
                res.json(req.user);
             }, (err) => next(err));
     });
@@ -173,7 +173,7 @@ export default (app, db) => {
             })
             .then((result) => {
                 
-                authUser.totalScore = parseInt(result.sum);
+                authUser.totalScore = parseInt(result.sum || 0);
 
                 res.json({
                     token: jwtToken(authUser.id),

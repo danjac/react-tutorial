@@ -10,6 +10,7 @@ import jwt from 'jsonwebtoken';
 import expressJwt from 'express-jwt';
 import dotenv from 'dotenv';
 import knex from 'knex';
+import cors from 'cors';
 import routes from './server/routes';
 import {reactify} from './server/middleware';
 import jsxRoutes from './client/Routes';
@@ -26,6 +27,7 @@ app.set('port', port);
 app.set('views', path.join(__dirname, '/server/views'));
 app.set('view engine', 'ejs');
 
+app.use(cors());
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(methodOverride());
