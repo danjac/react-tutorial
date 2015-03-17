@@ -1,5 +1,56 @@
 import React from 'react';
 import Router from 'react-router';
+import {NotAuthenticated} from './errors';
+
+
+export function authenticate(db) {
+
+    return (req, res, next) => {
+
+        const err = new NotAuthenticated("You are not signed in");
+
+        if (!req.authToken) {
+            return next(err);
+        }
+        db("users")
+            .where("id", req.authToken.id)
+            .first("id", "name", "email", "votes")
+            .then((user) => {
+                if (!user) {
+                    return next(err);
+                }
+                req.user = user;
+                next();
+            }, (err) => next(err));
+    };
+};
+
+
+export function validate(validator) {
+
+    return (req, res, next) => {
+        
+        if (validator.async) {
+            console.log("validating async...")
+            validator.checkAsync(req.body).then((result) => {
+                console.log("errors", result.errors, "data", result.data)
+                if (!result.ok) {
+                    return res.status(400).json(result.errors);
+                }
+                req.clean = result.data;
+                next();
+            }, (err) => next(err));
+        } else {
+            let result = validator.check(req.body);
+            if (!result.ok) {
+                return res.status(400).json(result.body);
+            }
+            req.clean = result.data;
+            next();
+        }
+    }
+};
+
 
 export function reactify(routes) {
 

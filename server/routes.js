@@ -5,6 +5,7 @@ import moment from 'moment';
 import Immutable from 'immutable';
 import * as validators from '../client/validators';
 import * as errors from './errors';
+import {authenticate, validate} from './middleware';
 
 const pageSize = 10;
 
@@ -14,35 +15,9 @@ const jwtToken = (userId) => {
     });
 };
 
-// move into middleware.js
-const validate = (validator) => {
-
-    return (req, res, next) => {
-        
-        if (validator.async) {
-            console.log("validating async...")
-            validator.checkAsync(req.body).then((result) => {
-                console.log("errors", result.errors, "data", result.data)
-                if (!result.ok) {
-                    return res.status(400).json(result.errors);
-                }
-                req.clean = result.data;
-                next();
-            }, (err) => next(err));
-        } else {
-            let result = validator.check(req.body);
-            if (!result.ok) {
-                return res.status(400).json(result.body);
-            }
-            req.clean = result.data;
-            next();
-        }
-    }
-};
-
-
-
 export default (app, db) => {
+
+    const auth = authenticate(db);
 
     const nameExists = (name, resolve, reject) => {
         return db("users")
@@ -77,25 +52,6 @@ export default (app, db) => {
 
     const validateSignup = validate(signupValidator);
     const validateNewPost = validate(new validators.NewPost());
-
-    const auth = (req, res, next) => {
-
-        const err = new errors.NotAuthenticated("You are not signed in");
-
-        if (!req.authToken) {
-            return next(err);
-        }
-        db("users")
-            .where("id", req.authToken.id)
-            .first("id", "name", "email", "votes")
-            .then((user) => {
-                if (!user) {
-                    return next(err);
-                }
-                req.user = user;
-                next();
-            }, (err) => next(err));
-    };
 
     const getPosts = (page, orderBy, username=null) => {
 
