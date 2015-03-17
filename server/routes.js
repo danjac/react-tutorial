@@ -199,7 +199,11 @@ export default (app, db) => {
 
     app.post("/api/submit/", [auth], (req, res, next) =>  {
 
-        let {title:title, url: url} = new validators.NewPost().check(req.body);
+        try {
+            let {title:title, url: url} = new validators.NewPost().check(req.body);
+        } catch(e) {
+            return next(e);
+        }
 
         db("posts")
             .returning("id")
@@ -232,29 +236,32 @@ export default (app, db) => {
                 }, (err) => next(err));
     });
 
-    const nameExists = (name) => {
+    const nameExists = (name, resolve, reject) => {
         return db("users")
             .count("id")
             .where("name", name)
             .first()
             .then((result) => {
                 if (parseInt(result.count) > 0){
-                    return [name, "This username already exists!"]
+                    reject("This username already exists!")
+                } else {
+                    resolve(name);
                 }
-                return [name, null]
             });
     };
 
-    const emailExists = (email) => {
+    const emailExists = (email, resolve, reject) => {
         return db("users")
             .count("id")
             .where("email", email)
             .first()
             .then((result) => {
                 if (parseInt(result.count) > 0){
-                    return [email, "This email address already exists!"]
-                }
-                return [email, null]
+                    reject("This email address already exists!")
+                } else {
+                    resolve(email);
+                } 
+
             });
     };
 

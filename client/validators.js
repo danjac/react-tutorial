@@ -65,9 +65,9 @@ class Validator {
         const validators = this._validators.filter((v) => !v.async);
 
         validators.forEach((v) => {
-            let [value, error] = v.fn(this._data.get(v.name), this);
-            this.setData(v.name, value);
-            this.setError(v.name, error);
+            v.fn(this._data.get(v.name), 
+                 (value) => this.setData(v.name, value),
+                 (error) => this.setError(v.name, error));
         });
 
         if (!this.isValid() && throwsException){
@@ -85,19 +85,16 @@ class Validator {
         const promises = validators.map((v) => {
             let value = this._data.get(v.name);
             return new Promise((resolve) => {
-                v.fn(value)
-                    .then((result) => {
-                        resolve([v.name, result]);
+                v.fn(value, 
+                     (value) => this.setData(v.name, value),
+                     (error) => this.setError(v.name, error))
+                    .then(() => {
+                        resolve();
                     });
             })
         }).toJS();
 
-        return Promise.all(promises).then((values) => {
-            values.forEach((v) => {
-                let [name, [value, error]] = v;
-                this.setData(name, value);
-                this.setError(name, error);
-            });
+        return Promise.all(promises).then(() => {
             if (!this.isValid() && throwsException) {
                 throw new ValidationFailure(this);
             }
@@ -126,28 +123,31 @@ export class Signup extends Validator {
 
         super();
 
-        this.validate("name", (value) => {
+        this.validate("name", (value, resolve, reject) => {
             value = (value || "").trim();
             if (!validator.isLength(value, 10, 60)) {
-                return [value, "Your name must be between 10 and 60 characters"];
+                reject("Your name must be between 10 and 60 characters");
+            } else {
+                resolve(value);
             }
-            return [value, null];
         });
 
-        this.validate("email", (value) => {
+        this.validate("email", (value, resolve, reject) => {
             value = (value || "").trim();
             if (!validator.isEmail(value)) {
-                return [value, "Please enter a valid email address"];
+                reject("Please enter a valid email address");
+            } else {
+                resolve(value);
             }
-            return [value, null];
         });
 
-        this.validate("password", (value) => {
+        this.validate("password", (value, resolve, reject) => {
             value = (value || "").trim();
             if (!validator.isLength(value, 6)) {
-                return [value, "Your password must be at least 6 characters long"];
+                reject("Your password must be at least 6 characters long");
+            } else {
+                resolve(value);
             }
-            return [value, null];
         });
 
     }
@@ -160,21 +160,23 @@ export class NewPost extends Validator {
 
         super();
 
-        this.validate("title", (value) => {
+        this.validate("title", (value, resolve, reject) => {
             value = (value || "").trim();
             if (!validator.isLength(value, 10, 200)){
-                return [value, "Title of your post must be between 10 and 200 characters"];
+                reject("Title of your post must be between 10 and 200 characters");
+            } else {
+                resolve(value);
             }
-            return [value, null];
         });
 
 
-        this.validate("url", (value) => {
+        this.validate("url", (value, resolve, reject) => {
             value = (value || "").trim();
             if (!validator.isURL(value)) {
-                return [value, "You must provide a valid URL"];
+                reject("You must provide a valid URL");
+            } else {
+                resolve(value);
             }
-            return [value, null];
         });
     }
 };
