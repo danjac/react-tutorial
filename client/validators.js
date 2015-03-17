@@ -2,24 +2,11 @@ import validator from 'validator';
 import Immutable from 'immutable';
 
 
-class ValidationFailure extends Error {
+class ValidationResult {
 
-    constructor(validator) {
-        this.status = 400; // for server-side
-        this.errors = this.payload = validator.errors;
-    }
-}
-
-class Validator {
     constructor() {
         this._errors = Immutable.Map();
         this._data = Immutable.Map();
-        this._validators = Immutable.List();
-    }
-
-    reset() {
-        this._errors = this._errors.clear();
-        this._data = this._data.clear();
     }
 
     setError(name, message) {
@@ -28,11 +15,7 @@ class Validator {
         }
     }
 
-    hasError(name) {
-        return this._errors.has(name);
-    }
-
-    isValid() {
+    get ok() {
         return this._errors.isEmpty();
     }
 
@@ -48,6 +31,10 @@ class Validator {
         this._data = this._data.set(name, value);
     }
 
+    getData(name, value) {
+        return this._data.get(name);
+    }
+
     get data() {
         return this._data.toJS();
     }
@@ -56,63 +43,66 @@ class Validator {
         this._data = Immutable.Map(data);
     }
 
-    check(data, throwsException=true) {
+}
+
+class Validator {
+    constructor() {
+        this._validators = Immutable.List();
+        this.async = false;
+    }
+
+    check(data) {
         // skip all async validators
         // return fields as plain JS obj
 
-        this.data = data;
+        let result = new ValidationResult();
 
         const validators = this._validators.filter((v) => !v.async);
 
         validators.forEach((v) => {
-            v.fn(this._data.get(v.name), 
-                 (value) => this.setData(v.name, value),
-                 (error) => this.setError(v.name, error));
+            let input = data[v.name];
+            if (v.trim) input = validator.trim(input);
+            let value = v.fn(input, 
+                             (error) => result.setError(v.name, error));
+            result.setData(v.name, value);
         });
-
-        if (!this.isValid() && throwsException){
-            throw new ValidationFailure(this);
-        }
-        return this.data;
+        return result;
     }
 
-    checkAsync(data, throwsException=true) {
+    checkAsync(data) {
 
-        this.check(data, false); // sync check first, don't throw exception
+        let result = this.check(data); // sync check first
 
         const validators = this._validators.filter((v) => v.async);
 
         const promises = validators.map((v) => {
-            let value = this._data.get(v.name);
-            return new Promise((resolve) => {
-                v.fn(value, 
-                     (value) => this.setData(v.name, value),
-                     (error) => this.setError(v.name, error))
-                    .then(() => {
-                        resolve();
-                    });
-            })
+            let input = data[v.name];
+            if (v.trim) input = validator.trim(input);
+            return v.fn(input, 
+                        (value) => result.setData(v.name, value),
+                        (error) => result.setError(v.name, error));
         }).toJS();
 
-        return Promise.all(promises).then(() => {
-            if (!this.isValid() && throwsException) {
-                throw new ValidationFailure(this);
-            }
-            return this.data;
+        return Promise.all(promises).then((values) => {
+            return result;
         });
     }
 
-    validate(name, fn, async) {
+    validate(name, fn, opts) {
+        opts = opts || {
+            async: false,
+            trim: true
+        };
         const validator = {
             name: name,
             fn: fn,
-            async: async
+            async: opts.async,
+            trim: opts.trim
         }
         this._validators = this._validators.push(validator);
-    }
-
-    validateAsync(name, fn) {
-        this.validate(name, fn, true);
+        if (opts.async) {
+            this.async = true;
+        }
     }
 
 }
@@ -123,31 +113,25 @@ export class Signup extends Validator {
 
         super();
 
-        this.validate("name", (value, resolve, reject) => {
-            value = (value || "").trim();
+        this.validate("name", (value, err) => {
             if (!validator.isLength(value, 10, 60)) {
-                reject("Your name must be between 10 and 60 characters");
-            } else {
-                resolve(value);
-            }
+                err("Your name must be between 10 and 60 characters");
+            } 
+            return value;
         });
 
-        this.validate("email", (value, resolve, reject) => {
-            value = (value || "").trim();
+        this.validate("email", (value, err) => {
             if (!validator.isEmail(value)) {
-                reject("Please enter a valid email address");
-            } else {
-                resolve(value);
+                err("Please enter a valid email address");
             }
+            return value;
         });
 
-        this.validate("password", (value, resolve, reject) => {
-            value = (value || "").trim();
+        this.validate("password", (value, err) => {
             if (!validator.isLength(value, 6)) {
-                reject("Your password must be at least 6 characters long");
-            } else {
-                resolve(value);
-            }
+                err("Your password must be at least 6 characters long");
+            } 
+            return value;
         });
 
     }
@@ -160,23 +144,19 @@ export class NewPost extends Validator {
 
         super();
 
-        this.validate("title", (value, resolve, reject) => {
-            value = (value || "").trim();
+        this.validate("title", (value, err) => {
             if (!validator.isLength(value, 10, 200)){
-                reject("Title of your post must be between 10 and 200 characters");
-            } else {
-                resolve(value);
-            }
+                err("Title of your post must be between 10 and 200 characters");
+            } 
+            return value;
         });
 
 
-        this.validate("url", (value, resolve, reject) => {
-            value = (value || "").trim();
+        this.validate("url", (value, err) => {
             if (!validator.isURL(value)) {
-                reject("You must provide a valid URL");
-            } else {
-                resolve(value);
-            }
+                err("You must provide a valid URL");
+            } 
+            return value;
         });
     }
 };

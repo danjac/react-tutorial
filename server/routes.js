@@ -14,7 +14,69 @@ const jwtToken = (userId) => {
     });
 };
 
+// move into middleware.js
+const validate = (validator) => {
+
+    return (req, res, next) => {
+        
+        if (validator.async) {
+            console.log("validating async...")
+            validator.checkAsync(req.body).then((result) => {
+                console.log("errors", result.errors, "data", result.data)
+                if (!result.ok) {
+                    return res.status(400).json(result.errors);
+                }
+                req.clean = result.data;
+                next();
+            }, (err) => next(err));
+        } else {
+            let result = validator.check(req.body);
+            if (!result.ok) {
+                return res.status(400).json(result.body);
+            }
+            req.clean = result.data;
+            next();
+        }
+    }
+};
+
+
+
 export default (app, db) => {
+
+    const nameExists = (name, resolve, reject) => {
+        return db("users")
+            .count("id")
+            .where("name", name)
+            .first()
+            .then((result) => {
+                if (parseInt(result.count) > 0){
+                    reject("This username already exists!")
+                } 
+                resolve(name);
+            });
+    };
+
+    const emailExists = (email, resolve, reject) => {
+        return db("users")
+            .count("id")
+            .where("email", email)
+            .first()
+            .then((result) => {
+                if (parseInt(result.count) > 0){
+                    reject("This email address already exists!")
+                }
+                resolve(email);
+            });
+    };
+
+    const signupValidator = new validators.Signup();
+
+    signupValidator.validate("name", nameExists, {async: true});
+    signupValidator.validate("email", emailExists, {async: true});
+
+    const validateSignup = validate(signupValidator);
+    const validateNewPost = validate(new validators.NewPost());
 
     const auth = (req, res, next) => {
 
@@ -197,13 +259,9 @@ export default (app, db) => {
         vote(req, res, next, -1);
     });
 
-    app.post("/api/submit/", [auth], (req, res, next) =>  {
+    app.post("/api/submit/", [auth, validateNewPost], (req, res, next) =>  {
 
-        try {
-            let {title:title, url: url} = new validators.NewPost().check(req.body);
-        } catch(e) {
-            return next(e);
-        }
+        let {title: title, url: url} = req.clean;
 
         db("posts")
             .returning("id")
@@ -236,66 +294,29 @@ export default (app, db) => {
                 }, (err) => next(err));
     });
 
-    const nameExists = (name, resolve, reject) => {
+    app.post("/api/signup/", [validateSignup], (req, res, next) =>  {
+
+        let {name: name, email: email, password: password} = req.clean;
+
         return db("users")
-            .count("id")
-            .where("name", name)
-            .first()
-            .then((result) => {
-                if (parseInt(result.count) > 0){
-                    reject("This username already exists!")
-                } else {
-                    resolve(name);
+            .returning("id")
+            .insert({
+                name: name,
+                email: email,
+                password: bcrypt.hashSync(password, 10)
+        })
+        .then((ids) => {
+            const userId = ids[0];
+            res.json({
+                token: jwtToken(userId),
+                user: {
+                    id: userId,
+                    name: name,
+                    email: email,
+                    created_at: moment.utc()
                 }
             });
-    };
+        }, (err) => next(err));
+    });
 
-    const emailExists = (email, resolve, reject) => {
-        return db("users")
-            .count("id")
-            .where("email", email)
-            .first()
-            .then((result) => {
-                if (parseInt(result.count) > 0){
-                    reject("This email address already exists!")
-                } else {
-                    resolve(email);
-                } 
-
-            });
-    };
-
-    app.post("/api/signup/", (req, res, next) =>  {
-
-        var formData = null;
-
-        const validator = new validators.Signup();
-
-        validator.validateAsync("name", nameExists);
-        validator.validateAsync("email", emailExists);
-
-        validator.checkAsync(req.body)
-            .then((data) => {
-                formData = data;
-                return db("users")
-                    .returning("id")
-                    .insert({
-                        name: formData.name,
-                        email: formData.email,
-                        password: bcrypt.hashSync(formData.password, 10)
-                    });
-            })
-            .then((ids) => {
-                const userId = ids[0];
-                res.json({
-                    token: jwtToken(userId),
-                    user: {
-                        id: userId,
-                        name: formData.name,
-                        email: formData.email,
-                        created_at: moment.utc()
-                    }
-                });
-            }, (err) => next(err));
-        });
 };

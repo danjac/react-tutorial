@@ -31,20 +31,25 @@ export default React.createClass({
     handleSubmit (event) {
         event.preventDefault();
 
-        const refs = {
+        let validator = new validators.Signup();
+
+        let result = validator.check({
             name: this.refs.name.getValue(),
             email: this.refs.email.getValue(),
             password: this.refs.password.getValue()
-        };
+        });
 
-        try {
-            let data = new validators.Signup().check(refs);
-            actions.signup(data.name, data.email, data.password);
-        } catch (e) {
-            this.setState({ errors: e.errors });
-        } 
+        console.log(result.data, result.errors, result.ok)
+
+        if (result.ok){
+            actions.signup(result.data.name, 
+                           result.data.email, 
+                           result.data.password);
+        } else {
+            this.setState({ errors: result.errors });        
+        }
+
     },
-
 
     render () {
 

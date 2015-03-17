@@ -34,16 +34,15 @@ export default React.createClass({
     handleSubmit(event) {
         event.preventDefault();
 
-        const refs = {
+        let result = new validators.NewPost().check({
             title: this.refs.title.getValue(),
             url: this.refs.url.getValue()
-        };
+        });
 
-        try {
-            let data = new validators.NewPost().check(refs);
-            actions.submitPost(data.title, data.url);
-        } catch(e) {
-            this.setState({ errors: e.errors });
+        if (result.ok){
+            actions.submitPost(result.data.title, result.data.url);
+        } else {
+            this.setState({ errors: result.errors });
         }
 
     },
