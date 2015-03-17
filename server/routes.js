@@ -41,7 +41,8 @@ export default (app, db) => {
             'users.name AS author',
             'users.id AS author_id'
         )
-        .from('posts').innerJoin(
+        .from('posts')
+        .innerJoin(
             'users',
             'users.id',
             'posts.user_id'
@@ -54,9 +55,8 @@ export default (app, db) => {
         return posts.orderBy(
             'posts.' + orderBy, 'desc'
         )
-        .limit(pageSize).offset(offset).then((posts) => {
-            return posts;
-        })
+        .limit(pageSize)
+        .offset(offset)
         .then((posts) => {
             result.posts = Immutable.List(posts);
             var q = db("posts").count("posts.id");
