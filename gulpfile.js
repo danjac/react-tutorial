@@ -26,8 +26,8 @@ var dest = {
 };
 
 
-gulp.task('serve', function() {
-    browserSync({
+gulp.task('serve', ['build-src'], function() {
+    browserSync.init({
         proxy: 'http://localhost:5000'
     });
 });
@@ -88,5 +88,5 @@ gulp.task('install', shell.task([
 
 gulp.task('default', ['serve'], function() {
     gulp.start('install', 'pkg', 'build-src');
-    gulp.watch(srcDir + '/**', {}, ['build-src', browserSync.reload]);
+    gulp.watch(srcDir + '/**', {}, ['build-src']);
 });

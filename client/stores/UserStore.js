@@ -33,6 +33,13 @@ export default Reflux.createStore({
         this.trigger();
     },
 
+    deletePostComplete(post) {
+        if (this.user) {
+            this.user.totalScore -= post.score;
+            this.trigger();
+        }
+    },
+
     logout() {
         this.user = null;
         this.trigger();

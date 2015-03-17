@@ -138,12 +138,20 @@ export default (app, db) => {
         res.reactify("/submit");
     });
 
-    app.get("/api/auth/", [auth], (req, res) => {
-        return res.json(req.user);
+    app.get("/api/auth/", [auth], (req, res, next) => {
+        db("posts")
+            .where("user_id", req.user.id)
+            .sum("score")
+            .first()
+            .then((result) => {
+               req.user.totalScore = parseInt(result.sum);
+               res.json(req.user);
+            }, (err) => next(err));
     });
 
     app.post("/api/login/", (req, res, next) =>  {
         const {identity, password} = req.body;
+        let authUser = null;
         if (!identity || !password) {
             return res.sendStatus(400);
         }
@@ -152,12 +160,24 @@ export default (app, db) => {
             .orWhere("email", identity)
             .first()
             .then((user) => {
-                if (!user || !bcrypt.compareSync(password, user.password)) {
-                    return res.sendStatus(401);
+                authUser = user;
+
+                if (!authUser || !bcrypt.compareSync(password, authUser.password)) {
+                    throw new errors.NotAuthenticated("Invalid login credentials!");
                 } 
+                authUser = _.omit(authUser, "password");
+                return db("posts")
+                        .where("user_id", authUser.id)
+                        .sum("score")
+                        .first();
+            })
+            .then((result) => {
+                
+                authUser.totalScore = parseInt(result.sum);
+
                 res.json({
-                    token: jwtToken(user.id),
-                    user: _.omit(user, 'password')
+                    token: jwtToken(authUser.id),
+                    user: authUser
                 });
 
             }, (err) => next(err));
@@ -269,6 +289,7 @@ export default (app, db) => {
                     id: userId,
                     name: name,
                     email: email,
+                    totalScore: 0,
                     created_at: moment.utc()
                 }
             });

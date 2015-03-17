@@ -37,19 +37,19 @@ export default React.createClass({
     },
 
     getRightNav() {
-        var className = "navbar-right";
+        const className = "navbar-right";
         if (this.state.user) {
             return (
               <Nav className={className}>
-                <NavItemLink to={this.makeHref("user", {name: this.state.user.name})}>{this.state.user.name}</NavItemLink>
-                <NavItem onClick={actions.logout}>Logout</NavItem>
+                <NavItemLink to={this.makeHref("user", {name: this.state.user.name})}>{this.state.user.name} ({this.state.user.totalScore})</NavItemLink>
+                <NavItem onClick={actions.logout}>logout</NavItem>
               </Nav>
             );
         }
         return (
               <Nav className={className}>
-                <NavItemLink to={this.makeHref("login")}>Login</NavItemLink>
-                <NavItemLink to={this.makeHref("signup")}>Signup</NavItemLink>
+                <NavItemLink to={this.makeHref("login")}>login</NavItemLink>
+                <NavItemLink to={this.makeHref("signup")}>signup</NavItemLink>
               </Nav>
         );
     },
@@ -63,9 +63,9 @@ export default React.createClass({
         var navbar = (
             <Navbar brand="ReactNews" className="navbar navbar-inverse" fixedTop={true} fluid={true}>
               <Nav className="navbar-left">
-                <NavItemLink to={this.makeHref("popular")}>Top</NavItemLink>
-                <NavItemLink to={this.makeHref("latest")}>New</NavItemLink>
-                <NavItemLink to={this.makeHref("submit")}>Submit</NavItemLink>
+                <NavItemLink to={this.makeHref("popular")}>top</NavItemLink>
+                <NavItemLink to={this.makeHref("latest")}>new</NavItemLink>
+                <NavItemLink to={this.makeHref("submit")}>submit</NavItemLink>
               </Nav>
               {this.getRightNav()}
             </Navbar>

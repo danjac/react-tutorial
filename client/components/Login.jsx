@@ -70,7 +70,7 @@ export default React.createClass({
         <form onSubmit={this.handleSubmit}>
             <Input ref="identity" 
                    type="text" 
-                   label="Email or username" 
+                   label="Email address or username" 
                    help={this.state.errors.identity} 
                    bsStyle={this.state.errors.identity? 'error': null} />
             <Input ref="password" 
