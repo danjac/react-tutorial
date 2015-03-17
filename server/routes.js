@@ -3,7 +3,8 @@ import _ from 'lodash';
 import bcrypt from 'bcryptjs';
 import moment from 'moment';
 import Immutable from 'immutable';
-import * as validators from '../client/validators';
+import {NewPost} from '../client/validators';
+import {SignupAsync} from './validators';
 import * as errors from './errors';
 import {authenticate, validate} from './middleware';
 
@@ -18,40 +19,6 @@ const jwtToken = (userId) => {
 export default (app, db) => {
 
     const auth = authenticate(db);
-
-    const nameExists = (name, accept, reject) => {
-        return db("users")
-            .count("id")
-            .where("name", name)
-            .first()
-            .then((result) => {
-                if (parseInt(result.count) > 0){
-                    reject("This username already exists!")
-                } 
-                accept(name);
-            });
-    };
-
-    const emailExists = (email, accept, reject) => {
-        return db("users")
-            .count("id")
-            .where("email", email)
-            .first()
-            .then((result) => {
-                if (parseInt(result.count) > 0){
-                    return reject("This email address already exists!")
-                }
-                accept(email);
-            });
-    };
-
-    const signupValidator = new validators.Signup();
-
-    signupValidator.validate("name", nameExists, {async: true});
-    signupValidator.validate("email", emailExists, {async: true});
-
-    const validateSignup = validate(signupValidator);
-    const validateNewPost = validate(new validators.NewPost());
 
     const getPosts = (page, orderBy, username=null) => {
 
@@ -235,7 +202,10 @@ export default (app, db) => {
         vote(req, res, next, -1);
     });
 
-    app.post("/api/submit/", [auth, validateNewPost], (req, res, next) =>  {
+    app.post("/api/submit/", [
+        auth, 
+        validate(new NewPost())
+    ], (req, res, next) =>  {
 
         db("posts")
             .returning("id")
@@ -265,7 +235,9 @@ export default (app, db) => {
             }, (err) => next(err));
     });
 
-    app.post("/api/signup/", [validateSignup], (req, res, next) =>  {
+    app.post("/api/signup/", [
+        validate(new SignupAsync(db))
+    ], (req, res, next) =>  {
 
         return db("users")
             .returning("id")
