@@ -62,9 +62,9 @@ class Validator {
         validators.forEach((v) => {
             let input = data[v.name];
             if (v.trim) input = validator.trim(input);
-            let value = v.fn(input, 
-                             (error) => result.setError(v.name, error));
-            result.setData(v.name, value);
+            v.fn(input, 
+                 (value) => result.setData(v.name, value),             
+                 (error) => result.setError(v.name, error));
         });
         return result;
     }
@@ -113,25 +113,25 @@ export class Signup extends Validator {
 
         super();
 
-        this.validate("name", (value, err) => {
+        this.validate("name", (value, accept, reject) => {
             if (!validator.isLength(value, 10, 60)) {
-                err("Your name must be between 10 and 60 characters");
+                return reject("Your name must be between 10 and 60 characters");
             } 
-            return value;
+            accept(value);
         });
 
-        this.validate("email", (value, err) => {
+        this.validate("email", (value, accept, reject) => {
             if (!validator.isEmail(value)) {
-                err("Please enter a valid email address");
+                return reject("Please enter a valid email address");
             }
-            return value;
+            accept(value);
         });
 
-        this.validate("password", (value, err) => {
+        this.validate("password", (value, accept, reject) => {
             if (!validator.isLength(value, 6)) {
-                err("Your password must be at least 6 characters long");
+                return reject("Your password must be at least 6 characters long");
             } 
-            return value;
+            accept(value);
         });
 
     }
@@ -144,19 +144,19 @@ export class NewPost extends Validator {
 
         super();
 
-        this.validate("title", (value, err) => {
+        this.validate("title", (value, accept, reject) => {
             if (!validator.isLength(value, 10, 200)){
-                err("Title of your post must be between 10 and 200 characters");
+                return reject("Title of your post must be between 10 and 200 characters");
             } 
-            return value;
+            accept(value);
         });
 
 
-        this.validate("url", (value, err) => {
+        this.validate("url", (value, accept, reject) => {
             if (!validator.isURL(value)) {
-                err("You must provide a valid URL");
+                return reject("You must provide a valid URL");
             } 
-            return value;
+            accept(value);
         });
     }
 };

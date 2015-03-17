@@ -19,7 +19,7 @@ export default (app, db) => {
 
     const auth = authenticate(db);
 
-    const nameExists = (name, resolve, reject) => {
+    const nameExists = (name, accept, reject) => {
         return db("users")
             .count("id")
             .where("name", name)
@@ -28,20 +28,20 @@ export default (app, db) => {
                 if (parseInt(result.count) > 0){
                     reject("This username already exists!")
                 } 
-                resolve(name);
+                accept(name);
             });
     };
 
-    const emailExists = (email, resolve, reject) => {
+    const emailExists = (email, accept, reject) => {
         return db("users")
             .count("id")
             .where("email", email)
             .first()
             .then((result) => {
                 if (parseInt(result.count) > 0){
-                    reject("This email address already exists!")
+                    return reject("This email address already exists!")
                 }
-                resolve(email);
+                accept(email);
             });
     };
 

@@ -1,7 +1,7 @@
 import Reflux from 'reflux';
 import request from 'superagent';
-import Immutable from 'immutable';
 import _ from 'lodash';
+import * as validators from './validators';
 
 const actions = Reflux.createActions([
    "dismissAlert",
@@ -54,12 +54,21 @@ actions.voteDown.preEmit = (post) => {
 
 actions.signup.preEmit = (name, email, password) => {
 
+    const validator = new validators.Signup();
+
+    const result = validator.check({
+        name: name,
+        email: email,
+        password: password
+    });
+
+    if (!result.ok) {
+        return actions.signupFailure(result.errors);
+    }
+
     request.post("/api/signup/")
-        .send({
-            name: name,
-            email: email,
-            password: password
-        }).end((res) => {
+        .send(result.data)
+        .end((res) => {
             if (res.badRequest) {
                 return actions.signupFailure(res.body);
             }
@@ -75,6 +84,18 @@ actions.deletePost.preEmit = (post) => {
 };
 
 actions.submitPost.preEmit = (title, url) => {
+
+    const validator = new validators.NewPost();
+
+    const result = validator.check({
+        title: title,
+        url: url
+    });
+
+    if (!result.ok) {
+        return actions.submitPostFailure(result.errors);
+    }
+
     request.post("/api/submit/")
         .use(bearer)
         .send({
@@ -83,7 +104,7 @@ actions.submitPost.preEmit = (title, url) => {
         })
         .end((res) => {
             if (res.unauthorized || res.badRequest) {
-                return actions.submitPostFailure(Immutable.Map(res.body));
+                return actions.submitPostFailure(res.body);
             }
             actions.submitPostSuccess(res.body);
         });

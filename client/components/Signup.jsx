@@ -31,23 +31,11 @@ export default React.createClass({
     handleSubmit (event) {
         event.preventDefault();
 
-        let validator = new validators.Signup();
-
-        let result = validator.check({
-            name: this.refs.name.getValue(),
-            email: this.refs.email.getValue(),
-            password: this.refs.password.getValue()
-        });
-
-        console.log(result.data, result.errors, result.ok)
-
-        if (result.ok){
-            actions.signup(result.data.name, 
-                           result.data.email, 
-                           result.data.password);
-        } else {
-            this.setState({ errors: result.errors });        
-        }
+        actions.signup(
+            this.refs.name.getValue(),
+            this.refs.email.getValue(),
+            this.refs.password.getValue()
+        );
 
     },
 

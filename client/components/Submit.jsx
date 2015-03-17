@@ -22,9 +22,7 @@ export default React.createClass({
     },
 
     onSubmitPostFailure(errors) {
-        if (!errors.isEmpty()) {
-            this.setState({ errors: errors });
-        }
+        this.setState({ errors: errors });
     },
 
     onSubmitPostSuccess() {
@@ -34,16 +32,8 @@ export default React.createClass({
     handleSubmit(event) {
         event.preventDefault();
 
-        let result = new validators.NewPost().check({
-            title: this.refs.title.getValue(),
-            url: this.refs.url.getValue()
-        });
-
-        if (result.ok){
-            actions.submitPost(result.data.title, result.data.url);
-        } else {
-            this.setState({ errors: result.errors });
-        }
+        actions.submitPost(this.refs.title.getValue(),
+                           this.refs.url.getValue());
 
     },
 
