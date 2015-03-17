@@ -98,10 +98,7 @@ actions.submitPost.preEmit = (title, url) => {
 
     request.post("/api/submit/")
         .use(bearer)
-        .send({
-            title: title,
-            url: url
-        })
+        .send(result.data)
         .end((res) => {
             if (res.unauthorized || res.badRequest) {
                 return actions.submitPostFailure(res.body);

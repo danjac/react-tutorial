@@ -237,24 +237,18 @@ export default (app, db) => {
 
     app.post("/api/submit/", [auth, validateNewPost], (req, res, next) =>  {
 
-        let {title: title, url: url} = req.clean;
-
         db("posts")
             .returning("id")
-            .insert({
-                title: title,
-                url: url,
+            .insert(_.assign(req.clean, {
                 user_id: req.user.id
-            })
+            }))
             .then((ids) => {
-                res.json({
+                res.json(_.assign(req.clean, {
                     id: ids[0],
-                    title: title,
-                    url: url,
                     author: req.user.name,
                     author_id: req.user.id,
                     created_at: moment.utc()
-                });
+                }));
             }, (err) => next(err));
     });
 
@@ -264,36 +258,35 @@ export default (app, db) => {
                 id: req.params.id,
                 user_id: req.user.id
             })
-            .del().then((result) => {
+            .del()
+            .then((result) => {
                 const status = result === 1 ? 200 : 403;
                 res.sendStatus(status);
-                }, (err) => next(err));
+            }, (err) => next(err));
     });
 
     app.post("/api/signup/", [validateSignup], (req, res, next) =>  {
 
-        let {name: name, email: email, password: password} = req.clean;
-
         return db("users")
             .returning("id")
             .insert({
-                name: name,
-                email: email,
-                password: bcrypt.hashSync(password, 10)
-        })
-        .then((ids) => {
-            const userId = ids[0];
-            res.json({
-                token: jwtToken(userId),
-                user: {
-                    id: userId,
-                    name: name,
-                    email: email,
-                    totalScore: 0,
-                    created_at: moment.utc()
-                }
-            });
-        }, (err) => next(err));
+                name: req.clean.name,
+                email: req.clean.email,
+                password: bcrypt.hashSync(req.clean.password, 10)
+            })
+            .then((ids) => {
+                const userId = ids[0];
+                res.json({
+                    token: jwtToken(userId),
+                    user: {
+                        id: userId,
+                        name: req.clean.name,
+                        email: req.clean.email,
+                        totalScore: 0,
+                        created_at: moment.utc()
+                    }
+                });
+            }, (err) => next(err));
     });
 
 };
