@@ -33,8 +33,8 @@ export class SignupAsync extends Signup {
                 });
         };
         
-        this.validate("name", nameExists, {async: true});
-        this.validate("email", emailExists, {async: true});
+        this.validate("name", nameExists, true);
+        this.validate("email", emailExists, true);
     }
 }
 

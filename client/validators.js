@@ -88,19 +88,15 @@ class Validator {
         });
     }
 
-    validate(name, fn, opts) {
-        opts = opts || {
-            async: false,
-            trim: true
-        };
+    validate(name, fn, async=false, trim=true) {
         const validator = {
             name: name,
             fn: fn,
-            async: opts.async,
-            trim: opts.trim
+            async: async,
+            trim: trim
         }
         this._validators = this._validators.push(validator);
-        if (opts.async) {
+        if (validator.async) {
             this.async = true;
         }
     }
