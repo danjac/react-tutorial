@@ -25,6 +25,11 @@ const config = {
 	    }
     },
 
+    pool: {
+        min: 1,
+        max: 1
+    },
+
     directory: './migrations',
     tableName: 'knex_migrations'
 
@@ -32,11 +37,11 @@ const config = {
 
 const db = knex.initialize(config.database);
 
-const deleteAll = () => {
-    let deletes = ["users", "posts"].map((table) => {
-        return db(table).del();
+const truncateAll = () => {
+    let calls = ["users", "posts"].map((table) => {
+        return db.raw('TRUNCATE TABLE ' + table + ' CASCADE');
     });
-    return Promise.all(deletes);
+    return Promise.all(calls);
 };
 
 const migrate = () => {
@@ -64,16 +69,62 @@ app.use((req, res, next) => {
 
 routes(app, db);
 
-describe("POST /api/submit", function() {
-
-    this.timeout(0);
+describe("GET /api/auth", function() {
 
     before((done) => {
         migrate().then(() => done());
     });
 
     beforeEach((done) => {
-        deleteAll().then(() => done());
+        truncateAll().then(() => done());
+    });
+
+    it('should return a 401 if no user is authenticated', (done) => {
+        request(app)
+            .get("/api/auth/")
+            .expect(401, done);
+    });
+
+    it('should return a 401 if no valid user matches token', (done) => {
+        request(app)
+            .get('/api/auth/')
+            .set('authToken', '4')
+            .expect(401, done);
+    });
+
+    it('should return some JSON if valid user matches token', (done) => {
+        db("users")
+			.returning("id")
+			.insert({
+				name: "tester",
+				password: "tester",
+				email: "tester@gmail.com"})
+		.then((ids) => {
+            let userId = parseInt(ids[0]);
+            request(app)
+                .get('/api/auth/')
+                .set('authToken', ids)
+                .expect((res) => {
+                    expect(res.status).to.equal(200);
+                    expect(res.body.id).to.equal(userId);
+                    expect(res.body.name).to.equal("tester");
+                    expect(res.body.email).to.equal("tester@gmail.com");
+                }).end(done);
+        });
+    });
+    
+});
+
+describe("POST /api/submit", function() {
+
+    //this.timeout(0);
+
+    before((done) => {
+        migrate().then(() => done());
+    });
+
+    beforeEach((done) => {
+        truncateAll().then(() => done());
     });
     
     it('should not allow posting if user not authenticated', (done) => {
@@ -81,6 +132,26 @@ describe("POST /api/submit", function() {
             .post("/api/submit/")
             .expect(401, done);
 	});
+
+    it('should return errors if missing data', (done) => {
+        db("users")
+			.returning("id")
+			.insert({
+				name: "tester",
+				password: "tester",
+				email: "tester@gmail.com"})
+		.then((ids) => {
+            let userId = parseInt(ids[0]);
+            return request(app)	
+                .post("/api/submit/")
+                .send({
+                    title: '',
+                    url: 'foobar'
+                })
+                .set('authToken', userId)
+                .expect(400, done);
+        });
+    });
 
     it('should allow posting if legit user', (done) => {
 
@@ -118,7 +189,7 @@ describe("GET /api/posts/", function() {
 
     beforeEach((done) => {
 
-        deleteAll()
+        truncateAll()
         .then(() => {
    		    return db("users")
 			.returning("id")
