@@ -51,7 +51,7 @@ class Validator {
         this.async = false;
     }
 
-    check(data) {
+    validate(data) {
         // skip all async filters
         // return fields as plain JS obj
 
@@ -69,9 +69,9 @@ class Validator {
         return result;
     }
 
-    checkAsync(data) {
+    validateAsync(data) {
 
-        let result = this.check(data); // sync check first
+        let result = this.validate(data); // sync validate first
 
         const filters = this._filters.filter((v) => v.async);
 

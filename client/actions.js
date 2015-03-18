@@ -56,7 +56,7 @@ actions.signup.preEmit = (name, email, password) => {
 
     const validator = new validators.Signup();
 
-    const result = validator.check({
+    const result = validator.validate({
         name: name,
         email: email,
         password: password
@@ -87,7 +87,7 @@ actions.submitPost.preEmit = (title, url) => {
 
     const validator = new validators.NewPost();
 
-    const result = validator.check({
+    const result = validator.validate({
         title: title,
         url: url
     });

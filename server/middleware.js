@@ -33,8 +33,7 @@ export function validates(...validators) {
         
         validators.forEach((validator) => {
             if (validator.async) {
-                console.log("validating async...")
-                validator.checkAsync(req.body).then((result) => {
+                validator.validateAsync(req.body).then((result) => {
                     if (!result.ok) {
                         return res.status(400).json(result.errors);
                     }
@@ -42,7 +41,7 @@ export function validates(...validators) {
                     next();
                 }, (err) => next(err));
             } else {
-                let result = validator.check(req.body);
+                let result = validator.validate(req.body);
                 if (!result.ok) {
                     return res.status(400).json(result.body);
                 }

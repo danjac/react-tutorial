@@ -66,7 +66,7 @@ describe("GET /", () => {
 
 	it('should render a list of posts', (done) => {
 
-        tracker = getTracker();
+        let tracker = getTracker();
 
         tracker.on('query', (query) => {
             query.response([
