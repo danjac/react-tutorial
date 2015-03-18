@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import knex from 'knex';
 import expressJwt from 'express-jwt';
 import {expect} from 'chai';
-import mockDB, {getTracker} from 'mock-knex';
 
 import jsxRoutes from '../client/Routes';
 import {reactify} from '../server/middleware';
@@ -29,7 +28,7 @@ const config = {
 
 };
 
-//const db = knex.initialize(config.database);
+const db = knex.initialize(config.database);
 const app = express();
 
 app.use(reactify(jsxRoutes));
@@ -44,46 +43,43 @@ app.use(expressJwt({
 app.set('views', __dirname + '/../server/views');
 app.set('view engine', 'ejs');
 
-       
+routes(app, db);
+
 describe("GET /", () => {
 
-    var db;
-
 	beforeEach((done) => {
-
-        mockDB.knex.use(knex);
-        mockDB.knex.install('pg');
-        db = knex({ client: 'pg' });
-        routes(app, db);
-        done();
-
+		db.migrate.rollback(config).then(() => {
+			return db.migrate.latest(config);
+		}).then(() => done());
 	});
 
 	afterEach((done) => {
-        mockDB.knex.uninstall();
-        done();
+		db.migrate.rollback(config).then(() => done());
 	});
 
 	it('should render a list of posts', (done) => {
 
-        let tracker = getTracker();
-
-        tracker.on('query', (query) => {
-            query.response([
-                {
-                    id: 1,
-                    title: 'test',
-                    url: 'http://',
-                    author: 'test',
-                    author_id: 1,
-                    created_at: new Date()
-                }
-            ]);
-        });
-
-        request(app)	
-            .get("/")
-            .expect(200, done);
+		db("users")
+			.returning("id")
+			.insert({
+				name: "tester",
+				password: "tester",
+				email: "tester@gmail.com"
+		}).then((ids) => {
+			const userId = ids[0];
+			const inserts = [
+				{
+					title: 'test',
+					url: 'http://test',
+					user_id: userId
+				}
+			];
+			return db("posts").insert(inserts);
+		}).then((ids) => {
+			request(app)	
+				.get("/")
+				.expect(200, done);
+		});
 
 	});
 
