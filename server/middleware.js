@@ -10,7 +10,7 @@ export function authenticate(db) {
 
         const err = new NotAuthenticated("You are not signed in");
 
-        if (!req.authToken) {
+        if (!req.authToken || !req.authToken.id) {
             return next(err);
         }
         db("users")

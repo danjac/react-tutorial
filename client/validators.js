@@ -55,12 +55,14 @@ class Validator {
         // skip all async filters
         // return fields as plain JS obj
 
+        data = data || {};
+
         let result = new ValidationResult();
 
         const filters = this._filters.filter((v) => !v.async);
 
         filters.forEach((f) => {
-            let input = data[f.name];
+            let input = data[f.name] || '';
             if (f.trim) input = validator.trim(input);
             f.fn(input, 
                  (value) => result.setData(f.name, value),             
