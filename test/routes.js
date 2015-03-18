@@ -45,17 +45,49 @@ app.set('view engine', 'ejs');
 
 routes(app, db);
 
+
+
 describe("GET /", () => {
 
-	beforeEach((done) => {
-		db.migrate.rollback(config).then(() => {
-			return db.migrate.latest(config);
-		}).then(() => done());
+    before((done) => {
+        db.migrate.latest(config).then(() => done());
+    });
+
+    beforeEach((done) => {
+
+        let deletes = ["users", "posts"].map((table) => {
+            return db(table).del();
+        });
+        Promise.all(deletes).then(() => done());
+
+    });
+
+	it('should render a list of posts by id', (done) => {
+
+		db("users")
+			.returning("id")
+			.insert({
+				name: "tester",
+				password: "tester",
+				email: "tester@gmail.com"
+		}).then((ids) => {
+			const userId = ids[0];
+			const inserts = [
+				{
+					title: 'test',
+					url: 'http://test',
+					user_id: userId
+				}
+			];
+			return db("posts").insert(inserts);
+		}).then((ids) => {
+			request(app)	
+				.get("/")
+				.expect(200, done);
+		});
+
 	});
 
-	afterEach((done) => {
-		db.migrate.rollback(config).then(() => done());
-	});
 
 	it('should render a list of posts', (done) => {
 
