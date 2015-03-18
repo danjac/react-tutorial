@@ -188,16 +188,17 @@ describe("GET /api/posts/", function() {
     });
 
     beforeEach((done) => {
+        truncateAll().then(() => done());
+    });
 
-        truncateAll()
-        .then(() => {
-   		    return db("users")
+	it('should render a list of posts by score', (done) => {
+   	    db("users")
 			.returning("id")
 			.insert({
 				name: "tester",
 				password: "tester",
-				email: "tester@gmail.com"});
-		})
+				email: "tester@gmail.com"
+        })
         .then((ids) => {
 			const userId = ids[0];
 			const inserts = [
@@ -207,25 +208,53 @@ describe("GET /api/posts/", function() {
 					user_id: userId
 				}
 			];
-            db("posts").insert(inserts)
+            return db("posts").insert(inserts)
         })
-        .then(() => done());
-    });
-
-	it('should render a list of posts by score', (done) => {
-
-        request(app)	
-            .get("/api/posts/")
-            .expect(200, done);
+        .then(() => {
+            request(app)	
+                .get("/api/posts/")
+                .expect((res) => {
+                    expect(res.status).to.equal(200);
+                    expect(res.body.posts.length).to.equal(1);
+                    expect(res.body.total).to.equal(1);
+                    expect(res.body.isFirst).to.be.ok;
+                    expect(res.body.isLast).to.be.ok;
+                }).end(done);
+        });
 
 	});
 
 	it('should render a list of posts by id', (done) => {
-
-        request(app)	
-            .get("/api/posts/")
-            .query({ orderBy: "id" })
-            .expect(200, done);
+   	    db("users")
+			.returning("id")
+			.insert({
+				name: "tester",
+				password: "tester",
+				email: "tester@gmail.com"
+        })
+        .then((ids) => {
+			const userId = ids[0];
+			const inserts = [
+				{
+					title: 'test',
+					url: 'http://test',
+					user_id: userId
+				}
+			];
+            return db("posts").insert(inserts)
+        })
+        .then(() => {
+            request(app)	
+                .get("/api/posts/")
+                .query({ orderBy: "id" })
+                .expect((res) => {
+                    expect(res.status).to.equal(200);
+                    expect(res.body.posts.length).to.equal(1);
+                    expect(res.body.total).to.equal(1);
+                    expect(res.body.isFirst).to.be.ok;
+                    expect(res.body.isLast).to.be.ok;
+                }).end(done);
+        });
 
     });
 
