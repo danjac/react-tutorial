@@ -6,7 +6,7 @@ import Immutable from 'immutable';
 import {NewPost} from '../client/validators';
 import {SignupAsync} from './validators';
 import * as errors from './errors';
-import {authenticate, validate} from './middleware';
+import {authenticate, validates} from './middleware';
 
 const pageSize = 10;
 
@@ -204,7 +204,7 @@ export default (app, db) => {
 
     app.post("/api/submit/", [
         auth, 
-        validate(new NewPost())
+        validates(new NewPost())
     ], (req, res, next) =>  {
 
         db("posts")
@@ -236,7 +236,7 @@ export default (app, db) => {
     });
 
     app.post("/api/signup/", [
-        validate(new SignupAsync(db))
+        validates(new SignupAsync(db))
     ], (req, res, next) =>  {
 
         return db("users")

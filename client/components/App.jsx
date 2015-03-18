@@ -65,7 +65,7 @@ const Navigation = React.createClass({
 
     render() {
 
-        const brand = <Link to={this.makeHref("popular")}>ReactNews</Link>;
+        const brand = <Link to={this.makeHref("popular")}>ReaktNews</Link>;
 
         return (
             <Navbar brand={brand} className="navbar navbar-inverse" fixedTop={true} fluid={true}>

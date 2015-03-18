@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import knex from 'knex';
 import expressJwt from 'express-jwt';
 import {expect} from 'chai';
+import mockDB, {getTracker} from 'mock-knex';
 
 import jsxRoutes from '../client/Routes';
 import {reactify} from '../server/middleware';
@@ -28,7 +29,7 @@ const config = {
 
 };
 
-const db = knex.initialize(config.database);
+//const db = knex.initialize(config.database);
 const app = express();
 
 app.use(reactify(jsxRoutes));
@@ -43,18 +44,30 @@ app.use(expressJwt({
 app.set('views', __dirname + '/../server/views');
 app.set('view engine', 'ejs');
 
-routes(app, db);
 
+var db;
+
+       
 describe("GET /", () => {
 
 	beforeEach((done) => {
+        /*
 		db.migrate.rollback(config).then(() => {
 			return db.migrate.latest(config);
 		}).then(() => done());
+        */
+        mockDB.knex.use(knex);
+        mockDB.knex.install('pg');
+        db = knex({ client: 'pg' });
+        routes(app, db);
+        done();
+
 	});
 
 	afterEach((done) => {
-		db.migrate.rollback(config).then(() => done());
+		//db.migrate.rollback(config).then(() => done());
+        mockDB.knex.uninstall();
+        done();
 	});
 
 	it('should render a list of posts', (done) => {

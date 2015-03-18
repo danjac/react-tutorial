@@ -1,5 +1,6 @@
 import React from 'react';
 import Router from 'react-router';
+import _ from 'lodash';
 import {NotAuthenticated} from './errors';
 
 
@@ -26,28 +27,29 @@ export function authenticate(db) {
 };
 
 
-export function validate(validator) {
+export function validates(...validators) {
 
     return (req, res, next) => {
         
-        if (validator.async) {
-            console.log("validating async...")
-            validator.checkAsync(req.body).then((result) => {
-                console.log("errors", result.errors, "data", result.data)
+        validators.forEach((validator) => {
+            if (validator.async) {
+                console.log("validating async...")
+                validator.checkAsync(req.body).then((result) => {
+                    if (!result.ok) {
+                        return res.status(400).json(result.errors);
+                    }
+                    req.clean = result.data;
+                    next();
+                }, (err) => next(err));
+            } else {
+                let result = validator.check(req.body);
                 if (!result.ok) {
-                    return res.status(400).json(result.errors);
+                    return res.status(400).json(result.body);
                 }
-                req.clean = result.data;
+                req.clean = _.assign(req.clean || {}, result.data);
                 next();
-            }, (err) => next(err));
-        } else {
-            let result = validator.check(req.body);
-            if (!result.ok) {
-                return res.status(400).json(result.body);
             }
-            req.clean = result.data;
-            next();
-        }
+        });
     }
 };
 

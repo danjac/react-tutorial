@@ -46,7 +46,7 @@ export default Reflux.createStore({
     },
 
     deletePostComplete(post) {
-        this.success(`Your post ${post.title} has been deleted!`)            
+        this.success(`Your post "${post.title}" has been deleted!`)            
     },
 
     submitPostSuccess() {
@@ -58,7 +58,7 @@ export default Reflux.createStore({
     },
 
     signupSuccess(user) {
-        this.success("Hi " + user.name + "! Welcome to the site!");
+        this.success(`Hi ${user.name}! Welcome to the site!`);
     }
 
 });
