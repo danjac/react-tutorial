@@ -179,8 +179,17 @@ describe("PUT /api/upvote", function() {
                 return request(app)	
                     .put("/api/upvote/" + postId)
                     .set('authToken', userId)
-                    .expect(200, done);
+                    .expect(200)
+                    .end(() => {
+                        db("posts").first()
+                            .then((post) => {
+                                expect(post.score).to.equal(2);
+                                done();
+                            });
+                    });
+
             });
+
 
 	});
 
