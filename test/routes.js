@@ -2,6 +2,7 @@ import request from 'supertest';
 import express from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
+import errorHandler from 'errorhandler';
 import methodOverride from 'method-override';
 import knex from 'knex';
 import expressJwt from 'express-jwt';
@@ -113,6 +114,156 @@ describe("GET /api/auth", function() {
         });
     });
     
+});
+
+describe("PUT /api/upvote", function() {
+    before((done) => {
+        migrate().then(() => done());
+    });
+
+    beforeEach((done) => {
+        truncateAll().then(() => done());
+    });
+    
+    it('should not allow upvote if not logged in', (done) => {
+        request(app)	
+            .put("/api/upvote/1")
+            .expect(401, done);
+	});
+
+    it('should not allow upvote if post does not exist', (done) => {
+        db("users")
+			.returning("id")
+			.insert({
+				name: "tester",
+				password: "tester",
+				email: "tester@gmail.com"})
+		.then((ids) => {
+            let userId = parseInt(ids[0]);
+            return request(app)	
+                .put("/api/upvote/1")
+                .set('authToken', userId)
+                .expect(403, done);
+        });
+
+	});
+
+    it('should allow upvote if post does not belong to user', (done) => {
+
+        let userId = null;
+
+        db("users")
+			.returning("id")
+			.insert([{
+				name: "tester",
+				password: "tester",
+				email: "tester@gmail.com"
+            }, {
+				name: "tester22",
+				password: "tester",
+				email: "tester2@gmail.com"
+            }])
+            .then((ids) => {
+                userId = parseInt(ids[0]);
+                let otherId = ids[1];
+                return db("posts")
+                    .returning("id")
+                    .insert({
+                        title: "test",
+                        url: "http://",
+                        user_id: otherId
+                    });
+            })
+            .then((ids) => {
+                let postId = ids[0];
+                return request(app)	
+                    .put("/api/upvote/" + postId)
+                    .set('authToken', userId)
+                    .expect(200, done);
+            });
+
+	});
+
+    it('should not allow upvote if post belongs to user', (done) => {
+
+        let userId = null;
+
+        db("users")
+			.returning("id")
+			.insert({
+				name: "tester",
+				password: "tester",
+				email: "tester@gmail.com"
+            })
+            .then((ids) => {
+                userId = parseInt(ids[0]);
+                return db("posts")
+                    .returning("id")
+                    .insert({
+                        title: "test",
+                        url: "http://",
+                        user_id: userId
+                    });
+            })
+            .then((ids) => {
+                let postId = ids[0];
+                return request(app)	
+                    .put("/api/upvote/" + postId)
+                    .set('authToken', userId)
+                    .expect(403, done);
+            });
+
+	});
+
+
+    it('should not allow upvote if post if user has already voted', (done) => {
+
+        let userId, postId;
+
+        db("users")
+			.returning("id")
+			.insert([{
+				name: "tester",
+				password: "tester",
+				email: "tester@gmail.com"
+            }, {
+				name: "tester22",
+				password: "tester",
+				email: "tester2@gmail.com"
+            }])
+            .then((ids) => {
+                userId = parseInt(ids[0]);
+                let otherId = ids[1];
+                return db("posts")
+                    .returning("id")
+                    .insert({
+                        title: "test",
+                        url: "http://",
+                        user_id: otherId
+                    });
+            })
+            .then((ids) => {
+                postId = ids[0];
+                return db("users")
+                    .where("id", userId)
+                    .update({
+                        votes: [postId]
+                    })
+            })
+            .then(() => {
+                return request(app)	
+                    .put("/api/upvote/" + postId)
+                    .set('authToken', userId)
+                    .expect(403, done);
+            });
+
+	});
+
+
+
+
+
+
 });
 
 describe("POST /api/submit", function() {

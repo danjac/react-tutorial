@@ -6,6 +6,9 @@
   "private": true,
   "dependencies": {
     "bootstrap": "~3.3.2",
-    "bootswatch-dist": "sandstone"
+    "bootswatch-dist": "darkly"
+  },
+  "resolutions": {
+    "bootswatch-dist": "darkly"
   }
 }

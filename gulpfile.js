@@ -62,6 +62,7 @@ gulp.task('build-src', function() {
 });
 
 gulp.task('pkg', function() {
+    // installs all the 3rd party stuffs.
 
     return gulp.src(bowerFiles({
             debugging: true,

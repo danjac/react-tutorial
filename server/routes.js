@@ -163,6 +163,8 @@ export default (app, db) => {
     });
 
     const vote = (req, res, next, amount) => {
+        
+        let status = 200;
 
         db.transaction((trx) => {
 
@@ -176,7 +178,8 @@ export default (app, db) => {
                 .then((result) => {
 
                     if (result !== 1) {
-                        throw new errors.NotAllowed("You cannot vote on this post!");
+                        status = 403;
+                        return;
                     }
 
                     req.user.votes.push(req.params.id);
@@ -191,7 +194,7 @@ export default (app, db) => {
                 .then(trx.commit, trx.rollback);
 
         })
-        .then(() => res.sendStatus(200), (err) => next(err));
+        .then(() => res.sendStatus(status), (err) => next(err));
     };
 
     app.put("/api/upvote/:id", [auth], (req, res, next) => {
