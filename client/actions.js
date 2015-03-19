@@ -25,7 +25,9 @@ const actions = Reflux.createActions([
    "signupSuccess",
    "signupFailure",
    "voteUp",
-   "voteDown"
+   "voteDown",
+   "startLoading",
+   "endLoading"
 ]);
  
 
@@ -66,9 +68,12 @@ actions.signup.preEmit = (name, email, password) => {
         return actions.signupFailure(result.errors);
     }
 
+    actions.startLoading();
+
     request.post("/api/signup/")
         .send(result.data)
         .end((res) => {
+            actions.endLoading();
             if (res.badRequest) {
                 return actions.signupFailure(res.body);
             }
@@ -96,10 +101,13 @@ actions.submitPost.preEmit = (title, url) => {
         return actions.submitPostFailure(result.errors);
     }
 
+    actions.startLoading();
+
     request.post("/api/submit/")
         .use(bearer)
         .send(result.data)
         .end((res) => {
+            actions.endLoading();
             if (res.unauthorized || res.badRequest) {
                 return actions.submitPostFailure(res.body);
             }
@@ -113,12 +121,27 @@ actions.logout.preEmit = () => {
 
 actions.login.preEmit = (identity, password) => {
 
+
+    const validator = new validators.Login();
+
+    const result = validator.validate({
+        identity: identity,
+        password: password
+    });
+
+    if (!result.ok) {
+        return actions.loginFailure(result.errors);
+    }
+
+    actions.startLoading();
+
     request.post('/api/login/')
         .send({
             identity: identity,
             password: password
         })
         .end((res) => {
+            actions.endLoading();
             if (res.unauthorized) {
                 return actions.loginFailure();
             }
@@ -129,9 +152,12 @@ actions.login.preEmit = (identity, password) => {
 
 actions.getUser.preEmit = () => {
 
+    actions.startLoading();
+
     request.get("/api/auth/")
         .use(bearer)
         .end((res) => {
+            actions.endLoading();
             if (res.unauthorized) {
                 return actions.getUserComplete(null);
             }

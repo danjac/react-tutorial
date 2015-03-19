@@ -88,13 +88,16 @@ export default React.createClass({
         Router.State,
         Reflux.listenTo(MessageStore, 'onMessagesUpdate'),
         Reflux.listenTo(UserStore, 'onUserUpdate'),
-        Reflux.listenTo(actions.logout, 'onLogout')
+        Reflux.listenTo(actions.logout, 'onLogout'),
+        Reflux.listenTo(actions.startLoading, 'onLoadingStart'),
+        Reflux.listenTo(actions.endLoading, 'onLoadingEnd')
     ],
 
     getInitialState() {
         return {
             messages: MessageStore.getDefaultData(),
             user: UserStore.getDefaultData(),
+            loading: false
         }
     },
 
@@ -110,11 +113,30 @@ export default React.createClass({
         this.setState({ user: UserStore.getDefaultData() });
     },
 
+    onLoadingStart() {
+        this.setState({ loading: true });
+    },
+
+    onLoadingEnd() {
+        this.setState({ loading: false });
+    },
+
     componentDidMount() {
         actions.getUser();
     },
 
     render() {
+
+        if (this.state.loading) {
+            // replace with loading gif...
+            return (
+                <div className="container-fluid">
+                    <div className="text-center">
+                        <h1>Loading....</h1>
+                    </div> 
+                </div>
+            );
+        }
 
         return (
             <div className="container-fluid">

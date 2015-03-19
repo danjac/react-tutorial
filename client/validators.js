@@ -158,3 +158,24 @@ export class NewPost extends Validator {
         });
     }
 };
+
+export class Login extends Validator {
+    constructor() {
+
+        super();
+
+        this.addFilter("identity", (value, accept, reject) => {
+            if (!value) {
+                return reject("Please enter your username or email address");
+            }
+            accept(value);
+        });
+
+        this.addFilter("password", (value, accept, reject) => {
+            if(!value) {
+                return reject("Please enter your password");
+            }
+            accept(value);
+        });
+    }
+};

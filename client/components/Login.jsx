@@ -12,7 +12,8 @@ export default React.createClass({
     mixins: [
         Router.Navigation,
         Router.State,
-        Reflux.listenTo(UserStore, 'onLoginSuccess'),
+        Reflux.listenTo(actions.loginSuccess, 'onLoginSuccess'),
+        Reflux.listenTo(actions.loginFailure, 'onLoginFailure'),
     ],
 
     getInitialState() {
@@ -33,34 +34,18 @@ export default React.createClass({
         }
     },
 
+    onLoginFailure(errors) {
+        this.setState({ errors: errors || {}});
+    },
+
     handleSubmit(event) {
         event.preventDefault();
 
         var identity = this.refs.identity.getValue(),
             password = this.refs.password.getValue();
 
-        var errors = this.validate(identity, password);
+        actions.login(identity, password);
 
-        this.setState({ errors: errors });
-
-        if (_.isEmpty(errors)) {
-            actions.login(identity, password);
-        }
-
-    },
-
-    validate(identity, password) {
-        var errors = {};
-
-        if (!validator.isLength(identity, 1)) {
-            errors.identity = 'Username or email address required';
-        }
-
-        if (!validator.isLength(password, 1)) {
-            errors.password = 'Password required';
-        }
-
-        return errors;
     },
 
     render() {
