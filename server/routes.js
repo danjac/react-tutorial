@@ -211,16 +211,17 @@ export default (app, db) => {
     ], (req, res, next) =>  {
 
         db("posts")
-            .returning("id")
+            .returning(["id", "created_at"])
             .insert(_.assign(req.clean, {
                 user_id: req.user.id
             }))
-            .then((ids) => {
+            .then((posts) => {
+                let post = posts[0];
                 res.json(_.assign(req.clean, {
-                    id: ids[0],
+                    id: post.id,
                     author: req.user.name,
                     author_id: req.user.id,
-                    created_at: moment.utc()
+                    created_at: post.created_at
                 }));
             }, (err) => next(err));
     });
@@ -258,6 +259,7 @@ export default (app, db) => {
                         name: req.clean.name,
                         email: req.clean.email,
                         totalScore: 0,
+                        votes: [],
                         created_at: moment.utc()
                     }
                 });
