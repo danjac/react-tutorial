@@ -70,7 +70,129 @@ app.use((req, res, next) => {
 
 routes(app, db);
 
-describe("GET /api/auth", function() {
+describe("DELETE /api/delete", () => {
+
+    before((done) => {
+        migrate().then(() => done());
+    });
+
+    beforeEach((done) => {
+        truncateAll().then(() => done());
+    });
+
+    it('should return a 401 if no user is authenticated', (done) => {
+
+        request(app)
+            .del("/api/1")
+            .expect(401, done);
+    });
+
+    it('should return a 404 if no post exists', (done) => {
+
+        db("users")
+			.returning("id")
+			.insert({
+				name: "tester",
+				password: "tester",
+				email: "tester@gmail.com"})
+		.then((ids) => {
+            let userId = parseInt(ids[0]);
+            return request(app)
+                .del('/api/1')
+                .set('authToken', userId)
+                .expect(404, done);
+        });
+
+    });
+
+    it('should return a 404 if post does not belong to user', (done) => {
+
+        let userId = null;
+
+        db("users")
+			.returning("id")
+			.insert([{
+				name: "tester",
+				password: "tester",
+				email: "tester@gmail.com"
+            }, {
+				name: "tester22",
+				password: "tester",
+				email: "tester2@gmail.com"
+            }])
+            .then((ids) => {
+                userId = parseInt(ids[0]);
+                let otherId = ids[1];
+                return db("posts")
+                    .returning("id")
+                    .insert({
+                        title: "test",
+                        url: "http://",
+                        user_id: otherId
+                    });
+            })
+            .then((ids) => {
+                let postId = ids[0];
+                return request(app)	
+                    .delete("/api/" + postId)
+                    .set('authToken', userId)
+                    .expect(404)
+                        .end(() => {
+                            db("posts")
+                                .count("id")
+                                .first()
+                                .then((result) => {
+                                    expect(parseInt(result.count)).to.equal(1);
+                                    done();
+                                });
+                        });
+            });
+    });
+
+    it('should delete the post if the post belongs to the user', (done) => {
+
+        let userId = null;
+
+        db("users")
+			.returning("id")
+			.insert({
+				name: "tester",
+				password: "tester",
+				email: "tester@gmail.com"
+            })
+            .then((ids) => {
+                userId = parseInt(ids[0]);
+                return db("posts")
+                    .returning("id")
+                    .insert({
+                        title: "test",
+                        url: "http://",
+                        user_id: userId
+                    });
+            })
+            .then((ids) => {
+                let postId = ids[0];
+                return request(app)	
+                    .delete("/api/" + postId)
+                    .set('authToken', userId)
+                    .expect(200)
+                        .end(() => {
+                            db("posts")
+                                .count("id")
+                                .first()
+                                .then((result) => {
+                                    expect(parseInt(result.count)).to.equal(0);
+                                    done();
+                                });
+                        });
+            });
+    });
+
+
+});
+
+
+describe("GET /api/auth", () =>  {
 
     before((done) => {
         migrate().then(() => done());
@@ -108,6 +230,7 @@ describe("GET /api/auth", function() {
                 .expect((res) => {
                     expect(res.status).to.equal(200);
                     expect(res.body.id).to.equal(userId);
+                    expect(res.body.totalScore).to.equal(0);
                     expect(res.body.name).to.equal("tester");
                     expect(res.body.email).to.equal("tester@gmail.com");
                 }).end(done);
@@ -143,7 +266,7 @@ describe("PUT /api/upvote", function() {
             return request(app)	
                 .put("/api/upvote/1")
                 .set('authToken', userId)
-                .expect(403, done);
+                .expect(404, done);
         });
 
 	});
@@ -219,7 +342,7 @@ describe("PUT /api/upvote", function() {
                 return request(app)	
                     .put("/api/upvote/" + postId)
                     .set('authToken', userId)
-                    .expect(403, done);
+                    .expect(404, done);
             });
 
 	});
@@ -263,7 +386,7 @@ describe("PUT /api/upvote", function() {
                 return request(app)	
                     .put("/api/upvote/" + postId)
                     .set('authToken', userId)
-                    .expect(403, done);
+                    .expect(404, done);
             });
 
 	});

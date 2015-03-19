@@ -178,7 +178,7 @@ export default (app, db) => {
                 .then((result) => {
 
                     if (result !== 1) {
-                        status = 403;
+                        status = 404;
                         return;
                     }
 
@@ -233,7 +233,7 @@ export default (app, db) => {
             })
             .del()
             .then((result) => {
-                const status = result === 1 ? 200 : 403;
+                const status = result === 1 ? 200 : 404;
                 res.sendStatus(status);
             }, (err) => next(err));
     });
