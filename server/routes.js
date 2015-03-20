@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import moment from 'moment';
 import Immutable from 'immutable';
 import {NewPost} from '../client/validators';
-import {SignupAsync} from './validators';
+import {Signup} from './validators';
 import * as errors from './errors';
 import {authenticate, validates} from './middleware';
 
@@ -207,7 +207,7 @@ export default (app, db) => {
 
     app.post("/api/submit/", [
         auth, 
-        validates(new NewPost())
+        validates(NewPost)
     ], (req, res, next) =>  {
 
         db("posts")
@@ -240,7 +240,7 @@ export default (app, db) => {
     });
 
     app.post("/api/signup/", [
-        validates(new SignupAsync(db))
+        validates(Signup(db))
     ], (req, res, next) =>  {
 
         return db("users")

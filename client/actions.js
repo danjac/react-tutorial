@@ -1,7 +1,9 @@
 import Reflux from 'reflux';
 import request from 'superagent';
 import _ from 'lodash';
+import Checkit from 'checkit';
 import * as validators from './validators';
+
 
 const actions = Reflux.createActions([
    "dismissAlert",
@@ -56,30 +58,26 @@ actions.voteDown.preEmit = (post) => {
 
 actions.signup.preEmit = (name, email, password) => {
 
-    const validator = new validators.Signup();
-
-    const result = validator.validate({
+    validators.Signup.run({
         name: name,
         email: email,
         password: password
+    })
+    .then((data) => {
+        request.post("/api/signup/")
+            .send(data)
+            .end((res) => {
+                if (res.badRequest) {
+                    return actions.signupFailure(res.body);
+                }
+                window.localStorage.setItem(authToken, res.body.token);
+                actions.signupSuccess(res.body.user);
+            });
+    })
+    .catch(Checkit.Error, (err) => {
+        console.log("error", err);
+        actions.signupFailure(err.toJSON());
     });
-
-    if (!result.ok) {
-        return actions.signupFailure(result.errors);
-    }
-
-    actions.startLoading();
-
-    request.post("/api/signup/")
-        .send(result.data)
-        .end((res) => {
-            actions.endLoading();
-            if (res.badRequest) {
-                return actions.signupFailure(res.body);
-            }
-            window.localStorage.setItem(authToken, res.body.token);
-            actions.signupSuccess(res.body.user);
-        });
 };
 
 actions.deletePost.preEmit = (post) => {
@@ -90,29 +88,26 @@ actions.deletePost.preEmit = (post) => {
 
 actions.submitPost.preEmit = (title, url) => {
 
-    const validator = new validators.NewPost();
-
-    const result = validator.validate({
+    validators.NewPost.run({
         title: title,
         url: url
+    })
+    .then((data) => {
+        actions.startLoading();
+        request.post("/api/submit/")
+            .use(bearer)
+            .send(data)
+            .end((res) => {
+                actions.endLoading();
+                if (res.unauthorized || res.badRequest) {
+                    return actions.submitPostFailure(res.body);
+                }
+                actions.submitPostSuccess(res.body);
+            });
+    })
+    .catch(Checkit.Error, (err) => {
+        actions.submitPostFailure(err.toJSON());
     });
-
-    if (!result.ok) {
-        return actions.submitPostFailure(result.errors);
-    }
-
-    actions.startLoading();
-
-    request.post("/api/submit/")
-        .use(bearer)
-        .send(result.data)
-        .end((res) => {
-            actions.endLoading();
-            if (res.unauthorized || res.badRequest) {
-                return actions.submitPostFailure(res.body);
-            }
-            actions.submitPostSuccess(res.body);
-        });
 }
 
 actions.logout.preEmit = () => {
@@ -121,33 +116,27 @@ actions.logout.preEmit = () => {
 
 actions.login.preEmit = (identity, password) => {
 
-
-    const validator = new validators.Login();
-
-    const result = validator.validate({
+    validators.Login.run({
         identity: identity,
         password: password
+    })
+    .then((data) => {
+        actions.startLoading();
+        request.post('/api/login/')
+            .send(data)
+            .end((res) => {
+                actions.endLoading();
+                if (res.unauthorized) {
+                    return actions.loginFailure();
+                }
+                window.localStorage.setItem(authToken, res.body.token);
+                actions.loginSuccess(res.body.user);
+            });
+    })
+    .catch(Checkit.Error, (err) => {
+        actions.loginFailure(err.toJSON());
     });
 
-    if (!result.ok) {
-        return actions.loginFailure(result.errors);
-    }
-
-    actions.startLoading();
-
-    request.post('/api/login/')
-        .send({
-            identity: identity,
-            password: password
-        })
-        .end((res) => {
-            actions.endLoading();
-            if (res.unauthorized) {
-                return actions.loginFailure();
-            }
-            window.localStorage.setItem(authToken, res.body.token);
-            actions.loginSuccess(res.body.user);
-        });
 };
 
 actions.getUser.preEmit = () => {

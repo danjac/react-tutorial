@@ -1,40 +1,36 @@
-import {Signup} from '../client/validators';
+import Checkit from 'checkit';
 
+export function Signup(db) {
 
-export class SignupAsync extends Signup {
+    const nameExists = (name) => {
+        return db("users")
+            .count("id")
+            .where("name", name)
+            .first()
+            .then((result) => {
+                if (parseInt(result.count) > 0){
+                    throw new Error('This username already exists');
+                } 
+            });
+    };
 
-    constructor(db) {
+    const emailExists = (email) => {
+        return db("users")
+            .count("id")
+            .where("email", email)
+            .first()
+            .then((result) => {
+                if (parseInt(result.count) > 0){
+                    throw new Error("This email address already exists!")
+                }
+            });
+    };
 
-        super();
+    return new Checkit({
+        name: ['minLength:10', 'maxLength:60', nameExists],
+        email: ['required', 'email', emailExists],
+        password: ['minLength:6']
+    });
 
-        const nameExists = (name, accept, reject) => {
-            return db("users")
-                .count("id")
-                .where("name", name)
-                .first()
-                .then((result) => {
-                    if (parseInt(result.count) > 0){
-                        reject("This username already exists!")
-                    } 
-                    accept(name);
-                });
-        };
-
-        const emailExists = (email, accept, reject) => {
-            return db("users")
-                .count("id")
-                .where("email", email)
-                .first()
-                .then((result) => {
-                    if (parseInt(result.count) > 0){
-                        return reject("This email address already exists!")
-                    }
-                    accept(email);
-                });
-        };
-        
-        this.addFilter("name", nameExists, true);
-        this.addFilter("email", emailExists, true);
-    }
-}
+};
 
