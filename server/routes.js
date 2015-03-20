@@ -22,7 +22,7 @@ export default (app, db) => {
 
     const getPosts = (page, orderBy, where) => {
 
-        page = page || 1;
+        page = parseInt(page || 1);
         orderBy = ["score", "id"].includes(orderBy) ? orderBy : "id";
 
         const offset = ((page - 1) * pageSize);
@@ -81,6 +81,22 @@ export default (app, db) => {
 
     };
 
+    const searchPosts = (page, orderBy, search) => {
+        const q = "%" + (search || '') + "%";
+        const where = (posts) => {
+            return posts.where("users.name", "ilike", q)
+                    .orWhere("title", "ilike", q);
+        };
+        return getPosts(page, orderBy, where);
+    };
+ 
+    const getPostsByUser = (page, orderBy, username) => {
+        const where = (posts) => {
+            return posts.where("user.name", username);
+        };
+        return getPosts(page, orderBy, where);
+    };
+
     app.get("/", (req, res) =>  {
         getPosts(1, "score").then((result) => res.reactify("/", result));
     });
@@ -90,22 +106,14 @@ export default (app, db) => {
     });
 
     app.get("/user/:name", (req, res) =>  {
-        const where = (posts) => {
-            return posts.where("user.name", req.params.name);
-        };
-        getPosts(1, "score", where)
+        getPostsByUser(1, "score", req.params.name)
             .then((result) => {
                 res.reactify("/user/" + req.params.name, result);
             });
     });
 
     app.get("/search", (req, res, next) => {
-        const q = "%" + req.query.q || '' + "%";
-        const where = (posts) => {
-            return posts.where("users.name", "ilike", q)
-                    .orWhere("title", "ilike", q);
-        };
-        getPosts(1, "score", where)
+        searchPosts(1, "score", req.query.q)
             .then((result) => {
                 res.reactify("/search/", result);
             }, (err) => next(err));
@@ -169,18 +177,16 @@ export default (app, db) => {
     });
 
     app.get("/api/posts/", (req, res, next) =>  {
-        const page = parseInt(req.query.page || 1);
-        getPosts(page, req.query.orderBy)
+        getPosts(req.query.page, req.query.orderBy)
             .then((result) => res.json(result), (err) => next(err));
     });
 
     app.get("/api/user/:name", (req, res, next) =>  {
-        const page = parseInt(req.query.page || 1);
-        const where = (posts) => {
-            return posts.where("name", req.params.name);
-        };
-        getPosts(page, req.query.orderBy, where)
-            .then((result) => res.json(result), (err) => next(err));
+        getPostsByUser(req.query.page, 
+                       req.query.orderBy, 
+                       req.params.name)
+            .then((result) => res.json(result), 
+                  (err) => next(err));
     });
 
     const vote = (req, res, next, amount) => {
@@ -288,13 +294,9 @@ export default (app, db) => {
     });
 
     app.get("/api/search/", (req, res, next) => {
-        const q = "%" + req.query.q + "%";
-        const where = (posts) => {
-            return posts.where("title", "ilike", q)
-                    .orWhere("users.name", "ilike", q);
-        };
-        const page = parseInt(req.query.page || 1);
-        getPosts(page, req.query.orderBy, where)
+        searchPosts(req.query.page, 
+                    req.query.orderBy, 
+                    req.query.q)
             .then((result) => {
                 res.json(result);
             }, (err) => next(err));
