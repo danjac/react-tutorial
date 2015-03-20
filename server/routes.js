@@ -20,19 +20,19 @@ export default (app, db) => {
 
     const auth = authenticate(db);
 
-    const getPosts = (page, orderBy, username=null) => {
+    const getPosts = (page, orderBy, where) => {
 
         page = page || 1;
         orderBy = ["score", "id"].includes(orderBy) ? orderBy : "id";
 
         const offset = ((page - 1) * pageSize);
 
-        var result = {
+        let result = {
             isFirst: (page === 1),
             page: page
         };
 
-        var posts = db.select(
+        let posts = db.select(
             'posts.id',
             'posts.title',
             'posts.url',
@@ -48,8 +48,19 @@ export default (app, db) => {
             'posts.user_id'
         );
 
-        if (username) {
-            posts = posts.where("users.name", username);
+        if (where) {
+            posts = where(posts);
+        }
+
+        let counter = db("posts")
+                        .count("posts.id")
+                        .innerJoin(
+                            'users',
+                            'users.id',
+                            'posts.user_id'
+                        );
+        if (where) {
+            counter = where(counter);
         }
 
         return posts.orderBy(
@@ -59,15 +70,7 @@ export default (app, db) => {
         .offset(offset)
         .then((posts) => {
             result.posts = Immutable.List(posts);
-            var q = db("posts").count("posts.id");
-            if (username) {
-                q = q.innerJoin(
-                        'users',
-                        'users.id',
-                        'posts.user_id'
-                    ).where("users.name", username)
-            }
-            return q.first();
+            return counter.first();
         })
         .then((total) => {
             result.total = parseInt(total.count);
@@ -87,10 +90,25 @@ export default (app, db) => {
     });
 
     app.get("/user/:name", (req, res) =>  {
-        getPosts(1, "score", req.params.name)
+        const where = (posts) => {
+            return posts.where("user.name", req.params.name);
+        };
+        getPosts(1, "score", where)
             .then((result) => {
                 res.reactify("/user/" + req.params.name, result);
             });
+    });
+
+    app.get("/search", (req, res, next) => {
+        const q = "%" + req.query.q || '' + "%";
+        const where = (posts) => {
+            return posts.where("users.name", "ilike", q)
+                    .orWhere("title", "ilike", q);
+        };
+        getPosts(1, "score", where)
+            .then((result) => {
+                res.reactify("/search/", result);
+            }, (err) => next(err));
     });
 
     app.get("/login/", (req, res) =>  {
@@ -158,7 +176,10 @@ export default (app, db) => {
 
     app.get("/api/user/:name", (req, res, next) =>  {
         const page = parseInt(req.query.page || 1);
-        getPosts(page, req.query.orderBy, req.params.name)
+        const where = (posts) => {
+            return posts.where("name", req.params.name);
+        };
+        getPosts(page, req.query.orderBy, where)
             .then((result) => res.json(result), (err) => next(err));
     });
 
@@ -263,6 +284,19 @@ export default (app, db) => {
                         created_at: moment.utc()
                     }
                 });
+            }, (err) => next(err));
+    });
+
+    app.get("/api/search/", (req, res, next) => {
+        const q = "%" + req.query.q + "%";
+        const where = (posts) => {
+            return posts.where("title", "ilike", q)
+                    .orWhere("users.name", "ilike", q);
+        };
+        const page = parseInt(req.query.page || 1);
+        getPosts(page, req.query.orderBy, where)
+            .then((result) => {
+                res.json(result);
             }, (err) => next(err));
     });
 

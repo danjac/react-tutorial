@@ -2,7 +2,7 @@ import React from 'react';
 import {PureRenderMixin} from 'react/addons';
 import Reflux from 'reflux';
 import Router, {RouteHandler, Link} from 'react-router';
-import {Alert, Navbar, Nav, NavItem}  from 'react-bootstrap';
+import {Alert, Navbar, Nav, NavItem, Input}  from 'react-bootstrap';
 import {NavItemLink} from 'react-router-bootstrap';
 import actions from '../actions';
 import UserStore from '../stores/UserStore';
@@ -63,15 +63,29 @@ const Navigation = React.createClass({
         );
     },
 
+    handleSearch(event) {
+        event.preventDefault();
+        const q = this.refs.search.getValue();
+        this.refs.search.getInputDOMNode().value = "";
+        this.transitionTo("search", null, {q: q});
+    },
+
     render() {
 
-        const brand = <Link to={this.makeHref("popular")}>ReaktNews</Link>;
+        const brand = <Link to={this.makeHref("popular")}>ReactNews</Link>;
 
         return (
             <Navbar brand={brand} className="navbar navbar-inverse" fixedTop={true} fluid={true}>
               <Nav className="navbar-left">
                 <NavItemLink to={this.makeHref("latest")}>new</NavItemLink>
                 <NavItemLink to={this.makeHref("submit")}>submit</NavItemLink>
+                <form className="navbar-form navbar-left" 
+                      role="search" 
+                      placeholder="Search"
+                      onSubmit={this.handleSearch}>
+                    <Input type="search" 
+                           ref="search"  />
+                </form>
               </Nav>
               {this.getRightNav()}
             </Navbar>

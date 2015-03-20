@@ -9,6 +9,7 @@ const actions = Reflux.createActions([
    "dismissAlert",
    "fetchLatestPosts",
    "fetchPopularPosts",
+   "searchPosts",
    "fetchPostsForUser",
    "fetchPostsComplete",
    "login",
@@ -153,6 +154,20 @@ actions.getUser.preEmit = () => {
             actions.getUserComplete(res.body);
         });
 };
+
+actions.searchPosts.preEmit = (page, query) => {
+
+    if (!query) {
+        return;
+    }
+    request.get('/api/search/')
+        .query({
+            page: page,
+            q: query
+        })
+        .end((res) => actions.fetchPostsComplete(page, res.body));
+};
+
 
 const fetchPosts = (page, orderBy) => {
 

@@ -8,7 +8,9 @@ import User from './components/User';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Submit from './components/Submit';
+import Search from './components/Search';
  
+
 export default (
     <Route handler={App}>
         <DefaultRoute name="popular" handler={Popular} />
@@ -17,6 +19,7 @@ export default (
         <Route name="login" path="/login" handler={Login} />
         <Route name="signup" path="/signup" handler={Signup} />
         <Route name="submit" path="/submit" handler={Submit} />
+        <Route name="search" path="/search" handler={Search} />
     </Route>
 );
 
