@@ -110,15 +110,10 @@ export default (app) => {
             return badResult();
         }
 
-        User.findOne()
-            .or([
-                {name: identity}, 
-                {email: identity}
-            ])
-            .exec()
+        User.authenticate(identity, password)
             .then((user) => {
 
-                if (!user || !user.checkPassword(password)) {
+                if (!user) {
                     return badResult();
                 }
 

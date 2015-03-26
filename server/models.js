@@ -52,7 +52,26 @@ userSchema.plugin(uniqueValidator);
 
 userSchema.methods.checkPassword = function(password) {
     return bcrypt.compareSync(password, this.password);
-}
+};
+
+userSchema.statics.authenticate = function(identity, password) {
+    return this
+        .findOne()
+        .or([
+            {name: identity}, 
+            {email: identity}
+        ])
+        .exec()
+        .then((user) => {
+
+            if (!user || !user.checkPassword(password)) {
+                return null;
+            }
+
+            return user;
+
+        });
+};
 
 // scrub password from returned value
 userSchema.set('toJSON', {
