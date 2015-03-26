@@ -36,6 +36,11 @@ const actions = Reflux.createActions([
 
 const authToken = "authToken";
 
+const parseServerErrors = (errors) => {
+    // errors return in form of [name] -> {message: ...}
+    return _.mapValues(errors, (e) => e.message);
+};
+
 
 const bearer = (request) => {
   const token = window.localStorage.getItem(authToken);
@@ -48,13 +53,13 @@ const bearer = (request) => {
 
 
 actions.voteUp.preEmit = (post) => {
-  request.put("/api/upvote/" + post.id)
+  request.put("/api/upvote/" + post._id)
     .use(bearer)
     .end();
 };
 
 actions.voteDown.preEmit = (post) => {
-  request.put("/api/downvote/" + post.id)
+  request.put("/api/downvote/" + post._id)
     .use(bearer)
     .end();
 };
@@ -66,7 +71,7 @@ actions.signup.preEmit = (data) => {
             .send(clean)
             .end((res) => {
                 if (res.badRequest) {
-                    return actions.signupFailure(res.body);
+                    return actions.signupFailure(parseServerErrors(res.body));
                 }
                 window.localStorage.setItem(authToken, res.body.token);
                 actions.signupSuccess(res.body.user);
@@ -93,8 +98,8 @@ actions.submitPost.preEmit = (data) => {
             .send(clean)
             .end((res) => {
                 actions.endLoading();
-                if (res.unauthorized || res.badRequest) {
-                    return actions.submitPostFailure(res.body);
+                if (res.badRequest) {
+                    return actions.submitPostFailure(parseServerErrors(res.body));
                 }
                 actions.submitPostSuccess(res.body);
             });
@@ -112,12 +117,12 @@ actions.login.preEmit = (data) => {
 
     validators.Login.run(data)
     .then((clean) => {
-        actions.startLoading();
+        //actions.startLoading();
         request.post('/api/login/')
             .send(clean)
             .end((res) => {
-                actions.endLoading();
-                if (res.unauthorized) {
+                //actions.endLoading();
+                if (res.badRequest) {
                     return actions.loginFailure();
                 }
                 window.localStorage.setItem(authToken, res.body.token);

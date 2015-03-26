@@ -26,7 +26,7 @@ export default Reflux.createStore({
     },
 
     indexOf(post) {
-        return this.posts.findIndex((p) => p.id === post.id);
+        return this.posts.findIndex((p) => p._id === post._id);
     },
 
     deletePost(post) {

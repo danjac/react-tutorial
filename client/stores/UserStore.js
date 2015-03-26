@@ -53,7 +53,7 @@ export default Reflux.createStore({
     },
 
     tallyVote(post) {
-        this.user.votes.push(post.id);
+        this.user.votes.push(post._id);
         this.trigger();
     },
 

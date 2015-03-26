@@ -4,23 +4,20 @@ import _ from 'lodash';
 import {User} from './models';
 
 
-export function authenticate() {
-    return (req, res, next) => {
+export function auth (req, res, next) {
+    if (!req.authToken || !req.authToken.id) {
+        return res.sendStatus(401);
+    }
 
-        if (!req.authToken || !req.authToken.id) {
-            return res.sendStatus(401);
-        }
-
-        User.findById(req.authToken.id)
-            .exec()
-            .then((user) => {
-                if (!user) {
-                    return res.sendStatus(401);
-                }
-                req.user = user;
-                next();
-            }, (err) => next(err));
-    };
+    User.findById(req.authToken.id)
+        .exec()
+        .then((user) => {
+            if (!user) {
+                return res.sendStatus(401);
+            }
+            req.user = user;
+            next();
+        }, (err) => next(err));
 };
 
 

@@ -1,11 +1,13 @@
 import mongoose from 'mongoose';
 import validate from 'mongoose-validator';
+import uniqueValidator from 'mongoose-unique-validator';
+import bcrypt from 'bcryptjs';
 
 const Schema = mongoose.Schema,
       ObjectId = Schema.ObjectId;
 
 
-export const User = mongoose.model('User', new Schema({
+const userSchema = new Schema({
     name:       {
         type:       String,
         required:   true,
@@ -32,7 +34,8 @@ export const User = mongoose.model('User', new Schema({
     },
     password:    {
         type:       String,
-        required:   true
+        required:   true,
+        set:        (p) => bcrypt.hashSync(p, 10)
     },
     totalScore:      {
         type:       Number,
@@ -43,9 +46,24 @@ export const User = mongoose.model('User', new Schema({
         type:       Date,
         default:    Date.now
     }
-}));
+});
 
-export const Post = mongoose.model('Post', new Schema({
+userSchema.plugin(uniqueValidator);
+
+userSchema.methods.checkPassword = function(password) {
+    return bcrypt.compareSync(password, this.password);
+}
+
+// scrub password from returned value
+userSchema.set('toJSON', {
+    transform: (doc, ret, options) => {
+        delete ret.password;
+    }
+});
+
+export const User = mongoose.model('User', userSchema);
+
+const postSchema = new Schema({
     author:     {
         type:       ObjectId,
         ref:        'User'
@@ -79,4 +97,6 @@ export const Post = mongoose.model('Post', new Schema({
         type:   Date,
         default:Date.now
     }
-}));
+});
+
+export const Post = mongoose.model('Post', postSchema);

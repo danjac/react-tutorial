@@ -1,9 +1,6 @@
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
-import bcrypt from 'bcryptjs';
-import moment from 'moment';
-import Immutable from 'immutable';
-import {authenticate} from './middleware';
+import {auth} from './middleware';
 import {User, Post} from './models';
 
 const pageSize = 10;
@@ -14,37 +11,89 @@ const jwtToken = (userId) => {
     });
 };
 
+const vote = (req, res, next, amount) => {
+
+    Post.findById(req.params.id)
+        .populate('author')
+        .exec()
+        .then((post) => {
+
+            if (!post) {
+                return res.sendStatus(404);
+            }
+
+            if (post.author._id === req.user._id || 
+                req.user.votes.includes(post._id)) {
+                return res.sendStatus(403);
+            }
+
+            req.user.votes.push(post._id);
+
+            return Promise.all([
+
+                post.update({
+                    score: post.score + amount
+                }).exec(),
+
+                post.author.update({
+                    totalScore: post.author.totalScore + amount
+                }).exec(),
+
+                req.user.save()
+
+            ])
+            .then(() => res.sendStatus(200),
+                  (err) => next(err));
+            
+        });
+};
+
+const getPosts = (page, orderBy, where) => {
+    const result = {},
+          page = parseInt(page, 10) || 1,
+          orderBy = ["score", "created"].includes(orderBy) ? orderBy : "created",
+          offset = (page * pageSize) - pageSize,
+          q = Post.find(where || {});
+
+    return q.populate('author', '_id name')
+        .sort("-" + orderBy)
+        .limit(pageSize)
+        .skip(offset)
+        .exec()
+        .then((posts) => {
+            result.posts = posts;
+            return q.count()
+        })
+        .then((total) => {
+
+            const numPages = Math.ceil(total / pageSize);
+
+            return _.assign(result, {
+                numPages: numPages,
+                isFirst: (page === 1),
+                isLast: (page >= numPages),
+                total: total
+            });
+        });
+};
+
+const searchPosts = (page, orderBy, q) => {
+    return getPosts(page, orderBy, { title: new RegExp(q, "i") });
+};
+
+
 export default (app) => {
 
-    const auth = authenticate();
-
     app.get("/", (req, res, next) =>  {
+        getPosts(1, "score")
+            .then((result) => res.reactify("/",result),
+                  (err) => next(err));
+    });
 
-        const result = {},
-              page = parseInt(req.query.page || 1),
-              offset = (page - 1) * pageSize;
-
-        Post.find({})
-            .populate('author', '_id name')
-            .sort("-score")
-            .limit(pageSize)
-            .skip(offset)
-            .exec()
-            .then((posts) => {
-                result.posts = posts;
-                return Post.count().exec()
-            })
-            .then((total) => {
-
-                const numPages = Math.ceil(total / pageSize);
-
-                res.reactify("/", _.assign(result, {
-                    numPages: numPages,
-                    isFirst: (page === 1),
-                    isLast: (page >= numPages),
-                    total: total
-                }));
-            }, (err) => next(err));
+    app.get("/latest/", (req, res, next) =>  {
+        getPosts(1, "created")
+            .then((result) => res.reactify("/latest",result),
+                  (err) => next(err));
     });
 
     app.get("/api/auth/", [auth], (req, res, next) => {
@@ -53,24 +102,29 @@ export default (app) => {
 
     app.post("/api/login/", (req, res, next) =>  {
 
+        const badResult = () => res.status(400).send("Invalid login credentials");
+
         const {identity, password} = req.body;
 
         if (!identity || !password) {
-            return res.status(400).send("Missing login credentials");
+            return badResult();
         }
 
         User.findOne()
-            .or([{ name: identity }, {email: identity}])
+            .or([
+                {name: identity}, 
+                {email: identity}
+            ])
             .exec()
             .then((user) => {
 
-                // tbd add as user method
-                if (!user || !bcrypt.compareSync(password, authUser.password)) {
-                    return res.status(401).send("Invalid login credentials");
-                } 
+                if (!user || !user.checkPassword(password)) {
+                    return badResult();
+                }
+
                 res.json({
-                    token: jwtToken(user.id),
-                    user: _.omit(user, 'password')
+                    token: jwtToken(user._id),
+                    user: user
                 });
 
             }, (err) => next(err));
@@ -78,35 +132,26 @@ export default (app) => {
 
     app.post("/api/signup/", (req, res, next) =>  {
 
-        // TBD: add this to 'pre' event for user model
-        const data = _.assign(req.body, {
-            password: bcrypt.hashSync(req.body.password, 10)
-        });
-
-        new User(data).save((err, user) => {
-            if (err) {
-                return next(err);
-            }
-
-            res.json({
-                token: jwtToken(user.id),
-                user: _.omit(user, 'password')
-            });
-        });
+        new User(req.body)
+            .save()
+            .then((user) => {
+                res.json({
+                    token: jwtToken(user._id),
+                    user: user
+                });
+            }, (err) => next(err));
 
     });
 
 
     app.post("/api/submit/", [auth], (req, res, next) => {
 
-        const data = _.assign(req.body, { author: req.user.id });
-        new Post(data).save((err, post) => {
-            if (err) {
-                return next(err);
-            }
-            res.json(post);
-        });
-
+        new Post(_.assign(req.body, { 
+                author: req.user.id 
+            }))
+            .save()
+            .then((post) => res.json(post),
+                  (err) => next(err));
     });
 
     app.delete("/api/:id", [auth], (req, res, next) =>  {
@@ -115,30 +160,36 @@ export default (app) => {
             author: req.user.id
         })
         .exec()
+        .then((post) => {
+            if (!post) {
+                return res.sendStatus(404);
+            }
+            return req.user.update({
+                totalScore: req.user.totalScore - post.score
+            }).exec();
+        })
         .then(() => res.sendStatus(200),
               (err) => next(err));
     });
 
+    app.get("/api/search", (req, res, next) => {
 
-    /*
-    app.get("/latest/", (req, res) =>  {
-        getPosts(1, "id").then((result) => res.reactify("/latest", result));
+        searchPosts(req.query.page,
+                    req.query.orderBy,
+                    req.query.q)
+        .then((result) => res.json(result),
+              (err) => next(err));
+
     });
 
-    app.get("/user/:name", (req, res) =>  {
-        getPostsByUser(1, "score", req.params.name)
-            .then((result) => {
-                res.reactify("/user/" + req.params.name, result);
-            });
-    });
+    app.get("/search/", (req, res, next) => {
+        searchPosts(req.query.page,
+                    req.query.orderBy,
+                    req.query.q)
+        .then((result) => res.reactify("search", result),
+              (err) => next(err));
 
-    app.get("/search", (req, res, next) => {
-        searchPosts(1, "score", req.query.q)
-            .then((result) => {
-                res.reactify("/search/", result);
-            }, (err) => next(err));
     });
-    */
 
     app.get("/login/", (req, res) =>  {
         res.reactify("/login");
@@ -152,55 +203,28 @@ export default (app) => {
         res.reactify("/submit");
     });
 
-    /*
-
     app.get("/api/posts/", (req, res, next) =>  {
         getPosts(req.query.page, req.query.orderBy)
-            .then((result) => res.json(result), (err) => next(err));
-    });
-
-    app.get("/api/user/:name", (req, res, next) =>  {
-        getPostsByUser(req.query.page, 
-                       req.query.orderBy, 
-                       req.params.name)
             .then((result) => res.json(result), 
                   (err) => next(err));
     });
 
-    const vote = (req, res, next, amount) => {
-        
-        let status = 200;
-
-        db.transaction((trx) => {
-
-            db("posts")
-                .transacting(trx)
-                .where("id", req.params.id)
-                .whereRaw("user_id != ?", [req.user.id])
-                //.whereNot("user_id", req.id) -> add this post 0.7.5?
-                .whereNotIn("id", req.user.votes)
-                .increment('score', amount)
-                .then((result) => {
-
-                    if (result !== 1) {
-                        status = 404;
-                        return;
-                    }
-
-                    req.user.votes.push(req.params.id);
-
-                    return db("users")
-                        .transacting(trx)
-                        .where("id", req.user.id)
-                        .update({
-                            votes: req.user.votes
-                        });
-                })
-                .then(trx.commit, trx.rollback);
-
-        })
-        .then(() => res.sendStatus(status), (err) => next(err));
-    };
+    app.get("/api/user/:name", (req, res, next) =>  {
+        User.findOne()
+            .where("name", req.params.name)
+            .exec()
+            .then((user) => {
+                if (!user) {
+                    return res.sendStatus(404);
+                }
+            
+                return getPosts(req.query.page, 
+                                req.query.orderBy, 
+                                {author: user._id});
+            })
+            .then((result) => res.json(result),
+                  (err) => next(err));
+    });
 
     app.put("/api/upvote/:id", [auth], (req, res, next) => {
         vote(req, res, next, 1);
@@ -210,47 +234,4 @@ export default (app) => {
         vote(req, res, next, -1);
     });
 
-    app.post("/api/submit/", [
-        auth, 
-        validates(NewPost)
-    ], (req, res, next) =>  {
-
-        db("posts")
-            .returning(["id", "created_at"])
-            .insert(_.assign(req.clean, {
-                user_id: req.user.id
-            }))
-            .then((posts) => {
-                let post = posts[0];
-                res.json(_.assign(req.clean, {
-                    id: post.id,
-                    author: req.user.name,
-                    author_id: req.user.id,
-                    created_at: post.created_at
-                }));
-            }, (err) => next(err));
-    });
-
-    app.delete("/api/:id", [auth], (req, res, next) =>  {
-        db("posts")
-            .where({
-                id: req.params.id,
-                user_id: req.user.id
-            })
-            .del()
-            .then((result) => {
-                const status = result === 1 ? 200 : 404;
-                res.sendStatus(status);
-            }, (err) => next(err));
-    });
-
-    app.get("/api/search/", (req, res, next) => {
-        searchPosts(req.query.page, 
-                    req.query.orderBy, 
-                    req.query.q)
-            .then((result) => {
-                res.json(result);
-            }, (err) => next(err));
-    });
-    */
 };

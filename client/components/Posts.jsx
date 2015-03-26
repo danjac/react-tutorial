@@ -60,7 +60,7 @@ const PostListItem = React.createClass({
         const user = this.props.user,
               post = this.props.post;
         if (user && post.author._id === user._id) {
-            let modal = <DeletePostModal post={post} />;
+            const modal = <DeletePostModal post={post} />;
             return (
                 <ModalTrigger modal={modal}>
                     <a href="#">delete</a>
@@ -74,7 +74,7 @@ const PostListItem = React.createClass({
         const user = this.props.user,
               post = this.props.post;
 
-        if (!user || user.id === post.author_id || _.includes(user.votes, post.id)){
+        if (!user || user._id === post.author._id || _.includes(user.votes, post._id)){
             return '';
         }
 
@@ -159,7 +159,7 @@ export default React.createClass({
             <div>
                 <ul className="list-unstyled">
                     {this.props.posts.map((post) => {
-                        return <PostListItem key={post.id} post={post} user={this.props.user} />;
+                        return <PostListItem key={post._id} post={post} user={this.props.user} />;
                     }).toJS()}
                 </ul>
                 {this.renderPager()}
