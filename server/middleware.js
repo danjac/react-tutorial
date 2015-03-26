@@ -1,45 +1,25 @@
 import React from 'react';
 import Router from 'react-router';
 import _ from 'lodash';
-import Checkit from 'checkit';
-import {NotAuthenticated} from './errors';
+import {User} from './models';
 
 
-export function authenticate(db) {
-
+export function authenticate() {
     return (req, res, next) => {
 
-        const err = new NotAuthenticated("You are not signed in");
-
         if (!req.authToken || !req.authToken.id) {
-            return next(err);
+            return res.sendStatus(401);
         }
-        db("users")
-            .where("id", req.authToken.id)
-            .first("id", "name", "email", "votes")
+
+        User.findById(req.authToken.id)
+            .exec()
             .then((user) => {
                 if (!user) {
-                    return next(err);
+                    return res.sendStatus(401);
                 }
                 req.user = user;
                 next();
             }, (err) => next(err));
-    };
-};
-
-
-export function validates(validator) {
-
-    return (req, res, next) => {
-        
-        validator.run(req.body)
-            .then((data) => {
-                req.clean = data;
-                next();
-            })
-            .catch(Checkit.Error, (err) => {
-                res.status(400).json(err.toJSON());
-            });
     };
 };
 

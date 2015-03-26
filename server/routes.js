@@ -3,10 +3,8 @@ import _ from 'lodash';
 import bcrypt from 'bcryptjs';
 import moment from 'moment';
 import Immutable from 'immutable';
-import {NewPost} from '../client/validators';
-import {Signup} from './validators';
-import * as errors from './errors';
-import {authenticate, validates} from './middleware';
+import {authenticate} from './middleware';
+import {User, Post} from './models';
 
 const pageSize = 10;
 
@@ -16,91 +14,113 @@ const jwtToken = (userId) => {
     });
 };
 
-export default (app, db) => {
+export default (app) => {
 
-    const auth = authenticate(db);
+    const auth = authenticate();
 
-    const getPosts = (page, orderBy, where) => {
+    app.get("/", (req, res, next) =>  {
 
-        page = parseInt(page || 1);
-        orderBy = ["score", "id"].includes(orderBy) ? orderBy : "id";
+        const result = {},
+              page = parseInt(req.query.page || 1),
+              offset = (page - 1) * pageSize;
 
-        const offset = ((page - 1) * pageSize);
+        Post.find({})
+            .populate('author', '_id name')
+            .sort("-score")
+            .limit(pageSize)
+            .skip(offset)
+            .exec()
+            .then((posts) => {
+                result.posts = posts;
+                return Post.count().exec()
+            })
+            .then((total) => {
 
-        let result = {
-            isFirst: (page === 1),
-            page: page
-        };
+                const numPages = Math.ceil(total / pageSize);
 
-        let posts = db.select(
-            'posts.id',
-            'posts.title',
-            'posts.url',
-            'posts.score',
-            'posts.created_at',
-            'users.name AS author',
-            'users.id AS author_id'
-        )
-        .from('posts')
-        .innerJoin(
-            'users',
-            'users.id',
-            'posts.user_id'
-        );
-
-        if (where) {
-            posts = where(posts);
-        }
-
-        let counter = db("posts")
-                        .count("posts.id")
-                        .innerJoin(
-                            'users',
-                            'users.id',
-                            'posts.user_id'
-                        );
-        if (where) {
-            counter = where(counter);
-        }
-
-        return posts.orderBy(
-            'posts.' + orderBy, 'desc'
-        )
-        .limit(pageSize)
-        .offset(offset)
-        .then((posts) => {
-            result.posts = Immutable.List(posts);
-            return counter.first();
-        })
-        .then((total) => {
-            result.total = parseInt(total.count);
-            const numPages = Math.ceil(result.total / pageSize);
-            result.isLast = (!numPages || page === numPages);
-            return result;
-        });
-
-    };
-
-    const searchPosts = (page, orderBy, search) => {
-        const q = "%" + (search || '') + "%";
-        const where = (posts) => {
-            return posts.where("users.name", "ilike", q)
-                    .orWhere("title", "ilike", q);
-        };
-        return getPosts(page, orderBy, where);
-    };
- 
-    const getPostsByUser = (page, orderBy, username) => {
-        const where = (posts) => {
-            return posts.where("user.name", username);
-        };
-        return getPosts(page, orderBy, where);
-    };
-
-    app.get("/", (req, res) =>  {
-        getPosts(1, "score").then((result) => res.reactify("/", result));
+                res.reactify("/", _.assign(result, {
+                    numPages: numPages,
+                    isFirst: (page === 1),
+                    isLast: (page >= numPages),
+                    total: total
+                }));
+            }, (err) => next(err));
     });
 
+    app.get("/api/auth/", [auth], (req, res, next) => {
+        res.json(req.user);
+    });
+
+    app.post("/api/login/", (req, res, next) =>  {
+
+        const {identity, password} = req.body;
+
+        if (!identity || !password) {
+            return res.status(400).send("Missing login credentials");
+        }
+
+        User.findOne()
+            .or([{ name: identity }, {email: identity}])
+            .exec()
+            .then((user) => {
+
+                // tbd add as user method
+                if (!user || !bcrypt.compareSync(password, authUser.password)) {
+                    return res.status(401).send("Invalid login credentials");
+                } 
+                res.json({
+                    token: jwtToken(user.id),
+                    user: _.omit(user, 'password')
+                });
+
+            }, (err) => next(err));
+    });
+
+    app.post("/api/signup/", (req, res, next) =>  {
+
+        // TBD: add this to 'pre' event for user model
+        const data = _.assign(req.body, {
+            password: bcrypt.hashSync(req.body.password, 10)
+        });
+
+        new User(data).save((err, user) => {
+            if (err) {
+                return next(err);
+            }
+
+            res.json({
+                token: jwtToken(user.id),
+                user: _.omit(user, 'password')
+            });
+        });
+
+    });
+
+
+    app.post("/api/submit/", [auth], (req, res, next) => {
+
+        const data = _.assign(req.body, { author: req.user.id });
+        new Post(data).save((err, post) => {
+            if (err) {
+                return next(err);
+            }
+            res.json(post);
+        });
+
+    });
+
+    app.delete("/api/:id", [auth], (req, res, next) =>  {
+        Post.findOneAndRemove({
+            _id: req.params.id,
+            author: req.user.id
+        })
+        .exec()
+        .then(() => res.sendStatus(200),
+              (err) => next(err));
+    });
+
+
+    /*
     app.get("/latest/", (req, res) =>  {
         getPosts(1, "id").then((result) => res.reactify("/latest", result));
     });
@@ -118,6 +138,7 @@ export default (app, db) => {
                 res.reactify("/search/", result);
             }, (err) => next(err));
     });
+    */
 
     app.get("/login/", (req, res) =>  {
         res.reactify("/login");
@@ -131,50 +152,7 @@ export default (app, db) => {
         res.reactify("/submit");
     });
 
-    app.get("/api/auth/", [auth], (req, res, next) => {
-        db("posts")
-            .where("user_id", req.user.id)
-            .sum("score")
-            .first()
-            .then((result) => {
-               req.user.totalScore = parseInt(result.sum || 0);
-               res.json(req.user);
-            }, (err) => next(err));
-    });
-
-    app.post("/api/login/", (req, res, next) =>  {
-        const {identity, password} = req.body;
-        let authUser = null;
-        if (!identity || !password) {
-            return res.sendStatus(400);
-        }
-        db("users")
-            .where("name", identity)
-            .orWhere("email", identity)
-            .first()
-            .then((user) => {
-                authUser = user;
-
-                if (!authUser || !bcrypt.compareSync(password, authUser.password)) {
-                    throw new errors.NotAuthenticated("Invalid login credentials!");
-                } 
-                authUser = _.omit(authUser, "password");
-                return db("posts")
-                        .where("user_id", authUser.id)
-                        .sum("score")
-                        .first();
-            })
-            .then((result) => {
-                
-                authUser.totalScore = parseInt(result.sum || 0);
-
-                res.json({
-                    token: jwtToken(authUser.id),
-                    user: authUser
-                });
-
-            }, (err) => next(err));
-    });
+    /*
 
     app.get("/api/posts/", (req, res, next) =>  {
         getPosts(req.query.page, req.query.orderBy)
@@ -266,33 +244,6 @@ export default (app, db) => {
             }, (err) => next(err));
     });
 
-    app.post("/api/signup/", [
-        validates(Signup(db))
-    ], (req, res, next) =>  {
-
-        return db("users")
-            .returning("id")
-            .insert({
-                name: req.clean.name,
-                email: req.clean.email,
-                password: bcrypt.hashSync(req.clean.password, 10)
-            })
-            .then((ids) => {
-                const userId = ids[0];
-                res.json({
-                    token: jwtToken(userId),
-                    user: {
-                        id: userId,
-                        name: req.clean.name,
-                        email: req.clean.email,
-                        totalScore: 0,
-                        votes: [],
-                        created_at: moment.utc()
-                    }
-                });
-            }, (err) => next(err));
-    });
-
     app.get("/api/search/", (req, res, next) => {
         searchPosts(req.query.page, 
                     req.query.orderBy, 
@@ -301,5 +252,5 @@ export default (app, db) => {
                 res.json(result);
             }, (err) => next(err));
     });
-
+    */
 };

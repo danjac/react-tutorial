@@ -1,6 +1,7 @@
 import express from 'express';
 import http from 'http';
 import path from 'path';
+import mongoose from 'mongoose';
 import errorHandler from 'errorhandler';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
@@ -9,7 +10,6 @@ import serveStatic from 'serve-static';
 import jwt from 'jsonwebtoken';
 import expressJwt from 'express-jwt';
 import dotenv from 'dotenv';
-import knex from 'knex';
 import cors from 'cors';
 import routes from './server/routes';
 import {reactify} from './server/middleware';
@@ -51,15 +51,10 @@ if (devMode) {
 // database 
 //
 
-const db = knex({
-    client: 'pg',
-    debug: devMode,
-    connection: {
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME
-    }
-});
+console.log("connecting to mongodb")
+
+mongoose.connect('mongodb://localhost/react-tutorial');
+mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 
 // Local middleware
 //
@@ -67,17 +62,14 @@ app.use(reactify(jsxRoutes));
 
 // Set up routes
 //
-routes(app, db);
+routes(app);
    
 // handle errors
 app.use((err, req, res, next) => {
-    if (err.status){
-        var resp = res.status(err.status);
-        if (err.payload){
-            return resp.json(err.payload);
-        } 
-        return resp.send(err.message);
-    }
+    if (err.name === 'ValidationError') {
+        console.log(err)
+        return res.status(400).json(err.errors);
+    };
     next(err);
 })
 

@@ -13,7 +13,6 @@ var browserify = require('gulp-browserify'),
 
 var staticDir = './public',
     srcDir = './client',
-    watch = false,
     cssFilter = gulpFilter('*.css'),
     jsFilter = gulpFilter('*.js'),
     fontFilter = gulpFilter(['*.eot', '*.woff', '*.svg', '*.ttf']);
@@ -70,12 +69,13 @@ gulp.task('pkg', function() {
             base: 'bower_components'
         }))
         .pipe(jsFilter)
+        .pipe(uglify())
         .pipe(concat('vendor.js'))
         .pipe(gulp.dest(dest.js))
         .pipe(jsFilter.restore())
         .pipe(cssFilter)
-        .pipe(concat('vendor.css'))
         .pipe(minifyCss())
+        .pipe(concat('vendor.css'))
         .pipe(gulp.dest(dest.css))
         .pipe(cssFilter.restore())
         .pipe(fontFilter)

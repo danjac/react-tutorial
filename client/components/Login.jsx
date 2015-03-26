@@ -1,6 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import Router from 'react-router';
+import _ from 'lodash';
 import {Input} from 'react-bootstrap';
 import UserStore from '../stores/UserStore';
 import actions from '../actions';
@@ -40,10 +41,9 @@ export default React.createClass({
     handleSubmit(event) {
         event.preventDefault();
 
-        const identity = this.refs.identity.getValue(),
-              password = this.refs.password.getValue();
+        const data = _.mapValues(this.refs, (ref) => ref.getValue())
 
-        actions.login(identity, password);
+        actions.login(data);
 
     },
 

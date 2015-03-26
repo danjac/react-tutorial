@@ -59,7 +59,7 @@ const PostListItem = React.createClass({
     deleteLink() {
         const user = this.props.user,
               post = this.props.post;
-        if (user && post.author_id === user.id) {
+        if (user && post.author._id === user._id) {
             let modal = <DeletePostModal post={post} />;
             return (
                 <ModalTrigger modal={modal}>
@@ -97,9 +97,9 @@ const PostListItem = React.createClass({
                 <div>
                     <small>
                         <mark>
-                            <Link to={this.makeHref("user", {name: post.author})}>{post.author}</Link>
+                            <Link to={this.makeHref("user", {name: post.author.name})}>{post.author.name}</Link>
                             &nbsp; Score: <b>{post.score}</b>
-                            &nbsp; Posted: <b>{moment(post.created_at).fromNow()}</b>
+                            &nbsp; Posted: <b>{moment(post.created).fromNow()}</b>
                             &nbsp; {this.deleteLink()} {this.votingLinks()}
                         </mark>
                     </small>

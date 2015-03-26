@@ -9,14 +9,23 @@ export const Signup = new Checkit({
 
 
 export const Login = new Checkit({
-    identity: 'required',
+    identity: {
+        rule: 'required',
+        message: 'You must provide an email address or username'
+    },
     password: 'required'
 });
 
 
 export const NewPost = new Checkit({
     title: ['minLength:6', 'maxLength:100'],
-    url: ['required', 'url']
+    url: [
+        'required', 
+        {
+            rule: 'url',
+            message: 'Please provide a valid URL'
+        }
+    ]
 });
 
 

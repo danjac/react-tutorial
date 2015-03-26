@@ -1,9 +1,9 @@
 import React from 'react';
 import Reflux from 'reflux';
 import Router from 'react-router';
+import _ from 'lodash';
 import {Input} from 'react-bootstrap';
 import actions from '../actions';
-import * as validators from '../validators';
 
 
 export default React.createClass({
@@ -31,11 +31,8 @@ export default React.createClass({
     handleSubmit (event) {
         event.preventDefault();
 
-        actions.signup(
-            this.refs.name.getValue(),
-            this.refs.email.getValue(),
-            this.refs.password.getValue()
-        );
+        const data = _.mapValues(this.refs, (ref) => ref.getValue())
+        actions.signup(data);
 
     },
 

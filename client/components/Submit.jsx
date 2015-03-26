@@ -1,9 +1,9 @@
 import React from 'react';
 import Reflux from 'reflux';
 import Router from 'react-router';
+import _ from 'lodash';
 import {Input} from 'react-bootstrap';
 import {Authenticate} from './Mixins';
-import * as validators from '../validators';
 import actions from '../actions';
 
 export default React.createClass({
@@ -32,8 +32,8 @@ export default React.createClass({
     handleSubmit(event) {
         event.preventDefault();
 
-        actions.submitPost(this.refs.title.getValue(),
-                           this.refs.url.getValue());
+        const data = _.mapValues(this.refs, (ref) => ref.getValue());
+        actions.submitPost(data);
 
     },
 

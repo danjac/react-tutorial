@@ -75,15 +75,15 @@ const Navigation = React.createClass({
         const brand = <Link to={this.makeHref("popular")}>ReactNews</Link>;
 
         return (
-            <Navbar brand={brand} className="navbar navbar-inverse" fixedTop={true} fluid={true}>
+            <Navbar brand={brand} className="navbar" fixedTop={true} fluid={true}>
               <Nav className="navbar-left">
                 <NavItemLink to={this.makeHref("latest")}>new</NavItemLink>
                 <NavItemLink to={this.makeHref("submit")}>submit</NavItemLink>
                 <form className="navbar-form navbar-left" 
                       role="search" 
-                      placeholder="Search"
                       onSubmit={this.handleSearch}>
                     <Input type="search" 
+                           placeholder="Search"
                            ref="search"  />
                 </form>
               </Nav>
@@ -116,7 +116,7 @@ export default React.createClass({
     },
 
     onLogout() {
-        this.transitionTo(this.makeHref("popular"));
+        this.transitionTo("popular");
     },
 
     onMessagesUpdate() {
