@@ -11,9 +11,10 @@ import jwt from 'jsonwebtoken';
 import expressJwt from 'express-jwt';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import routes from './server/routes';
-import {reactify} from './server/middleware';
-import jsxRoutes from './client/Routes';
+import _ from 'lodash';
+import routes from './lib/routes';
+import {reactify} from './lib/middleware';
+import jsxRoutes from './lib/frontend/Routes';
 
 dotenv.load();
 
@@ -24,7 +25,7 @@ const app = express();
 const port = process.env.PORT || 5000
 
 app.set('port', port);
-app.set('views', path.join(__dirname, '/server/views'));
+app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'ejs');
 
 app.use(cors());
@@ -67,8 +68,8 @@ routes(app);
 // handle errors
 app.use((err, req, res, next) => {
     if (err.name === 'ValidationError') {
-        console.log(err)
-        return res.status(400).json(err.errors);
+        const errors = _.mapValues(err.errors, (err) => err.message);
+        return res.status(400).json(errors);
     };
     next(err);
 })

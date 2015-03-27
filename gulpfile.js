@@ -12,11 +12,10 @@ var browserify = require('gulp-browserify'),
     browserSync = require('browser-sync');
 
 var staticDir = './public',
-    srcDir = './client',
+    srcDir = './lib/frontend',
     cssFilter = gulpFilter('*.css'),
     jsFilter = gulpFilter('*.js'),
     fontFilter = gulpFilter(['*.eot', '*.woff', '*.svg', '*.ttf']);
-
 
 var dest = {
     js: staticDir + '/js',
@@ -34,9 +33,9 @@ gulp.task('serve', ['build-src'], function() {
 gulp.task('build-src', function() {
     gulp.src(srcDir + '/app.js')
         .pipe(notify({message: "Build started"}))
-        .pipe(plumber({
-            errorHandler: notify.onError("Error: <%= error.message %>")
-        }))
+        //.pipe(plumber({
+        //    errorHandler: notify.onError("Error: <%= error.message %>")
+        //}))
         .pipe(sourcemaps.init())
         .pipe(concat('app.js'))
         .pipe(browserify({
@@ -54,9 +53,9 @@ gulp.task('build-src', function() {
         .pipe(sourcemaps.write(dest.js))
         .pipe(gulp.dest(dest.js))
         .pipe(browserSync.reload({stream:true}))
-        .pipe(notify({
-            message: 'Build complete'
-        }));
+        //.pipe(notify({
+        //    message: 'Build complete'
+        //}));
 
 });
 
