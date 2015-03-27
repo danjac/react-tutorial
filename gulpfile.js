@@ -33,9 +33,9 @@ gulp.task('serve', ['build-src'], function() {
 gulp.task('build-src', function() {
     gulp.src(srcDir + '/app.js')
         .pipe(notify({message: "Build started"}))
-        //.pipe(plumber({
-        //    errorHandler: notify.onError("Error: <%= error.message %>")
-        //}))
+        .pipe(plumber({
+            errorHandler: notify.onError("Error: <%= error.message %>")
+        }))
         .pipe(sourcemaps.init())
         .pipe(concat('app.js'))
         .pipe(browserify({
@@ -43,9 +43,8 @@ gulp.task('build-src', function() {
             packageCache: {},
             fullPaths: true,
             transform: [
-                "reactify",
-                "envify",
-                "babelify"
+                ["envify"],
+                ["babelify"]
             ],
             extensions: ['.js', '.jsx']
         }))
@@ -53,9 +52,9 @@ gulp.task('build-src', function() {
         .pipe(sourcemaps.write(dest.js))
         .pipe(gulp.dest(dest.js))
         .pipe(browserSync.reload({stream:true}))
-        //.pipe(notify({
-        //    message: 'Build complete'
-        //}));
+        .pipe(notify({
+            message: 'Build complete'
+        }));
 
 });
 
