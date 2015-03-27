@@ -5,7 +5,7 @@ import moment from 'moment';
 import {expect} from 'chai';
 import _ from 'lodash';
 import Immutable from 'immutable';
-import Posts from '../../client/components/Posts';
+import Posts from '../../lib/frontend/components/Posts';
 import StubRouterContext from '../StubRouterContext';
 
 const TestUtils = React.addons.TestUtils;
@@ -15,11 +15,13 @@ describe('Posts component', () => {
     it('should show no buttons for an anonymous user', () => {
         const posts = Immutable.List([
             {
-                id: 1,
+                _id: 1,
                 title: 'test',
                 url: 'http://test',
-                author_id: 1,
-                author: 'test',
+                author: {
+                    _id: 1,
+                    name: 'test'
+                },
                 created_at: moment.utc()
             }
         ]);
@@ -52,35 +54,39 @@ describe('Posts component', () => {
     it('should show correct buttons for a user', () => {
         const posts = Immutable.List([
             {
-                id: 1,
+                _id: 1,
                 title: 'test',
                 url: 'http://test',
-                author_id: 1,
+                author: {
+                    _id: 1,
+                    name: 'test'
+                },
                 created_at: moment.utc(),
-                author: 'test'
             },
             {
-                id: 2,
+                _id: 2,
                 title: 'test',
                 url: 'http://test',
-                author_id: 2,
+                author: {
+                    _id: 2,
+                    name: 'test'
+                },
                 created_at: moment.utc(),
-                author: 'test'
             }
 
         ]);
 
         const user = {
-            id: 1,
+            _id: 1,
             name: 'tester'
         };
+
         const Component = StubRouterContext(Posts, {
             posts: posts,
             user: user,
             total: 2,
             isFirst: true,
             isLast: true,
-            isServer: true,
             fetchPosts: () => {}
         });
 

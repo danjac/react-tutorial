@@ -1,8 +1,8 @@
 import React from 'react/addons';
 import sinon from 'sinon';
 import {expect} from 'chai';
-import Login from '../../client/components/Login';
-import actions from '../../client/actions';
+import Login from '../../lib/frontend/components/Login';
+import actions from '../../lib/frontend/actions';
 import StubRouterContext from '../StubRouterContext';
 
 
@@ -23,8 +23,13 @@ describe("Login component", () => {
         inputs[0].getDOMNode().value = 'tester'; // identity
         inputs[1].getDOMNode().value = 'testing'; // password
 
+        const data = {
+            identity: 'tester',
+            password: 'testing'
+        };
+
         TestUtils.Simulate.submit(form);
-        expect(spy.calledWith("tester", "testing")).to.be.ok;
+        expect(spy.calledWith(data)).to.be.ok;
 
         actions.login.restore();
 
