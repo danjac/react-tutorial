@@ -24,7 +24,7 @@ export const PostsPage = {
     ],
 
     getInitialState () {
-        return PostStore.getDefaultData(this.props);
+        return PostStore.getDefaultData();
     },
 
     componentDidMount () {

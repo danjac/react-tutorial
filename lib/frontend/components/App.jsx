@@ -35,7 +35,6 @@ const Messages = React.createClass({
 const Navigation = React.createClass({
 
     mixins: [
-        Router.Navigation,
         PureRenderMixin
     ],
 
@@ -43,22 +42,27 @@ const Navigation = React.createClass({
         user: React.PropTypes.object
     },
 
+    contextTypes: {
+        router: React.PropTypes.func
+    },
+
     getRightNav() {
 
-        const className = "navbar-right";
+        const className = "navbar-right",
+              makeHref = this.context.router.makeHref;
 
         if (this.props.user) {
             return (
               <Nav className={className}>
-                <NavItemLink to={this.makeHref("user", {name: this.props.user.name})}>{this.props.user.name} ({this.props.user.totalScore})</NavItemLink>
+                <NavItemLink to={makeHref("user", {name: this.props.user.name})}>{this.props.user.name} ({this.props.user.totalScore})</NavItemLink>
                 <NavItem onClick={actions.logout}>logout</NavItem>
               </Nav>
             );
         }
         return (
               <Nav className={className}>
-                <NavItemLink to={this.makeHref("login")}>login</NavItemLink>
-                <NavItemLink to={this.makeHref("signup")}>signup</NavItemLink>
+                <NavItemLink to={makeHref("login")}>login</NavItemLink>
+                <NavItemLink to={makeHref("signup")}>signup</NavItemLink>
               </Nav>
         );
     },
@@ -67,18 +71,19 @@ const Navigation = React.createClass({
         event.preventDefault();
         const q = this.refs.search.getValue();
         this.refs.search.getInputDOMNode().value = "";
-        this.transitionTo("search", null, {q: q});
+        this.context.router.transitionTo("search", null, {q: q});
     },
 
     render() {
 
-        const brand = <Link to={this.makeHref("popular")}>ReactNews</Link>;
+        const makeHref = this.context.router.makeHref,
+              brand = <Link to={makeHref("popular")}>ReactNews</Link>;
 
         return (
             <Navbar brand={brand} className="navbar navbar-inverse" fixedTop={true} fluid={true}>
               <Nav className="navbar-left">
-                <NavItemLink to={this.makeHref("latest")}>new</NavItemLink>
-                <NavItemLink to={this.makeHref("submit")}>submit</NavItemLink>
+                <NavItemLink to={makeHref("latest")}>new</NavItemLink>
+                <NavItemLink to={makeHref("submit")}>submit</NavItemLink>
                 <form className="navbar-form navbar-left" 
                       role="search" 
                       onSubmit={this.handleSearch}>
@@ -98,14 +103,16 @@ const Navigation = React.createClass({
 export default React.createClass({
 
     mixins: [
-        Router.Navigation,
-        Router.State,
         Reflux.listenTo(MessageStore, 'onMessagesUpdate'),
         Reflux.listenTo(UserStore, 'onUserUpdate'),
         Reflux.listenTo(actions.logout, 'onLogout'),
         Reflux.listenTo(actions.startLoading, 'onLoadingStart'),
         Reflux.listenTo(actions.endLoading, 'onLoadingEnd')
     ],
+
+    contextTypes: {
+        router: React.PropTypes.func
+    },
 
     getInitialState() {
         return {
@@ -116,7 +123,7 @@ export default React.createClass({
     },
 
     onLogout() {
-        this.transitionTo("popular");
+        this.context.router.transitionTo("popular");
     },
 
     onMessagesUpdate() {
@@ -156,7 +163,7 @@ export default React.createClass({
             <div className="container-fluid">
                 <Navigation user={this.state.user} />
                 <Messages messages={this.state.messages} />
-                <RouteHandler user={this.state.user} {...this.props} /> 
+                <RouteHandler user={this.state.user}  /> 
             </div>
         );
     }

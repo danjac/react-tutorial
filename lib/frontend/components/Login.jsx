@@ -10,11 +10,13 @@ import actions from '../actions';
 export default React.createClass({
 
     mixins: [
-        Router.Navigation,
-        Router.State,
         Reflux.listenTo(UserStore, 'onLoginSuccess'),
         Reflux.listenTo(actions.loginFailure, 'onLoginFailure'),
     ],
+
+    contextTypes: {
+        router: React.PropTypes.func
+    },
 
     getInitialState() {
         return {
@@ -23,8 +25,8 @@ export default React.createClass({
     },
 
     redirect() {
-        const nextPath = this.getQuery().nextPath || "/";
-        this.transitionTo(nextPath);
+        const nextPath = this.context.router.getCurrentQuery().nextPath || "/";
+        this.context.router.transitionTo(nextPath);
     },
 
     onLoginSuccess() {

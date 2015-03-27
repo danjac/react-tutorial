@@ -6,14 +6,21 @@ import {PostsPage} from './Mixins';
 export default React.createClass({
 
     mixins: [
-        Router.State,
         PostsPage
     ],
 
+    contextTypes: {
+        router: React.PropTypes.func
+    },
+
     getInitialState() {
         return {
-            search: this.getQuery().q
+            search: this.getSearchQuery()
         };
+    },
+
+    getSearchQuery() {
+        return this.context.router.getCurrentQuery().q;
     },
 
     fetchPosts(page) {
@@ -21,7 +28,7 @@ export default React.createClass({
     },
 
     componentWillReceiveProps(nextProps) {
-        const q = this.getQuery().q;
+        const q = this.getSearchQuery();
         if (q != this.state.search){
             this.setState({ search: q});
             actions.searchPosts(1, q);

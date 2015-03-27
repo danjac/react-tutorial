@@ -42,9 +42,12 @@ const PostListItem = React.createClass({
     },
 
     mixins: [
-        Router.Navigation,
         PureRenderMixin
     ],
+
+    contextTypes: {
+        router: PropTypes.func
+    },
 
     handleVoteUp(event) {
         event.preventDefault();
@@ -97,7 +100,7 @@ const PostListItem = React.createClass({
                 <div>
                     <small>
                         <mark>
-                            <Link to={this.makeHref("user", {name: post.author.name})}>{post.author.name}</Link>
+                            <Link to={this.context.router.makeHref("user", {name: post.author.name})}>{post.author.name}</Link>
                             &nbsp; Score: <b>{post.score}</b>
                             &nbsp; Posted: <b>{moment(post.created).fromNow()}</b>
                             &nbsp; {this.deleteLink()} {this.votingLinks()}
@@ -120,7 +123,8 @@ export default React.createClass({
         page: PropTypes.number,
         isFirst: PropTypes.bool,
         isLast: PropTypes.bool,
-        user: PropTypes.object
+        user: PropTypes.object,
+        fetchPosts: PropTypes.func
     },
 
     handlePageClick(page) {
