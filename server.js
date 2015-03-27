@@ -12,6 +12,7 @@ import expressJwt from 'express-jwt';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import _ from 'lodash';
+import Checkit from 'checkit';
 import routes from './lib/routes';
 import {reactify} from './lib/middleware';
 import jsxRoutes from './lib/frontend/Routes';
@@ -48,13 +49,10 @@ if (devMode) {
     console.log("Using development environment");
     app.use(errorHandler());
 }
-
-// handle some promise rejections
-process.on('unhandledRejection', function(reason, p){
-    console.log("Possibly Unhandled Rejection at: Promise ", p, " reason: ", reason);
-    // application specific logging here
-});
-
+//process.on("unhandledRejection", function(reason, promise) {
+    // See Promise.onPossiblyUnhandledRejection for parameter documentation
+ //   console.log("unhandled rejection:", reason);
+//});
 // database 
 //
 
@@ -73,9 +71,8 @@ routes(app);
    
 // handle errors
 app.use((err, req, res, next) => {
-    if (err.errors) {
-        const errors = _.mapValues(err.errors, (err) => err.message);
-        return res.status(400).json(errors);
+    if (err instanceof Checkit.Error) {
+        return res.status(400).json(err.toJSON());
     };
     next(err);
 })
