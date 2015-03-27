@@ -9,11 +9,14 @@ import actions from '../actions';
 export default React.createClass({
 
     mixins: [
-        Router.Navigation,
         Authenticate,
         Reflux.listenTo(actions.submitPostSuccess, "onSubmitPostSuccess"),
         Reflux.listenTo(actions.submitPostFailure, "onSubmitPostFailure")
     ],
+
+    contextTypes: {
+        router: React.PropTypes.func
+    },
 
     getInitialState() {
         return {
@@ -26,15 +29,13 @@ export default React.createClass({
     },
 
     onSubmitPostSuccess() {
-        this.transitionTo(this.makeHref("latest"));
+        this.context.router.transitionTo(this.context.router.makeHref("latest"));
     },
 
     handleSubmit(event) {
         event.preventDefault();
-
         const data = _.mapValues(this.refs, (ref) => ref.getValue());
         actions.submitPost(data);
-
     },
 
     render() {

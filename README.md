@@ -12,7 +12,7 @@ It's built with the following tech:
 - React-router
 - Reflux
 - Bootstrap
-- Knex+Postgresql
+- Mongoose
 - Mocha
 
 Setup
@@ -22,15 +22,8 @@ Setup
 1. Create a *.env* file with the following settings:
 
         NODE_ENV=development
-
-        DB_USER=postgres
-        DB_PASSWORD=mypassword
-        DB_NAME=mydatabasename
-
         SECRET_KEY=seekret
 
-1. Create a *knexfile.js* migrations script (see http://knexjs.org/#Migrations on how to do this)
-1. **knex migrate:latest**
 1. **babel-node server.js**
 1. Open a browser at *localhost:3000* and you should be good to go.
 

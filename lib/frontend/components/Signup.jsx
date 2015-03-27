@@ -9,10 +9,13 @@ import actions from '../actions';
 export default React.createClass({
 
     mixins: [
-        Router.Navigation,
         Reflux.listenTo(actions.signupFailure, "onSignupFailure"),
         Reflux.listenTo(actions.signupSuccess, "onSignupSuccess")
     ],
+
+    contextTypes: {
+        router: React.PropTypes.func
+    },
 
     getInitialState () {
         return {
@@ -21,7 +24,7 @@ export default React.createClass({
     },
 
     onSignupSuccess () {
-        this.transitionTo(this.makeHref("submit"));
+        this.context.router.transitionTo(this.context.router.makeHref("submit"));
     },
 
     onSignupFailure (errors) {
