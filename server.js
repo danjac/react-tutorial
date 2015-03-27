@@ -49,6 +49,12 @@ if (devMode) {
     app.use(errorHandler());
 }
 
+// handle some promise rejections
+process.on('unhandledRejection', function(reason, p){
+    console.log("Possibly Unhandled Rejection at: Promise ", p, " reason: ", reason);
+    // application specific logging here
+});
+
 // database 
 //
 
@@ -67,7 +73,7 @@ routes(app);
    
 // handle errors
 app.use((err, req, res, next) => {
-    if (err.name === 'ValidationError') {
+    if (err.errors) {
         const errors = _.mapValues(err.errors, (err) => err.message);
         return res.status(400).json(errors);
     };
