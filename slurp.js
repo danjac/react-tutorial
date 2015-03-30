@@ -2,18 +2,14 @@ import parser from 'fast-feed'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import request from 'superagent'
-import {User, Post} from './lib/models'
+import {connect, User, Post} from './lib/models'
 
 dotenv.load()
 
 const username = process.argv[2]
 const url = process.argv[3]
 
-const connectionString = 'mongodb://' + (process.env.DB_HOST || 'localhost') + '/' + process.env.DB_NAME
-console.log(connectionString)
-
-mongoose.connect(connectionString)
-mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
+connect()
 
 if (!username || !url) {
     console.log("Usage: slurp.js USERNAME URL")

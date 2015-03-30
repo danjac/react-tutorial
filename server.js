@@ -13,8 +13,9 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import _ from 'lodash'
 import Checkit from 'checkit'
+import {connect} from './lib/models'
 import routes from './lib/routes'
-import {reactify} from './lib/middleware'
+//import {reactify} from './lib/middleware'
 //import jsxRoutes from './lib/frontend/Routes'
 
 dotenv.load()
@@ -57,12 +58,7 @@ if (devMode) {
 //
 
 console.log("connecting to mongodb")
-const connectionString = 'mongodb://' + (process.env.DB_HOST || 'localhost') + '/' + process.env.DB_NAME
-console.log(connectionString)
-
-mongoose.connect(connectionString)
-mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
-
+connect()
 
 // Local middleware
 //
