@@ -9,26 +9,26 @@ var browserify = require('gulp-browserify'),
     uglify = require('gulp-uglify'),
     sourcemaps = require('gulp-sourcemaps'),
     notify = require('gulp-notify'),
-    browserSync = require('browser-sync');
+    browserSync = require('browser-sync')
 
 var staticDir = './public',
     srcDir = './lib/frontend',
     cssFilter = gulpFilter('*.css'),
     jsFilter = gulpFilter('*.js'),
-    fontFilter = gulpFilter(['*.eot', '*.woff', '*.svg', '*.ttf']);
+    fontFilter = gulpFilter(['*.eot', '*.woff', '*.svg', '*.ttf'])
 
 var dest = {
     js: staticDir + '/js',
     css: staticDir + '/css',
     fonts: staticDir + '/fonts'
-};
+}
 
 
 gulp.task('serve', ['build-src'], function() {
     browserSync.init({
         proxy: 'http://localhost:5000'
-    });
-});
+    })
+})
 
 gulp.task('build-src', function() {
     gulp.src(srcDir + '/app.js')
@@ -54,9 +54,9 @@ gulp.task('build-src', function() {
         .pipe(browserSync.reload({stream:true}))
         .pipe(notify({
             message: 'Build complete'
-        }));
+        }))
 
-});
+})
 
 gulp.task('pkg', function() {
     // installs all the 3rd party stuffs.
@@ -77,15 +77,15 @@ gulp.task('pkg', function() {
         .pipe(gulp.dest(dest.css))
         .pipe(cssFilter.restore())
         .pipe(fontFilter)
-        .pipe(gulp.dest(dest.fonts));
-});
+        .pipe(gulp.dest(dest.fonts))
+})
 
 gulp.task('install', shell.task([
     'bower cache clean',
     'bower install'
-]));
+]))
 
 gulp.task('default', ['serve'], function() {
-    gulp.start('install', 'pkg', 'build-src');
-    gulp.watch(srcDir + '/**', {}, ['build-src']);
-});
+    gulp.start('install', 'pkg', 'build-src')
+    gulp.watch(srcDir + '/**', {}, ['build-src'])
+})
