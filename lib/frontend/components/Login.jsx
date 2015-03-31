@@ -1,10 +1,10 @@
-import React from 'react';
-import Reflux from 'reflux';
-import Router from 'react-router';
-import _ from 'lodash';
-import {Input} from 'react-bootstrap';
-import UserStore from '../stores/UserStore';
-import actions from '../actions';
+import React from 'react'
+import Reflux from 'reflux'
+import Router from 'react-router'
+import _ from 'lodash'
+import {Input} from 'react-bootstrap'
+import UserStore from '../stores/UserStore'
+import actions from '../actions'
 
 
 export default React.createClass({
@@ -21,31 +21,31 @@ export default React.createClass({
     getInitialState() {
         return {
             errors: {}
-        };
+        }
     },
 
     redirect() {
-        const nextPath = this.context.router.getCurrentQuery().nextPath || "/";
-        this.context.router.transitionTo(nextPath);
+        const nextPath = this.context.router.getCurrentQuery().nextPath || "/"
+        this.context.router.transitionTo(nextPath)
     },
 
     onLoginSuccess() {
-        const user = UserStore.getDefaultData();
+        const user = UserStore.getDefaultData()
         if (user) {
-            return this.redirect();
+            return this.redirect()
         }
     },
 
     onLoginFailure(errors) {
-        this.setState({ errors: errors || {} });
+        this.setState({ errors: errors || {} })
     },
 
     handleSubmit(event) {
-        event.preventDefault();
+        event.preventDefault()
 
         const data = _.mapValues(this.refs, (ref) => ref.getValue())
 
-        actions.login(data);
+        actions.login(data)
 
     },
 
@@ -65,6 +65,6 @@ export default React.createClass({
                        bsStyle={this.state.errors.password? 'error': null} />
                 <Input type="submit" value="Login" />
             </form>
-        );
+        )
     }
-});
+})

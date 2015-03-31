@@ -9,7 +9,6 @@ import mongoose from 'mongoose'
 import ClearDB from 'mocha-mongoose'
 import {expect} from 'chai'
 
-import jsxRoutes from '../lib/frontend/Routes'
 import routes, {jwtToken} from '../lib/routes'
 import {Post, User} from '../lib/models'
 

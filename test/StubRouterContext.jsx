@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
   
 export default function(Component, props, stubs){
 
@@ -23,11 +23,11 @@ export default function(Component, props, stubs){
               getCurrentQuery () {},
               isActive () {},
           }, stubs)
-        };
+        }
     },
 
     render() {
-        return <Component {...props} />;
+        return <Component {...props} />
     }
-  });
-};
+  })
+}

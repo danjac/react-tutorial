@@ -1,14 +1,14 @@
-import React from 'react/addons';
-import Router from 'react-router';
-import sinon from 'sinon';
-import moment from 'moment';
-import {expect} from 'chai';
-import _ from 'lodash';
-import Immutable from 'immutable';
-import Posts from '../../lib/frontend/components/Posts';
-import StubRouterContext from '../StubRouterContext';
+import React from 'react/addons'
+import Router from 'react-router'
+import sinon from 'sinon'
+import moment from 'moment'
+import {expect} from 'chai'
+import _ from 'lodash'
+import Immutable from 'immutable'
+import Posts from '../../lib/frontend/components/Posts'
+import StubRouterContext from '../StubRouterContext'
 
-const TestUtils = React.addons.TestUtils;
+const TestUtils = React.addons.TestUtils
 
 describe('Posts component', () => {
 
@@ -24,7 +24,7 @@ describe('Posts component', () => {
                 },
                 created_at: moment.utc()
             }
-        ]);
+        ])
 
         const Component = StubRouterContext(Posts, {
             posts: posts,
@@ -34,22 +34,22 @@ describe('Posts component', () => {
             isLast: true,
             isServer: true,
             fetchPosts: () => {}
-        });
+        })
 
-        const component = TestUtils.renderIntoDocument(<Component />);
+        const component = TestUtils.renderIntoDocument(<Component />)
 
-        const numUpvoteLinks = TestUtils.scryRenderedDOMComponentsWithClass(component, "glyphicon-arrow-up").length;
-        expect(numUpvoteLinks).to.equal(0);
+        const numUpvoteLinks = TestUtils.scryRenderedDOMComponentsWithClass(component, "glyphicon-arrow-up").length
+        expect(numUpvoteLinks).to.equal(0)
 
         // we should have 1 delete link
 
-        const node = component.getDOMNode();
-        const links = TestUtils.scryRenderedDOMComponentsWithTag(component, "a");
-        const numDeleteLinks = links.filter((link) => link.props.children === 'delete').length;
+        const node = component.getDOMNode()
+        const links = TestUtils.scryRenderedDOMComponentsWithTag(component, "a")
+        const numDeleteLinks = links.filter((link) => link.props.children === 'delete').length
 
-        expect(numDeleteLinks).to.equal(0);
+        expect(numDeleteLinks).to.equal(0)
  
-    });
+    })
 
     it('should show correct buttons for a user', () => {
         const posts = Immutable.List([
@@ -74,12 +74,12 @@ describe('Posts component', () => {
                 created_at: moment.utc(),
             }
 
-        ]);
+        ])
 
         const user = {
             _id: 1,
             name: 'tester'
-        };
+        }
 
         const Component = StubRouterContext(Posts, {
             posts: posts,
@@ -88,23 +88,23 @@ describe('Posts component', () => {
             isFirst: true,
             isLast: true,
             fetchPosts: () => {}
-        });
+        })
 
-        const component = TestUtils.renderIntoDocument(<Component />);
+        const component = TestUtils.renderIntoDocument(<Component />)
 
         // we should have 1 upvote link
         //
 
-        const numUpvoteLinks = TestUtils.scryRenderedDOMComponentsWithClass(component, "glyphicon-arrow-up").length;
-        expect(numUpvoteLinks).to.equal(1);
+        const numUpvoteLinks = TestUtils.scryRenderedDOMComponentsWithClass(component, "glyphicon-arrow-up").length
+        expect(numUpvoteLinks).to.equal(1)
 
         // we should have 1 delete link
 
-        const node = component.getDOMNode();
-        const links = TestUtils.scryRenderedDOMComponentsWithTag(component, "a");
-        const numDeleteLinks = links.filter((link) => link.props.children === 'delete').length;
-        expect(numDeleteLinks).to.equal(1);
+        const node = component.getDOMNode()
+        const links = TestUtils.scryRenderedDOMComponentsWithTag(component, "a")
+        const numDeleteLinks = links.filter((link) => link.props.children === 'delete').length
+        expect(numDeleteLinks).to.equal(1)
 
-    });
+    })
 
-});
+})

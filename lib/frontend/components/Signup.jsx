@@ -1,9 +1,9 @@
-import React from 'react';
-import Reflux from 'reflux';
-import Router from 'react-router';
-import _ from 'lodash';
-import {Input} from 'react-bootstrap';
-import actions from '../actions';
+import React from 'react'
+import Reflux from 'reflux'
+import Router from 'react-router'
+import _ from 'lodash'
+import {Input} from 'react-bootstrap'
+import actions from '../actions'
 
 
 export default React.createClass({
@@ -20,22 +20,22 @@ export default React.createClass({
     getInitialState () {
         return {
             errors: {}
-        };
+        }
     },
 
     onSignupSuccess () {
-        this.context.router.transitionTo(this.context.router.makeHref("submit"));
+        this.context.router.transitionTo(this.context.router.makeHref("submit"))
     },
 
     onSignupFailure (errors) {
-        this.setState({ errors: errors });
+        this.setState({ errors: errors })
     },
 
     handleSubmit (event) {
-        event.preventDefault();
+        event.preventDefault()
 
         const data = _.mapValues(this.refs, (ref) => ref.getValue())
-        actions.signup(data);
+        actions.signup(data)
 
     },
 
@@ -63,7 +63,7 @@ export default React.createClass({
                       help={this.state.errors.password} />
                <Input type="submit" value="Signup" />
             </form>
-        );
+        )
     }
 
-});
+})

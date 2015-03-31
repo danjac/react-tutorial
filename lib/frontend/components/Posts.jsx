@@ -1,10 +1,10 @@
-import React, {PropTypes} from 'react';
-import {PureRenderMixin} from 'react/addons';
-import Router, {Link} from 'react-router';
-import _ from 'lodash';
-import moment from 'moment';
-import {Button, Modal, ModalTrigger, Pager, PageItem} from 'react-bootstrap';
-import actions from '../actions';
+import React, {PropTypes} from 'react'
+import {PureRenderMixin} from 'react/addons'
+import Router, {Link} from 'react-router'
+import _ from 'lodash'
+import moment from 'moment'
+import {Button, Modal, ModalTrigger, Pager, PageItem} from 'react-bootstrap'
+import actions from '../actions'
 
 
 const DeletePostModal = React.createClass({
@@ -12,8 +12,8 @@ const DeletePostModal = React.createClass({
     mixins: [PureRenderMixin],
 
     handleDelete (event) {
-        event.preventDefault();
-        actions.deletePost(this.props.post);
+        event.preventDefault()
+        actions.deletePost(this.props.post)
     },
 
     render() {
@@ -29,9 +29,9 @@ const DeletePostModal = React.createClass({
                 </div>
             </Modal>
 
-        );
+        )
     }
-});
+})
 
 
 const PostListItem = React.createClass({
@@ -50,35 +50,35 @@ const PostListItem = React.createClass({
     },
 
     handleVoteUp(event) {
-        event.preventDefault();
-        actions.voteUp(this.props.post); 
+        event.preventDefault()
+        actions.voteUp(this.props.post) 
     },
 
     handleVoteDown(event) { 
-        event.preventDefault();
-        actions.voteDown(this.props.post); 
+        event.preventDefault()
+        actions.voteDown(this.props.post) 
     },
 
     deleteLink() {
         const user = this.props.user,
-              post = this.props.post;
+              post = this.props.post
         if (user && post.author._id === user._id) {
-            const modal = <DeletePostModal post={post} />;
+            const modal = <DeletePostModal post={post} />
             return (
                 <ModalTrigger modal={modal}>
                     <a href="#">delete</a>
                 </ModalTrigger>
-            );
+            )
         }
-        return '';
+        return ''
     },
 
     votingLinks() {
         const user = this.props.user,
-              post = this.props.post;
+              post = this.props.post
 
         if (!user || user._id === post.author._id || _.includes(user.votes, post._id)){
-            return '';
+            return ''
         }
 
         return (
@@ -86,13 +86,13 @@ const PostListItem = React.createClass({
                 <a href="#" onClick={this.handleVoteUp}><i className="glyphicon glyphicon-arrow-up"></i></a>
                 <a href="#" onClick={this.handleVoteDown}><i className="glyphicon glyphicon-arrow-down"></i></a>
             </span>
-        );
+        )
 
     },
 
     render() {
 
-        const post = this.props.post;
+        const post = this.props.post
 
         return (
             <li>
@@ -101,17 +101,17 @@ const PostListItem = React.createClass({
                     <small>
                         <mark>
                             <Link to={this.context.router.makeHref("user", {name: post.author.name})}>{post.author.name}</Link>
-                            &nbsp; Score: <b>{post.score}</b>
-                            &nbsp; Posted: <b>{moment(post.created).fromNow()}</b>
-                            &nbsp; {this.deleteLink()} {this.votingLinks()}
+                            &nbsp Score: <b>{post.score}</b>
+                            &nbsp Posted: <b>{moment(post.created).fromNow()}</b>
+                            &nbsp {this.deleteLink()} {this.votingLinks()}
                         </mark>
                     </small>
                 </div>
             </li> 
-        );
+        )
     }
 
-});
+})
 
 export default React.createClass({
 
@@ -129,32 +129,32 @@ export default React.createClass({
 
     handlePageClick(page) {
         console.log("handlepageclick", page)
-        this.props.fetchPosts(page);
+        this.props.fetchPosts(page)
     },
      
     handleLastPageClick(event) {
-        event.preventDefault();
+        event.preventDefault()
         if (this.props.isFirst) {
-            return;
+            return
         }
-        this.handlePageClick(this.props.page - 1);
+        this.handlePageClick(this.props.page - 1)
     },
 
     handleNextPageClick(event) {
-        event.preventDefault();
+        event.preventDefault()
         if (this.props.isLast) {
-            return;
+            return
         }
-        this.handlePageClick(this.props.page + 1);
+        this.handlePageClick(this.props.page + 1)
     },
 
     renderPager() {
         return (
             <Pager>
-                <PageItem previous onClick={this.handleLastPageClick} disabled={this.props.isFirst}>&larr; Previous</PageItem>
-                <PageItem next onClick={this.handleNextPageClick} disabled={this.props.isLast}>&rarr; Next</PageItem>
+                <PageItem previous onClick={this.handleLastPageClick} disabled={this.props.isFirst}>&larr Previous</PageItem>
+                <PageItem next onClick={this.handleNextPageClick} disabled={this.props.isLast}>&rarr Next</PageItem>
             </Pager>
-        );
+        )
     },
 
 
@@ -163,11 +163,11 @@ export default React.createClass({
             <div>
                 <ul className="list-unstyled">
                     {this.props.posts.map((post) => {
-                        return <PostListItem key={post._id} post={post} user={this.props.user} />;
+                        return <PostListItem key={post._id} post={post} user={this.props.user} />
                     }).toJS()}
                 </ul>
                 {this.renderPager()}
             </div>
-        );
+        )
     }
-});
+})

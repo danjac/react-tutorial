@@ -1,8 +1,8 @@
-import React from 'react';
-import Router from 'react-router';
-import _ from 'lodash';
-import actions from '../actions';
-import {PostsPage} from './Mixins';
+import React from 'react'
+import Router from 'react-router'
+import _ from 'lodash'
+import actions from '../actions'
+import {PostsPage} from './Mixins'
 
 export default React.createClass({
 
@@ -14,19 +14,19 @@ export default React.createClass({
     getInitialState() {
         return {
             name: this.getParams().name
-        };
+        }
     },
 
     fetchPosts(page) {
-        actions.fetchPostsForUser(page, this.state.name);
+        actions.fetchPostsForUser(page, this.state.name)
     },
 
     componentWillReceiveProps(nextProps) {
-        const name = this.getParams().name;
+        const name = this.getParams().name
         if (name != this.state.name){
-            this.setState({ name: name});
-            actions.fetchPostsForUser(1, name);
+            this.setState({ name: name})
+            actions.fetchPostsForUser(1, name)
         }
     }
 
-});
+})
