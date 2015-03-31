@@ -67,6 +67,11 @@ const Navigation = React.createClass({
         )
     },
 
+    clearSearch(event) {
+        event.preventDefault()
+        this.refs.search.getInputDOMNode().value = ""
+    },
+
     handleSearch(event) {
         event.preventDefault()
         const q = this.refs.search.getValue().trim()
@@ -84,7 +89,8 @@ const Navigation = React.createClass({
                 <NavItemLink to={makeHref("latest")}>new</NavItemLink>
                 <NavItemLink to={makeHref("submit")}>submit</NavItemLink>
                 <form className="navbar-form navbar-left" 
-                      role="search">
+                      role="search"
+                      onSubmit={this.clearSearch}>
                     <Input type="search" 
                            placeholder="Search"
                            onKeyUp={this.handleSearch}

@@ -7,13 +7,17 @@ import {PostsPage} from './Mixins'
 export default React.createClass({
 
     mixins: [
-        Router.State,
         PostsPage
     ],
 
+    contextTypes: {
+        router: React.PropTypes.func
+    },
+
+
     getInitialState() {
         return {
-            name: this.getParams().name
+            name: this.context.router.getCurrentParams().name
         }
     },
 
@@ -22,7 +26,7 @@ export default React.createClass({
     },
 
     componentWillReceiveProps(nextProps) {
-        const name = this.getParams().name
+        const name = this.context.router.getCurrentParams().name
         if (name != this.state.name){
             this.setState({ name: name})
             actions.fetchPostsForUser(1, name)

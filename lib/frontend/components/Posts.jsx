@@ -101,9 +101,9 @@ const PostListItem = React.createClass({
                     <small>
                         <mark>
                             <Link to={this.context.router.makeHref("user", {name: post.author.name})}>{post.author.name}</Link>
-                            &nbsp Score: <b>{post.score}</b>
-                            &nbsp Posted: <b>{moment(post.created).fromNow()}</b>
-                            &nbsp {this.deleteLink()} {this.votingLinks()}
+                            &nbsp; Score: <b>{post.score}</b>
+                            &nbsp; Posted: <b>{moment(post.created).fromNow()}</b>
+                            &nbsp; {this.deleteLink()} {this.votingLinks()}
                         </mark>
                     </small>
                 </div>
@@ -151,8 +151,8 @@ export default React.createClass({
     renderPager() {
         return (
             <Pager>
-                <PageItem previous onClick={this.handleLastPageClick} disabled={this.props.isFirst}>&larr Previous</PageItem>
-                <PageItem next onClick={this.handleNextPageClick} disabled={this.props.isLast}>&rarr Next</PageItem>
+                <PageItem previous onClick={this.handleLastPageClick} disabled={this.props.isFirst}>&larr; Previous</PageItem>
+                <PageItem next onClick={this.handleNextPageClick} disabled={this.props.isLast}>&rarr; Next</PageItem>
             </Pager>
         )
     },
