@@ -50,7 +50,7 @@ const parseFeed = (user) => {
                 promises.push(user.update({ totalScore: newScore }).exec())
                 Promise
                     .race(promises)
-                    .then((results) => resolve(promises.length),
+                    .then((results) => resolve(feed.items.length),
                           (err) => reject(err))
             })
     })
