@@ -21,9 +21,9 @@ const Messages = React.createClass({
         return (
             <div>
             {this.props.messages.map((msg, index) => {
-                return <Alert onDismiss={() => actions.dismissAlert(index)} 
-                              key={index} 
-                              dismissAfter={3000} 
+                return <Alert onDismiss={() => actions.dismissAlert(index)}
+                              key={index}
+                              dismissAfter={3000}
                               bsStyle={msg.level}>{msg.text}</Alert>
             }).toJS()}
             </div>
@@ -88,10 +88,10 @@ const Navigation = React.createClass({
               <Nav className="navbar-left">
                 <NavItemLink to={makeHref("latest")}>new</NavItemLink>
                 <NavItemLink to={makeHref("submit")}>submit</NavItemLink>
-                <form className="navbar-form navbar-left" 
+                <form className="navbar-form navbar-left"
                       role="search"
                       onSubmit={this.clearSearch}>
-                    <Input type="search" 
+                    <Input type="search"
                            placeholder="Search"
                            onKeyUp={this.handleSearch}
                            ref="search"  />
@@ -110,6 +110,7 @@ export default React.createClass({
     mixins: [
         Reflux.listenTo(MessageStore, 'onMessagesUpdate'),
         Reflux.listenTo(UserStore, 'onUserUpdate'),
+        Reflux.listenTo(actions.loginRequired, 'onLoginRequired'),
         Reflux.listenTo(actions.logout, 'onLogout'),
         Reflux.listenTo(actions.startLoading, 'onLoadingStart'),
         Reflux.listenTo(actions.endLoading, 'onLoadingEnd')
@@ -129,6 +130,10 @@ export default React.createClass({
 
     onLogout() {
         this.context.router.transitionTo("popular")
+    },
+
+    onLoginRequired() {
+        this.context.router.transitionTo("login")
     },
 
     onMessagesUpdate() {
@@ -159,7 +164,7 @@ export default React.createClass({
                 <div className="container-fluid">
                     <div className="text-center">
                         <h1>Loading....</h1>
-                    </div> 
+                    </div>
                 </div>
             )
         }
@@ -168,7 +173,7 @@ export default React.createClass({
             <div className="container-fluid">
                 <Navigation user={this.state.user} />
                 <Messages messages={this.state.messages} />
-                <RouteHandler user={this.state.user}  /> 
+                <RouteHandler user={this.state.user}  />
             </div>
         )
     }

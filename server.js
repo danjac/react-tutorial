@@ -1,83 +1,118 @@
-import express from 'express'
-import http from 'http'
-import path from 'path'
-import mongoose from 'mongoose'
-import errorHandler from 'errorhandler'
-import morgan from 'morgan'
-import bodyParser from 'body-parser'
-import methodOverride from 'method-override'
-import serveStatic from 'serve-static'
-import jwt from 'jsonwebtoken'
-import expressJwt from 'express-jwt'
-import dotenv from 'dotenv'
-import cors from 'cors'
-import _ from 'lodash'
-import Checkit from 'checkit'
-import {connect} from './lib/models'
-import routes from './lib/routes'
-//import {reactify} from './lib/middleware'
-//import jsxRoutes from './lib/frontend/Routes'
+import path from 'path';
+import koa from 'koa';
+import body from 'koa-body';
+import logger from 'koa-logger';
+import error from 'koa-error-handler';
+import render from 'koa-ejs';
+import jwt from 'koa-jwt';
+import serveStatic from 'koa-static';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import _ from 'lodash';
+import Checkit from 'checkit';
+import {connect} from './lib/models';
+import routes from './lib/routes';
 
-dotenv.load()
+dotenv.load();
 
-const app = express()
+const app = koa();
 
 // all environments
 
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 5000;
+const devMode = 'development' === process.env.NODE_ENV;
 
-app.set('port', port)
-app.set('views', path.join(__dirname, '/views'))
-app.set('view engine', 'ejs')
+// common middleware
+//
+//
 
-app.use(cors())
-app.use(morgan('dev'))
-app.use(bodyParser.json())
-app.use(methodOverride())
-app.use(serveStatic(path.join(__dirname, '/public')))
+error(app);
 
-app.use(expressJwt({
+render(app, {
+    root: path.join(__dirname, 'views'),
+    layout: false,
+    viewExt: 'ejs',
+    cache: !(devMode),
+    debug: devMode
+});
+
+app.use(body());
+
+app.use(serveStatic(path.join(__dirname, 'public')));
+
+app.use(logger());
+
+app.use(jwt({
     secret: process.env.SECRET_KEY,
-    credentialsRequired: false,
-    requestProperty: 'authToken'
-}).unless({ path: ["/public"]}))
+    passthrough: true,
+    key: 'authToken'
+}));
 
-
-const devMode = 'development' == app.get('env')
 
 // development only
 if (devMode) {
-    console.log("Using development environment")
-    app.use(errorHandler())
+    console.log("Using development environment");
+    //app.use(errorHandler())
 }
-//process.on("unhandledRejection", function(reason, promise) {
-    // See Promise.onPossiblyUnhandledRejection for parameter documentation
- //   console.log("unhandled rejection:", reason)
-//})
-// database 
+
+console.log("connecting to mongodb");
+connect();
+
+  
+// handle errors
+
+app.use(function* (next) {
+    try {
+        yield next;
+    } catch(err) {
+        // return any 4xx errors as-is
+        // how to turn off logging?
+
+        if (err instanceof Checkit.Error) {
+            this.status = 400;
+            this.body = err.toJSON();
+            return this.app.emit('error', err, this);
+        }
+        if (err.status && err.status !== 500) {
+            this.status = err.status;
+            if (err.errors) {
+                this.body = err.errors;
+            } else {
+                this.body = err.toString();
+            }
+            this.app.emit('error', err, this);
+        } else {
+            throw err;
+        }
+    }
+});
+/*
+app.on('error', (err) => {
+    if (process.env.NODE_ENV === 'test'){
+        return;
+    }
+    if (err.status && err.status !== 500) {
+        return; 
+    }
+    console.log(err);
+});
+*/
+
 //
-
-console.log("connecting to mongodb")
-connect()
-
-// Local middleware
-//
-//app.use(reactify(jsxRoutes))
-
 // Set up routes
 //
-routes(app)
-   
-// handle errors
+routes(app);
+
+ /*
 app.use((err, req, res, next) => {
     if (err instanceof Checkit.Error) {
         return res.status(400).json(err.toJSON())
     }
     next(err)
 })
+*/
 
 // run server
 
-console.log("Running on port", port)
-app.server = http.createServer(app)
-app.server.listen(port)
+console.log("Running on port", port);
+app.listen(port);

@@ -29,6 +29,12 @@ export default React.createClass({
         this.context.router.transitionTo(nextPath)
     },
 
+    componentDidMount() {
+        if (self.props.user) {
+            return this.redirect()
+        }
+    },
+
     onLoginSuccess() {
         const user = UserStore.getDefaultData()
         if (user) {
