@@ -12,7 +12,7 @@ var browserify = require('gulp-browserify'),
     browserSync = require('browser-sync')
 
 var staticDir = './public',
-    srcDir = './lib/frontend',
+    srcDir = './app',
     cssFilter = gulpFilter('*.css'),
     jsFilter = gulpFilter('*.js'),
     fontFilter = gulpFilter(['*.eot', '*.woff', '*.svg', '*.ttf'])
