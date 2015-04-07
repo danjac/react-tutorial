@@ -134,6 +134,7 @@ actions.login.preEmit = (data) => {
                     if (err) {
                         return actions.loginFailure()
                     }
+                    console.log("LOGIN", res.body)
                     window.localStorage.setItem(authToken, res.body.token)
                     actions.loginSuccess(res.body.user)
                 })
