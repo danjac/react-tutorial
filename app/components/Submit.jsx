@@ -10,8 +10,8 @@ export default React.createClass({
 
     mixins: [
         Authenticate,
-        Reflux.listenTo(actions.submitPostSuccess, "onSubmitPostSuccess"),
-        Reflux.listenTo(actions.submitPostFailure, "onSubmitPostFailure")
+        Reflux.listenTo(actions.submitPost.completed, "onSubmitPostSuccess"),
+        Reflux.listenTo(actions.submitPost.failed, "onSubmitPostFailure")
     ],
 
     contextTypes: {
@@ -21,7 +21,7 @@ export default React.createClass({
     getInitialState() {
         return {
             errors: {}
-        }
+        };
     },
 
     onSubmitPostFailure(errors) {

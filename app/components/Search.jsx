@@ -16,22 +16,22 @@ export default React.createClass({
     getInitialState() {
         return {
             search: this.getSearchQuery()
-        }
+        };
     },
 
     getSearchQuery() {
-        return this.context.router.getCurrentQuery().q
+        return this.context.router.getCurrentQuery().q;
     },
 
     fetchPosts(page) {
-        actions.searchPosts(page, this.state.search)
+        actions.searchPosts(page, this.state.search);
     },
 
     componentWillReceiveProps(nextProps) {
-        const q = this.getSearchQuery()
+        const q = this.getSearchQuery();
         if (q != this.state.search){
-            this.setState({ search: q})
-            actions.searchPosts(1, q)
+            this.setState({ search: q});
+            actions.searchPosts(1, q);
         }
     }
 

@@ -9,8 +9,8 @@ import actions from '../actions'
 export default React.createClass({
 
     mixins: [
-        Reflux.listenTo(actions.signupFailure, "onSignupFailure"),
-        Reflux.listenTo(actions.signupSuccess, "onSignupSuccess")
+        Reflux.listenTo(actions.signup.failed, "onSignupFailure"),
+        Reflux.listenTo(actions.signup.completed, "onSignupSuccess")
     ],
 
     contextTypes: {
@@ -20,22 +20,22 @@ export default React.createClass({
     getInitialState () {
         return {
             errors: {}
-        }
+        };
     },
 
     onSignupSuccess () {
-        this.context.router.transitionTo(this.context.router.makeHref("submit"))
+        this.context.router.transitionTo(this.context.router.makeHref("submit"));
     },
 
     onSignupFailure (errors) {
-        this.setState({ errors: errors })
+        this.setState({ errors: errors });
     },
 
     handleSubmit (event) {
-        event.preventDefault()
+        event.preventDefault();
 
-        const data = _.mapValues(this.refs, (ref) => ref.getValue())
-        actions.signup(data)
+        const data = _.mapValues(this.refs, (ref) => ref.getValue());
+        actions.signup(data);
 
     },
 

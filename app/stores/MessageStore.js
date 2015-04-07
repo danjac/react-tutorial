@@ -33,11 +33,11 @@ export default Reflux.createStore({
         this.addMessage("warning", msg)
     },
 
-    loginSuccess(user) {
+    loginCompleted(user) {
         this.success("Welcome back, " + user.name)
     },
 
-    loginFailure() {
+    loginFailed() {
         this.warning("Sorry, you have entered incorrect login info")
     },
 
@@ -53,15 +53,15 @@ export default Reflux.createStore({
         this.success("Bye for now")
     },
 
-    deletePostComplete(post) {
+    deletePost(post) {
         this.success(`Your post "${post.title}" has been deleted!`)
     },
 
-    submitPostSuccess() {
+    submitPostCompleted() {
         this.success("Thank you for your post!")
     },
 
-    signupSuccess(user) {
+    signupCompleted(user) {
         this.success(`Hi ${user.name}! Welcome to the site!`)
     }
 

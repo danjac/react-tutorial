@@ -11,7 +11,7 @@ export default React.createClass({
 
     mixins: [
         Reflux.listenTo(UserStore, 'onLoginSuccess'),
-        Reflux.listenTo(actions.loginFailure, 'onLoginFailure'),
+        Reflux.listenTo(actions.login.failed, 'onLoginFailure'),
     ],
 
     contextTypes: {

@@ -1,10 +1,10 @@
-import React, {PropTypes} from 'react'
-import {PureRenderMixin} from 'react/addons'
-import Router, {Link} from 'react-router'
-import _ from 'lodash'
-import moment from 'moment'
-import {Button, Modal, ModalTrigger, Pager, PageItem} from 'react-bootstrap'
-import actions from '../actions'
+import React, {PropTypes} from 'react';
+import {PureRenderMixin} from 'react/addons';
+import Router, {Link} from 'react-router';
+import _ from 'lodash';
+import moment from 'moment';
+import {Button, Modal, ModalTrigger, Pager, PageItem} from 'react-bootstrap';
+import actions from '../actions';
 
 
 const DeletePostModal = React.createClass({
@@ -12,8 +12,8 @@ const DeletePostModal = React.createClass({
     mixins: [PureRenderMixin],
 
     handleDelete (event) {
-        event.preventDefault()
-        actions.deletePost(this.props.post)
+        event.preventDefault();
+        actions.deletePost(this.props.post);
     },
 
     render() {
@@ -128,24 +128,23 @@ export default React.createClass({
     },
 
     handlePageClick(page) {
-        console.log("handlepageclick", page)
-        this.props.fetchPosts(page)
+        this.props.fetchPosts(page);
     },
      
     handleLastPageClick(event) {
         event.preventDefault()
         if (this.props.isFirst) {
-            return
+            return;
         }
-        this.handlePageClick(this.props.page - 1)
+        this.handlePageClick(this.props.page - 1);
     },
 
     handleNextPageClick(event) {
         event.preventDefault()
         if (this.props.isLast) {
-            return
+            return;
         }
-        this.handlePageClick(this.props.page + 1)
+        this.handlePageClick(this.props.page + 1);
     },
 
     renderPager() {
@@ -154,7 +153,7 @@ export default React.createClass({
                 <PageItem previous onClick={this.handleLastPageClick} disabled={this.props.isFirst}>&larr; Previous</PageItem>
                 <PageItem next onClick={this.handleNextPageClick} disabled={this.props.isLast}>&rarr; Next</PageItem>
             </Pager>
-        )
+        );
     },
 
 
@@ -168,6 +167,6 @@ export default React.createClass({
                 </ul>
                 {this.renderPager()}
             </div>
-        )
+        );
     }
 })

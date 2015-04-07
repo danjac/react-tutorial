@@ -18,18 +18,18 @@ export default React.createClass({
     getInitialState() {
         return {
             name: this.context.router.getCurrentParams().name
-        }
+        };
     },
 
     fetchPosts(page) {
-        actions.fetchPostsForUser(page, this.state.name)
+        actions.fetchPostsForUser(page, this.state.name);
     },
 
     componentWillReceiveProps(nextProps) {
-        const name = this.context.router.getCurrentParams().name
+        const name = this.context.router.getCurrentParams().name;
         if (name != this.state.name){
-            this.setState({ name: name})
-            actions.fetchPostsForUser(1, name)
+            this.setState({ name: name});
+            actions.fetchPostsForUser(1, name);
         }
     }
 

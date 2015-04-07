@@ -6,63 +6,74 @@ export default Reflux.createStore({
     listenables: actions,
 
     init() {
-        this.user = null
+        this.user = null;
     },
 
     getDefaultData() {
-        return this.user
+        return this.user;
     },
 
     isLoggedIn() {
-        return this.user != null
+        return this.user != null;
     },
 
-    getUserComplete(user){
-        this.user = user
-        this.trigger()
+    addUser(user) {
+        this.user = user;
+        this.trigger();
     },
 
-    loginSuccess(user) {
-        this.user = user
-        this.trigger()
+    removeUser() {
+        this.user = null;
+        this.trigger();
     },
 
-    signupSuccess(user) {
-        this.user = user
-        this.trigger()
+    getUserCompleted(user){
+        this.addUser(user);
+    },
+
+    getUserFailed(){
+        this.removeUser();
+    },
+
+
+    loginCompleted(user) {
+        this.addUser(user);
+    },
+
+    signupCompleted(user) {
+        this.addUser(user);
     },
 
     deletePost(post) {
         if (this.user) {
-            this.user.totalScore -= post.score
-            this.trigger()
+            this.user.totalScore -= post.score;
+            this.trigger();
         }
     },
 
     submitPost(post) {
         if (this.user) {
-            this.user.totalScore += 1
-            this.trigger()
+            this.user.totalScore += 1;
+            this.trigger();
         }
     },
 
     logout() {
-        this.user = null
-        this.trigger()
+        this.removeUser();
     },
 
     tallyVote(post) {
-        this.user.votes.push(post._id)
-        this.trigger()
+        this.user.votes.push(post._id);
+        this.trigger();
     },
 
     voteUp(post) {
-        this.tallyVote(post)
+        this.tallyVote(post);
     },
 
     voteDown(post) {
-        this.tallyVote(post)
+        this.tallyVote(post);
     }
 
-})
+});
 

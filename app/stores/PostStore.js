@@ -22,42 +22,42 @@ export default Reflux.createStore({
             page: this.page,
             isFirst: this.isFirst,
             isLast: this.isLast
-        })
+        });
     },
 
     indexOf(post) {
-        return this.posts.findIndex((p) => p._id === post._id)
+        return this.posts.findIndex((p) => p._id === post._id);
     },
 
     deletePost(post) {
-        this.posts = this.posts.delete(this.indexOf(post))
-        this._trigger()
+        this.posts = this.posts.delete(this.indexOf(post));
+        this._trigger();
     },
 
     adjustScore(post, amount) {
         this.posts = this.posts.update(this.indexOf(post), (post) => {
             post.score += amount
             return post
-        })
-        this._trigger()
+        });
+        this._trigger();
     },
 
     voteUp(post) {
-        this.adjustScore(post, 1)
+        this.adjustScore(post, 1);
     },
 
     voteDown(post) {
-        this.adjustScore(post, -1)
+        this.adjustScore(post, -1);
     },
 
 
-    fetchPostsComplete(page, result) {
-        this.page = page
-        this.posts = Immutable.List(result.posts)
-        this.isFirst = result.isFirst
-        this.isLast = result.isLast
-        this.total = result.total
-        this._trigger()
+    fetchPostsCompleted(page, result) {
+        this.page = page;
+        this.posts = Immutable.List(result.posts);
+        this.isFirst = result.isFirst;
+        this.isLast = result.isLast;
+        this.total = result.total;
+        this._trigger();
     },
 
     getDefaultData() {
@@ -67,6 +67,6 @@ export default Reflux.createStore({
             total: this.total,
             isFirst: this.isFirst,
             isLast: this.isLast
-        }
+        };
     }
 })

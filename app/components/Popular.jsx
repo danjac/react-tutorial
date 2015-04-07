@@ -9,7 +9,7 @@ export default React.createClass({
     ],
 
     fetchPosts (page) {
-        actions.fetchPopularPosts(page)
+        actions.fetchPopularPosts(page);
     }
 
 })
