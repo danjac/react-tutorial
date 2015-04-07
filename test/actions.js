@@ -1,6 +1,6 @@
 import sinon from 'sinon'
 import {expect} from 'chai'
-import actions from '../lib/frontend/actions'
+import actions from '../app/actions'
 
 
 describe("login action", () => {

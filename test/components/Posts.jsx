@@ -5,7 +5,7 @@ import moment from 'moment'
 import {expect} from 'chai'
 import _ from 'lodash'
 import Immutable from 'immutable'
-import Posts from '../../lib/frontend/components/Posts'
+import Posts from '../../app/components/Posts'
 import StubRouterContext from '../StubRouterContext'
 
 const TestUtils = React.addons.TestUtils

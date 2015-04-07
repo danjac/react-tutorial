@@ -1,8 +1,8 @@
 import React from 'react/addons'
 import sinon from 'sinon'
 import {expect} from 'chai'
-import Login from '../../lib/frontend/components/Login'
-import actions from '../../lib/frontend/actions'
+import Login from '../../app/components/Login'
+import actions from '../../app/actions'
 import StubRouterContext from '../StubRouterContext'
 
 
