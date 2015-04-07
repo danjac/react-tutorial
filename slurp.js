@@ -1,8 +1,10 @@
-import parser from 'fast-feed'
-import dotenv from 'dotenv'
-import mongoose from 'mongoose'
-import request from 'superagent'
-import {connect, User, Post} from './lib/models'
+import parser from 'fast-feed';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import request from 'superagent';
+import connect from './config/db';
+import User from './lib/models/User';
+import Post from './lib/models/Post';
 
 dotenv.load()
 

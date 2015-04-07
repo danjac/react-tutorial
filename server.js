@@ -10,7 +10,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import _ from 'lodash';
 import Checkit from 'checkit';
-import {connect} from './lib/models';
+import connect from './config/db';
 import routes from './config/routes';
 
 dotenv.load();

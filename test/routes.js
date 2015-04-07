@@ -9,7 +9,8 @@ import ClearDB from 'mocha-mongoose';
 import {expect} from 'chai';
 
 import routes from '../config/routes'
-import {Post, User} from '../lib/models'
+import Post from '../lib/models/Post';
+import User from '../lib/models/User';
 
 dotenv.load()
 
