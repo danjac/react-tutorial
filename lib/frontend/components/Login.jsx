@@ -1,10 +1,10 @@
-import React from 'react'
-import Reflux from 'reflux'
-import Router from 'react-router'
-import _ from 'lodash'
-import {Input} from 'react-bootstrap'
-import UserStore from '../stores/UserStore'
-import actions from '../actions'
+import React from 'react';
+import Reflux from 'reflux';
+import Router from 'react-router';
+import _ from 'lodash';
+import {Input} from 'react-bootstrap';
+import UserStore from '../stores/UserStore';
+import actions from '../actions';
 
 
 export default React.createClass({
@@ -30,7 +30,7 @@ export default React.createClass({
     },
 
     componentDidMount() {
-        if (self.props.user) {
+        if (this.props.user) {
             return this.redirect()
         }
     },

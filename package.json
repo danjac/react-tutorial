@@ -8,6 +8,7 @@
     "babelify": "^5.0.4",
     "browser-sync": "^2.4.0",
     "chai": "^2.2.0",
+    "co-mocha": "^1.1.0",
     "envify": "^3.4.0",
     "gulp": "^3.8.11",
     "gulp-browserify": "^0.5.1",
@@ -33,6 +34,7 @@
     "bcryptjs": "^2.1.0",
     "checkit": "^0.5.1",
     "classnames": "^1.2.0",
+    "co": "^4.5.1",
     "dotenv": "^1.0.0",
     "ejs": "^2.3.1",
     "fast-feed": "^1.0.12",
@@ -62,6 +64,6 @@
     "superagent": "^1.1.0"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha"
+    "test": "mocha --harmony"
   }
 }

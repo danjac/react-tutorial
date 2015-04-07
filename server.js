@@ -103,15 +103,6 @@ app.on('error', (err) => {
 //
 routes(app);
 
- /*
-app.use((err, req, res, next) => {
-    if (err instanceof Checkit.Error) {
-        return res.status(400).json(err.toJSON())
-    }
-    next(err)
-})
-*/
-
 // run server
 
 console.log("Running on port", port);
