@@ -3,7 +3,7 @@ import mount from 'koa-mount';
 import index from '../lib/controllers';
 import * as api from '../lib/controllers/api';
 import * as auth from '../lib/controllers/auth';
-import {authenticate} from '../lib/middleware';
+import {authenticate} from '../lib/controllers/middleware';
 
 
 export default (app) => {
