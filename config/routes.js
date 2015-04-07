@@ -1,9 +1,9 @@
 import router from 'koa-router';
 import mount from 'koa-mount';
-import index from './controllers';
-import * as api from './controllers/api';
-import * as auth from './controllers/auth';
-import {authenticate} from './middleware';
+import index from '../lib/controllers';
+import * as api from '../lib/controllers/api';
+import * as auth from '../lib/controllers/auth';
+import {authenticate} from '../lib/middleware';
 
 
 export default (app) => {

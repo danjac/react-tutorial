@@ -8,7 +8,7 @@ import mongoose from 'mongoose';
 import ClearDB from 'mocha-mongoose';
 import {expect} from 'chai';
 
-import routes, {jwtToken} from '../lib/routes'
+import routes from '../config/routes'
 import {Post, User} from '../lib/models'
 
 dotenv.load()

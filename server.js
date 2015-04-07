@@ -11,7 +11,7 @@ import dotenv from 'dotenv';
 import _ from 'lodash';
 import Checkit from 'checkit';
 import {connect} from './lib/models';
-import routes from './lib/routes';
+import routes from './config/routes';
 
 dotenv.load();
 
