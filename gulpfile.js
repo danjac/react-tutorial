@@ -49,7 +49,7 @@ gulp.task('build-src', function() {
             extensions: ['.js', '.jsx']
         }))
         .pipe(uglify())
-        .pipe(sourcemaps.write(dest.js))
+        .pipe(sourcemaps.write())
         .pipe(gulp.dest(dest.js))
         .pipe(browserSync.reload({stream:true}))
         .pipe(notify({

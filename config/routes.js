@@ -26,6 +26,7 @@ export default (app) => {
         .routes()));
 
     app.use(mount('/', new router()
+        .get('/user/:user', index)
         .get('/:path', index)
         .get('/', index)
         .routes()));

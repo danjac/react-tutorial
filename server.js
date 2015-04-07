@@ -26,7 +26,6 @@ const devMode = 'development' === process.env.NODE_ENV;
 //
 //
 
-error(app);
 
 render(app, {
     root: path.join(__dirname, 'views'),
@@ -59,33 +58,27 @@ console.log("connecting to mongodb");
 connect();
 
   
-// handle errors
+// handle form input and other user errors
 
 app.use(function* (next) {
     try {
         yield next;
     } catch(err) {
-        // return any 4xx errors as-is
-        // how to turn off logging?
-
         if (err instanceof Checkit.Error) {
             this.status = 400;
             this.body = err.toJSON();
-            return this.app.emit('error', err, this);
+            return;
         }
-        if (err.status && err.status !== 500) {
+        if (err.status && err.status < 500) {
             this.status = err.status;
-            if (err.errors) {
-                this.body = err.errors;
-            } else {
-                this.body = err.toString();
-            }
-            this.app.emit('error', err, this);
-        } else {
-            throw err;
-        }
+            return;
+        } 
+        throw err;
     }
 });
+
+error(app);
+
 /*
 app.on('error', (err) => {
     if (process.env.NODE_ENV === 'test'){

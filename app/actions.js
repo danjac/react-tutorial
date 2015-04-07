@@ -97,7 +97,7 @@ actions.getUser.listen(() => {
 
 actions.searchPosts.listen((page, query) => {
 
-    api.search(page, query)
+    api.searchPosts(page, query)
         .then((result) => {
             actions.fetchPosts.completed(page, result); 
         });
