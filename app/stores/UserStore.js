@@ -1,5 +1,5 @@
-import Reflux from 'reflux'
-import actions from '../actions'
+import Reflux from 'reflux';
+import actions from '../actions';
 
 export default Reflux.createStore({
 

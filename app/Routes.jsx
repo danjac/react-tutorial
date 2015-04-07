@@ -1,14 +1,14 @@
-import React from 'react'
-import {DefaultRoute, Route} from 'react-router'
+import React from 'react';
+import {DefaultRoute, Route} from 'react-router';
 
-import App from './components/App'
-import Popular from './components/Popular'
-import Latest from './components/Latest'
-import User from './components/User'
-import Login from './components/Login'
-import Signup from './components/Signup'
-import Submit from './components/Submit'
-import Search from './components/Search'
+import App from './components/App';
+import Popular from './components/Popular';
+import Latest from './components/Latest';
+import User from './components/User';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import Submit from './components/Submit';
+import Search from './components/Search';
  
 
 export default (
@@ -21,5 +21,5 @@ export default (
         <Route name="submit" path="/submit" handler={Submit} />
         <Route name="search" path="/search" handler={Search} />
     </Route>
-)
+);
 

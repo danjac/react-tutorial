@@ -7,7 +7,7 @@ It's built with the following tech:
 
 - ES6 + Babel
 - NodeJS
-- Express
+- Koa
 - React
 - React-router
 - Reflux

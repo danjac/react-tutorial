@@ -1,19 +1,19 @@
-import Reflux from 'reflux'
-import request from 'superagent'
-import Immutable from 'immutable'
-import _ from 'lodash'
-import actions from '../actions'
+import Reflux from 'reflux';
+import request from 'superagent';
+import Immutable from 'immutable';
+import _ from 'lodash';
+import actions from '../actions';
 
 export default Reflux.createStore({
 
     listenables: actions,
     
     init() {
-        this.posts = Immutable.List()
-        this.page = 1
-        this.total = 0
-        this.isFirst = true
-        this.isLast = true
+        this.posts = Immutable.List();
+        this.page = 1;
+        this.total = 0;
+        this.isFirst = true;
+        this.isLast = true;
     },
 
     _trigger() {
