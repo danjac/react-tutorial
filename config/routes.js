@@ -23,6 +23,8 @@ export default (app) => {
         .post("/signup/", api.signup)
         .get("/search/", api.search)
         .get("/user/:name", api.getUser)
+        .get("/isname", api.nameExists)
+        .get("/isemail", api.emailExists)
         .routes()));
 
     app.use(mount('/', new router()

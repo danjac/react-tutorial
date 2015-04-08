@@ -39,6 +39,33 @@ class TokenStore {
 
 }
 
+const isUnique = (field, url) => {
+
+    return (value) => {
+
+        if (!value) {
+            return;
+        }
+
+        return new Promise((resolve, reject) => {
+            request
+            .get(url)
+            .query({ [field]: value })
+            .end((err, res) => {
+                if (res.body.exists) {
+                    reject(new Checkit.ValidationError("The " + field + " field is already in use"));
+                }
+                resolve();
+            });
+        });
+    };
+
+};
+
+validators.Signup.name.push(isUnique('name', '/api/isname'));
+validators.Signup.email.push(isUnique('email', '/api/isemail'));
+
+
 const fetchPosts = (page, orderBy) => {
 
     return new Promise((resolve, reject) => {
