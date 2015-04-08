@@ -2,19 +2,19 @@ import router from 'koa-router';
 import mount from 'koa-mount';
 import index from '../lib/controllers';
 import * as api from '../lib/controllers/api';
-import * as auth from '../lib/controllers/auth';
-import {authenticate} from '../lib/controllers/middleware';
+import * as secure from '../lib/controllers/secure';
 
 
 export default (app) => {
 
     app.use(mount('/api/auth', new router()
-        .post("/submit/", auth.submit)
-        .delete("/:id", auth.deletePost)
-        .put("/upvote/:id", auth.upvote)
-        .put("/downvote/:id", auth.downvote)
-        .get("/", auth.getUser)
-        .use(authenticate)
+        .post("/submit/", secure.submit)
+        .post("/logout/", secure.logout)
+        .delete("/:id", secure.deletePost)
+        .put("/upvote/:id", secure.upvote)
+        .put("/downvote/:id", secure.downvote)
+        .get("/", secure.getUser)
+        .use(secure.isSecure)
         .routes()));
 
     app.use(mount('/api', new router()

@@ -72,9 +72,8 @@ actions.logout.listen(() => {
     api.logout();
 });
 
+
 actions.login.listen((data) => {
-
-
     api.login(data)
         .then((user) => {
             actions.login.completed(user);

@@ -4,41 +4,6 @@ import Checkit from 'checkit';
 import * as validators from './validators';
 
 
-class TokenStore {
-
-    constructor() {
-        this.name  = "authToken";
-    }
-
-    get empty() {
-        return this.token === null;
-    }
-
-    get token() {
-        return window.localStorage.getItem(this.name);
-    }
-
-    set token(token) {
-        window.localStorage.setItem(this.name, token);
-    }
-
-    get bearer() {
-
-        return (request) => {
-            if (this.empty) {
-                return request;
-            }
-            request.set('Authorization', 'Bearer ' + this.token);
-            return request;
-        }
-    }
-
-    clear() {
-        window.localStorage.removeItem(this.name);
-    }
-
-}
-
 const isUnique = (field, url) => {
 
     return (value) => {
@@ -52,7 +17,7 @@ const isUnique = (field, url) => {
             .get(url)
             .query({ [field]: value })
             .end((err, res) => {
-                if (res.body.exists) {
+                if (res && res.body.exists) {
                     reject(new Checkit.ValidationError("The " + field + " field is already in use"));
                 }
                 resolve();
@@ -62,13 +27,11 @@ const isUnique = (field, url) => {
 
 };
 
-validators.Signup.name.push(isUnique('name', '/api/isname'));
-validators.Signup.email.push(isUnique('email', '/api/isemail'));
-
-
-const signupValidator = Checkit(validators.Signup),
-      postValidator = Checkit(validators.NewPost),
-      loginValidator = Checkit(validators.Login);
+const signupValidator = validators.Signup(
+        isUnique('name', '/api/isname'),
+        isUnique('email', '/api/isemail')),
+      postValidator = validators.NewPost(),
+      loginValidator = validators.Login();
 
 
 const fetchPosts = (page, orderBy) => {
@@ -90,21 +53,15 @@ const fetchPosts = (page, orderBy) => {
 }
 
 
-const tokenStore = new TokenStore(),
-      bearer = tokenStore.bearer;
-
-
 export function voteUp(post) {
     return request
         .put("/api/auth/upvote/" + post._id)
-        .use(tokenStore.bearer)
         .end();
 }
 
 export function voteDown(post) {
     return request
         .put("/api/auth/downvote/" + post._id)
-        .use(tokenStore.bearer)
         .end();
 }
 
@@ -120,8 +77,7 @@ export function signup(data) {
                         if (res.badRequest) {
                             return reject(res.body);
                         }
-                        tokenStore.token = res.body.token;
-                        resolve(res.body.user);
+                        resolve(res.body);
                       });
             })
             .catch(Checkit.Error, (err) => {
@@ -134,7 +90,6 @@ export function deletePost(post)  {
     return new Promise((resolve, reject) => {
         request
             .del("/api/auth/" + post._id)
-            .use(tokenStore.bearer)
             .end((err, res) => {
                 if (err) {
                     return reject(err);
@@ -152,7 +107,6 @@ export function submitPost(data) {
             .then((clean) => {
                 request
                     .post("/api/auth/submit/")
-                    .use(tokenStore.bearer)
                     .send(clean)
                     .end((err, res) => {
 
@@ -172,8 +126,9 @@ export function submitPost(data) {
 };
 
 export function logout() {
-    tokenStore.clear();
+    request.post("/api/auth/logout").end();
 };
+
 
 export function login(data) {
 
@@ -188,8 +143,8 @@ export function login(data) {
                         if (err) {
                             return reject();
                         }
-                        tokenStore.token = res.body.token;
-                        resolve(res.body.user);
+                        resolve(res.body);
+
                     });
             })
             .catch(Checkit.Error, (err) => {
@@ -201,12 +156,8 @@ export function login(data) {
 
 export function getUser() {
     return new Promise((resolve, reject) => {
-        if (tokenStore.empty){
-            return reject();
-        };
         request
             .get("/api/auth/")
-            .use(tokenStore.bearer)
             .end((err, res) => {
                 if (err) {
                     return reject();

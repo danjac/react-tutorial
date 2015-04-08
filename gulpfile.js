@@ -48,7 +48,7 @@ gulp.task('build-src', function() {
             ],
             extensions: ['.js', '.jsx']
         }))
-        .pipe(uglify())
+        //.pipe(uglify())
         .pipe(sourcemaps.write())
         .pipe(gulp.dest(dest.js))
         .pipe(browserSync.reload({stream:true}))

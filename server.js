@@ -1,17 +1,18 @@
 import path from 'path';
 import koa from 'koa';
-import body from 'koa-body';
+import body from 'koa-bodyparser';
 import logger from 'koa-logger';
-import error from 'koa-error-handler';
+import error from 'koa-error';
 import render from 'koa-ejs';
-import jwt from 'koa-jwt';
+import session from 'koa-generic-session';
 import serveStatic from 'koa-static';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import passport from 'koa-passport';
 import _ from 'lodash';
 import Checkit from 'checkit';
 import connect from './config/db';
 import routes from './config/routes';
+import auth from './config/auth';
 
 dotenv.load();
 
@@ -35,17 +36,12 @@ render(app, {
     debug: devMode
 });
 
+app.keys = [process.env.SECRET_KEY];
 app.use(body());
 
 app.use(serveStatic(path.join(__dirname, 'public')));
 
 app.use(logger());
-
-app.use(jwt({
-    secret: process.env.SECRET_KEY,
-    passthrough: true,
-    key: 'authToken'
-}));
 
 
 // development only
@@ -77,24 +73,22 @@ app.use(function* (next) {
     }
 });
 
-error(app);
+app.use(error());
 
-/*
-app.on('error', (err) => {
-    if (process.env.NODE_ENV === 'test'){
-        return;
-    }
-    if (err.status && err.status !== 500) {
-        return; 
-    }
-    console.log(err);
-});
-*/
+// authentication
+
+app.use(session({ key: 'react-tutorial' }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+auth(passport);
+
 
 //
 // Set up routes
 //
 routes(app);
+
 
 // run server
 

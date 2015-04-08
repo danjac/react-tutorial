@@ -77,7 +77,7 @@ describe("DELETE /api/delete",function() {
     });
     
     before((done) => {
-        clearDB(done)
+        clearDB(done);
     });
 
     before(co.wrap(function* () {
