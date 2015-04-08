@@ -66,6 +66,11 @@ validators.Signup.name.push(isUnique('name', '/api/isname'));
 validators.Signup.email.push(isUnique('email', '/api/isemail'));
 
 
+const signupValidator = Checkit(validators.Signup),
+      postValidator = Checkit(validators.NewPost),
+      loginValidator = Checkit(validators.Login);
+
+
 const fetchPosts = (page, orderBy) => {
 
     return new Promise((resolve, reject) => {
@@ -105,22 +110,23 @@ export function voteDown(post) {
 
 export function signup(data) {
     return new Promise((resolve, reject) => {
-        Checkit(validators.Signup).run(data)
-        .then((clean) => {
-            request
-                .post("/api/signup/")
-                .send(clean)
-                .end((err, res) => {
-                    if (res.badRequest) {
-                        return reject(res.body);
-                    }
-                    tokenStore.token = res.body.token;
-                    resolve(res.body.user);
-                  });
-        })
-        .catch(Checkit.Error, (err) => {
-            reject(err.toJSON());
-        });
+        signupValidator
+            .run(data)
+            .then((clean) => {
+                request
+                    .post("/api/signup/")
+                    .send(clean)
+                    .end((err, res) => {
+                        if (res.badRequest) {
+                            return reject(res.body);
+                        }
+                        tokenStore.token = res.body.token;
+                        resolve(res.body.user);
+                      });
+            })
+            .catch(Checkit.Error, (err) => {
+                reject(err.toJSON());
+            });
     });
 }
 
@@ -141,16 +147,14 @@ export function deletePost(post)  {
 export function submitPost(data) {
 
     return new Promise((resolve, reject) => {
-        Checkit(validators.NewPost)
+        postValidator
             .run(data)
             .then((clean) => {
-                //actions.startLoading()
                 request
                     .post("/api/auth/submit/")
                     .use(tokenStore.bearer)
                     .send(clean)
                     .end((err, res) => {
-                        //actions.endLoading()
 
                         if (err) {
                             if (res.badRequest) {
@@ -174,15 +178,13 @@ export function logout() {
 export function login(data) {
 
     return new Promise((resolve, reject) => {
-        Checkit(validators.Login)
+        loginValidator
             .run(data)
             .then((clean) => {
-                //actions.startLoading()
                 request
                     .post('/api/login/')
                     .send(clean)
                     .end((err, res) => {
-                        //actions.endLoading()
                         if (err) {
                             return reject();
                         }
