@@ -1,18 +1,23 @@
-import Strategy as LocalStrategy from 'passport-local';
+import LocalStrategy from 'passport-local';
+import co from 'co';
+import passport from 'koa-passport';
 import User from '../lib/models/User';
 
-const serialize = (user, done) => {
-    done(null, user._id);
-};
+export default (app) => {
 
-const deserialize = (id, done) => {
-    User.findById(id, done);
-};
+    passport.serializeUser((user, done) => done(null, user._id));
+    passport.deserializeUser((id, done) => User.findById(id, done));
 
-export function (passport) {
-
-    passport.serializeUser(serialize);
-    passport.deserializeUser(deserialize);
-    passport.use(new LocalStrategy(User.authenticate));
+    passport.use(new LocalStrategy({
+        usernameField: 'identity'
+    },
+    (identity, password, done) => {
+        co(function *() {
+            return yield User.authenticate(identity, password);
+        })
+        .then((user) => {
+            done(null, user || false);
+        });
+    }));
 
 }
