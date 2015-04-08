@@ -6,29 +6,28 @@ import connect from './config/db';
 import User from './lib/models/User';
 import Post from './lib/models/Post';
 
-dotenv.load()
+dotenv.load();
 
-const username = process.argv[2]
-const url = process.argv[3]
+const [username, url] = process.argv.slice(2);
 
-connect()
+connect();
 
 if (!username || !url) {
-    console.log("Usage: slurp.js USERNAME URL")
-    process.exit(1)
+    console.log("Usage: slurp.js USERNAME URL");
+    process.exit(1);
 }
 
 
 const truncate = (title) => {
     if (title.length <= 100) {
-        return title
+        return title;
     }
 
-    return title.substring(0, 97) + "..."
+    return title.substring(0, 97) + "...";
 }
 
 const parseFeed = (user) => {
-    console.log("parsing feed " + url + " for " + user.name)
+    console.log("parsing feed " + url + " for " + user.name);
     return new Promise((resolve, reject) => {
         const promises = []
         request
@@ -36,42 +35,42 @@ const parseFeed = (user) => {
             .buffer(true)
             .end((err, res) => {
                 if (err) {
-                    return reject(err)
+                    return reject(err);
                 }
-                const feed = parser.parse(res.text)
+                const feed = parser.parse(res.text);
                 feed.items.forEach((item) => {
                     let post = new Post({
                         author: user._id,
                         url: item.link,
                         title: truncate(item.title)
                     })
-                    console.log(post.title, post.url)
-                    promises.push(post.save())
+                    console.log(post.title, post.url);
+                    promises.push(post.save());
                 })
-                const newScore = user.totalScore + feed.items.length
-                promises.push(user.update({ totalScore: newScore }).exec())
+                const newScore = user.totalScore + feed.items.length;
+                promises.push(user.update({ totalScore: newScore }).exec());
                 Promise
                     .race(promises)
                     .then((results) => resolve(feed.items.length),
                           (err) => reject(err))
             })
     })
-}
+};
 
 User.findOne({name: username})
     .then((user) => {
         if (!user) {
-            console.log("No user found with name " + username)
-            process.exit(1)
+            console.log("No user found with name " + username);
+            process.exit(1);
         }
-        return parseFeed(user)
+        return parseFeed(user);
     })
     .then((result) => {
-            console.log("RESULTS", result)
-            process.exit(0)
+            console.log("RESULTS", result);
+            process.exit(0);
           },
           (err) => {
-              console.log("ERROR", err)
-              process.exit(1)
+              console.log("ERROR", err);
+              process.exit(1);
           })
 

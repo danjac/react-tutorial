@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import path from 'path';
 import koa from 'koa';
 import configure from './config';
 
