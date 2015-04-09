@@ -1,15 +1,15 @@
-var browserify = require('gulp-browserify'),
-    bowerFiles = require('main-bower-files'),
+var bowerFiles = require('main-bower-files'),
     gulp = require('gulp'),
+    util = require('gulp-util'),
+    path = require('path'),
     plumber = require('gulp-plumber'),
     shell = require('gulp-shell'),
     minifyCss = require('gulp-minify-css'),
     gulpFilter = require('gulp-filter'),
     concat = require('gulp-concat'),
-    uglify = require('gulp-uglify'),
-    sourcemaps = require('gulp-sourcemaps'),
-    notify = require('gulp-notify'),
-    browserSync = require('browser-sync')
+    uglify = require('gulp-uglify'), webpack = require('webpack'), webpackDevServer = require('webpack-dev-server'),
+    webpackConfig = require('./webpack.config.js'),
+    notify = require('gulp-notify');
 
 var staticDir = './public',
     srcDir = './app',
@@ -23,40 +23,7 @@ var dest = {
     fonts: staticDir + '/fonts'
 }
 
-
-gulp.task('serve', ['build-src'], function() {
-    browserSync.init({
-        proxy: 'http://localhost:5000'
-    })
-})
-
-gulp.task('build-src', function() {
-    gulp.src(srcDir + '/app.js')
-        .pipe(notify({message: "Build started"}))
-        .pipe(plumber({
-            errorHandler: notify.onError("Error: <%= error.message %>")
-        }))
-        .pipe(sourcemaps.init())
-        .pipe(concat('app.js'))
-        .pipe(browserify({
-            cache: {},
-            packageCache: {},
-            fullPaths: true,
-            transform: [
-                ["envify"],
-                ["babelify"]
-            ],
-            extensions: ['.js', '.jsx']
-        }))
-        //.pipe(uglify())
-        .pipe(sourcemaps.write())
-        .pipe(gulp.dest(dest.js))
-        //.pipe(browserSync.reload({stream:true}))
-        .pipe(notify({
-            message: 'Build complete'
-        }))
-
-})
+var compiler = webpack(webpackConfig);
 
 gulp.task('pkg', function() {
     // installs all the 3rd party stuffs.
@@ -80,19 +47,40 @@ gulp.task('pkg', function() {
         .pipe(gulp.dest(dest.fonts))
 })
 
+gulp.task("webpack:build", function(callback) {
+	// run webpack
+	compiler.run(function(err, stats) {
+		if(err) throw new util.PluginError("webpack:build", err);
+		util.log("[webpack:build]", stats.toString({
+			colors: true
+		}));
+		callback();
+	});
+});
+
+gulp.task("webpack-dev-server", function(callback) {
+    new webpackDevServer(webpack(webpackConfig), {
+        publicPath: webpackConfig.output.publicPath,
+        hot: true,
+        quiet: false,
+        lazy: false,
+        watchDelay: 300,
+        stats: { colors: true },
+        historyApiFallback: true
+    }).listen(8080, 'localhost', function (err, result) {
+        if (err) {
+            console.log(err);
+        }
+        console.log('Listening at localhost:8080');
+    });
+});
+
 gulp.task('install', shell.task([
     'bower cache clean',
     'bower install'
-]))
+]));
 
-gulp.task('default', [], function() {
-    gulp.start('install', 'pkg', 'build-src')
-    gulp.watch(srcDir + '/**', {}, ['build-src'])
-})
-
-/*
-gulp.task('default', ['serve'], function() {
-    gulp.start('install', 'pkg', 'build-src')
-    gulp.watch(srcDir + '/**', {}, ['build-src'])
-})
-*/
+gulp.task('default', ['webpack-dev-server'], function() {
+    gulp.start('install', 'pkg', 'webpack:build')
+    gulp.watch(srcDir + '/**', {}, ['watch'])
+});
