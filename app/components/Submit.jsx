@@ -10,7 +10,7 @@ export default React.createClass({
 
     mixins: [
         Authenticate,
-        Reflux.listenTo(actions.submitPost.completed, "onSubmitPostSuccess"),
+        Reflux.listenTo(actions.submitPost, "onSubmitPost"),
         Reflux.listenTo(actions.submitPost.failed, "onSubmitPostFailure")
     ],
 
@@ -28,7 +28,7 @@ export default React.createClass({
         this.setState({ errors: errors });
     },
 
-    onSubmitPostSuccess() {
+    onSubmitPost() {
         this.context.router.transitionTo(this.context.router.makeHref("latest"));
     },
 
@@ -55,7 +55,14 @@ export default React.createClass({
                        required
                        bsStyle={this.state.errors.url? 'error': null} 
                        help={this.state.errors.url} />
-                <Input type="submit" value="Submit post" />
+                <Input ref="image" 
+                       type="text" 
+                       label="Image" 
+                       placeholder="Enter link to the image you want to pin"
+                       required
+                       bsStyle={this.state.errors.image? 'error': null} 
+                       help={this.state.errors.image} />
+                 <Input type="submit" value="Submit post" />
             </form>
         );
     }

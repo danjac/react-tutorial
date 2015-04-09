@@ -8,8 +8,6 @@ import * as validators from './validators';
 // csrf initialization
 csrf(request);
 
-const csrfToken = () => { return window._csrf };
-
 
 const isUnique = (field, url) => {
 
@@ -37,7 +35,7 @@ const isUnique = (field, url) => {
 const signupValidator = validators.Signup(
         isUnique('name', '/api/isname'),
         isUnique('email', '/api/isemail')),
-      postValidator = validators.NewPost(),
+      postValidator = validators.NewPost(true),
       loginValidator = validators.Login();
 
 
@@ -63,14 +61,14 @@ const fetchPosts = (page, orderBy) => {
 export function voteUp(post) {
     return request
         .put("/api/auth/upvote/" + post._id)
-        .csrf(csrfToken())
+        .csrf()
         .end();
 }
 
 export function voteDown(post) {
     return request
         .put("/api/auth/downvote/" + post._id)
-        .csrf(csrfToken())
+        .csrf()
         .end();
 }
 
@@ -81,7 +79,7 @@ export function signup(data) {
             .then((clean) => {
                 request
                     .post("/api/signup/")
-                    .csrf(csrfToken())
+                    .csrf()
                     .send(clean)
                     .end((err, res) => {
                         if (res.badRequest) {
@@ -100,7 +98,7 @@ export function deletePost(post)  {
     return new Promise((resolve, reject) => {
         request
             .del("/api/auth/" + post._id)
-            .csrf(csrfToken())
+            .csrf()
             .end((err, res) => {
                 if (err) {
                     return reject(err);
@@ -118,14 +116,16 @@ export function submitPost(data) {
             .then((clean) => {
                 request
                     .post("/api/auth/submit/")
-                    .csrf(csrfToken())
+                    .csrf()
                     .send(clean)
                     .end((err, res) => {
 
                         if (err) {
                             if (res.badRequest) {
+                                console.log("error", res.body);
                                 return reject(res.body);
                             }
+                            console.log(err);
                             return reject();
                         }
                         resolve(res.body);
@@ -144,15 +144,13 @@ export function logout() {
 
 export function login(data) {
 
-    console.log("logging in...");
-
     return new Promise((resolve, reject) => {
         loginValidator
             .run(data)
             .then((clean) => {
                 request
                     .post('/api/login/')
-                    .csrf(csrfToken())
+                    .csrf()
                     .send(clean)
                     .end((err, res) => {
                         if (err) {

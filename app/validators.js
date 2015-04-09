@@ -18,8 +18,8 @@ export function Login() {
     });
 }
 
-export function NewPost() {
-    return new Checkit({
+export function NewPost(checkImage) {
+    const rules = {
         title: ['minLength:6', 'maxLength:100'],
         url: [
             'required', 
@@ -27,7 +27,18 @@ export function NewPost() {
                 rule: 'url',
                 message: 'Please provide a valid URL'
             }
-        ]
-    });
+        ],
+    };
+
+    if (checkImage) {
+        rules.image =  [
+            'required', 
+            {
+                rule: 'url',
+                message: 'Please provide a valid URL'
+            }
+        ];
+    }
+    return Checkit(rules);
 }
 

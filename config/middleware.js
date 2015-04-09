@@ -2,6 +2,7 @@ import path from 'path';
 import helmet from 'koa-helmet';
 import Checkit from 'checkit';
 import passport from 'koa-passport';
+import redisStore from 'koa-redis';
 import middlewares from 'koa-middlewares';
 
 
@@ -14,7 +15,11 @@ export default function(app) {
         throw new Error("You must set a SECRET_KEY in your environment!")
     }
     app.keys = [process.env.SECRET_KEY];
-    app.use(middlewares.session({ key: 'react-tutorial' }));
+
+    app.use(middlewares.session({ 
+        key: 'react-tutorial',
+        store: redisStore()
+    }));
 
     // authentication
 

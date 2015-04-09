@@ -4,7 +4,7 @@ import Router, {Link} from 'react-router';
 import Immutable from 'immutable';
 import _ from 'lodash';
 import moment from 'moment';
-import {Button, Modal, ModalTrigger, Pager, PageItem} from 'react-bootstrap';
+import {Grid, Row, Col, Button, Modal, ModalTrigger, Pager, PageItem} from 'react-bootstrap';
 import actions from '../actions';
 
 
@@ -96,20 +96,19 @@ const PostListItem = React.createClass({
         const post = this.props.post
 
         return (
-            <li>
-                <b><a href={post.url} target="_blank">{post.title}</a></b>
-                <div>
-                    <small>
-                        <mark>
-                            Score: <b>{post.score}</b>
-                            &nbsp; Posted by: <Link to={this.context.router.makeHref("user", {name: post.author.name})}>{post.author.name}</Link>
-                            &nbsp; <b>{moment(post.created).fromNow()}</b>
-                            &nbsp; {this.deleteLink()} {this.votingLinks()}
-                        </mark>
-                    </small>
-                </div>
-            </li> 
-        )
+            <Col sm={6} md={4}>
+                <a href={post.url} target="_blank" className="thumbnail">
+                  <img src={"/uploads/" + post.image} alt={post.title} />
+                  <div className="caption">
+                    <h3 className="text-center">{post.title}</h3>
+                    <p>
+                        {this.votingLinks()}
+                        {this.deleteLink()}
+                    </p>
+                  </div>
+                </a>
+            </Col>
+        );
     }
 
 })
@@ -171,16 +170,13 @@ export default React.createClass({
 
         return (
             <div>
-                <div className="container">
-                    <div className="col-md-2 col-md-offset-10 text-right">
-                        <b>Total: {this.props.result.total}</b>
-                    </div>
-                </div>
-                <ul className="list-unstyled">
-                    {this.props.result.posts.map((post) => {
-                        return <PostListItem key={post._id} post={post} user={this.props.user} />
-                    }).toJS()}
-                </ul>
+                <Grid>
+                    <Row>
+                        {this.props.result.posts.map((post) => {
+                            return <PostListItem key={post._id} post={post} user={this.props.user} />
+                        }).toJS()}
+                    </Row>
+                </Grid>
                 {this.renderPager()}
             </div>
         );

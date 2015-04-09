@@ -32,6 +32,7 @@ export default Reflux.createStore({
 
     deletePost(post) {
         this.posts = this.posts.delete(this.indexOf(post));
+        this.total -= 1;
         this._trigger();
     },
 

@@ -1,9 +1,8 @@
 import router from 'koa-router';
 import mount from 'koa-mount';
-import index from '../lib/controllers';
 import * as api from '../lib/controllers/api';
 import * as secure from '../lib/controllers/secure';
-
+import {index, upload} from '../lib/controllers';
 
 export default (app) => {
 
@@ -28,6 +27,7 @@ export default (app) => {
         .routes()));
 
     app.use(mount('/', new router()
+        .get('/uploads/:filename', upload)
         .get('/user/:user', index)
         .get('/:path', index)
         .get('/', index)

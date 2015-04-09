@@ -12,11 +12,6 @@ const TestUtils = React.addons.TestUtils
 
 describe('Posts component', () => {
 
-    before((done) => {
-
-        done();
-    });
-
     it('should show no buttons for an anonymous user', () => {
         const posts = Immutable.List([
             {
@@ -94,6 +89,7 @@ describe('Posts component', () => {
                 total: 2,
                 isFirst: true,
                 isLast: true,
+                page: 1
             },
             user: user,
             fetchPosts: () => {}

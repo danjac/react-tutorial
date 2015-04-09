@@ -5,7 +5,7 @@ export default function(Component, props, stubs){
   return React.createClass({
 
     childContextTypes: {
-        router: React.PropTypes.object
+        router: React.PropTypes.func
     },
 
     getChildContext() {
