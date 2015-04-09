@@ -97,8 +97,7 @@ const PostListItem = React.createClass({
 
         return (
             <li>
-                <b><a href={post.url} target="_blank">{post.title}</a>
-                &nbsp;<small>{new URL(post.url).hostname}</small></b>
+                <b><a href={post.url} target="_blank">{post.title}</a></b>
                 <div>
                     <small>
                         <mark>

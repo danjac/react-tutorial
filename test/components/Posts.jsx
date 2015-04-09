@@ -12,6 +12,11 @@ const TestUtils = React.addons.TestUtils
 
 describe('Posts component', () => {
 
+    before((done) => {
+
+        done();
+    });
+
     it('should show no buttons for an anonymous user', () => {
         const posts = Immutable.List([
             {
@@ -27,12 +32,14 @@ describe('Posts component', () => {
         ])
 
         const Component = StubRouterContext(Posts, {
-            posts: posts,
+            result: {
+                posts: posts,
+                total: 1,
+                isFirst: true,
+                isLast: true,
+                page: 1
+            },
             user: null,
-            total: 1,
-            isFirst: true,
-            isLast: true,
-            isServer: true,
             fetchPosts: () => {}
         })
 
@@ -82,11 +89,13 @@ describe('Posts component', () => {
         }
 
         const Component = StubRouterContext(Posts, {
-            posts: posts,
+            result: {
+                posts: posts,
+                total: 2,
+                isFirst: true,
+                isLast: true,
+            },
             user: user,
-            total: 2,
-            isFirst: true,
-            isLast: true,
             fetchPosts: () => {}
         })
 

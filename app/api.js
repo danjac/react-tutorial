@@ -8,7 +8,7 @@ import * as validators from './validators';
 // csrf initialization
 csrf(request);
 
-const csrfToken = window._csrf;
+const csrfToken = () => { return window._csrf };
 
 
 const isUnique = (field, url) => {
@@ -63,14 +63,14 @@ const fetchPosts = (page, orderBy) => {
 export function voteUp(post) {
     return request
         .put("/api/auth/upvote/" + post._id)
-        .csrf(csrfToken)
+        .csrf(csrfToken())
         .end();
 }
 
 export function voteDown(post) {
     return request
         .put("/api/auth/downvote/" + post._id)
-        .csrf(csrfToken)
+        .csrf(csrfToken())
         .end();
 }
 
@@ -81,7 +81,7 @@ export function signup(data) {
             .then((clean) => {
                 request
                     .post("/api/signup/")
-                    .csrf(csrfToken)
+                    .csrf(csrfToken())
                     .send(clean)
                     .end((err, res) => {
                         if (res.badRequest) {
@@ -100,7 +100,7 @@ export function deletePost(post)  {
     return new Promise((resolve, reject) => {
         request
             .del("/api/auth/" + post._id)
-            .csrf(csrfToken)
+            .csrf(csrfToken())
             .end((err, res) => {
                 if (err) {
                     return reject(err);
@@ -118,7 +118,7 @@ export function submitPost(data) {
             .then((clean) => {
                 request
                     .post("/api/auth/submit/")
-                    .csrf(csrfToken)
+                    .csrf(csrfToken())
                     .send(clean)
                     .end((err, res) => {
 
@@ -152,7 +152,7 @@ export function login(data) {
             .then((clean) => {
                 request
                     .post('/api/login/')
-                    .csrf(csrfToken)
+                    .csrf(csrfToken())
                     .send(clean)
                     .end((err, res) => {
                         if (err) {
