@@ -1,7 +1,14 @@
 import request from 'superagent';
+import csrf from 'superagent-csrf';
 import _ from 'lodash';
 import Checkit from 'checkit';
 import * as validators from './validators';
+
+
+// csrf initialization
+csrf(request);
+
+const csrfToken = window._csrf;
 
 
 const isUnique = (field, url) => {
@@ -56,12 +63,14 @@ const fetchPosts = (page, orderBy) => {
 export function voteUp(post) {
     return request
         .put("/api/auth/upvote/" + post._id)
+        .csrf(csrfToken)
         .end();
 }
 
 export function voteDown(post) {
     return request
         .put("/api/auth/downvote/" + post._id)
+        .csrf(csrfToken)
         .end();
 }
 
@@ -72,6 +81,7 @@ export function signup(data) {
             .then((clean) => {
                 request
                     .post("/api/signup/")
+                    .csrf(csrfToken)
                     .send(clean)
                     .end((err, res) => {
                         if (res.badRequest) {
@@ -90,6 +100,7 @@ export function deletePost(post)  {
     return new Promise((resolve, reject) => {
         request
             .del("/api/auth/" + post._id)
+            .csrf(csrfToken)
             .end((err, res) => {
                 if (err) {
                     return reject(err);
@@ -107,6 +118,7 @@ export function submitPost(data) {
             .then((clean) => {
                 request
                     .post("/api/auth/submit/")
+                    .csrf(csrfToken)
                     .send(clean)
                     .end((err, res) => {
 
@@ -132,12 +144,15 @@ export function logout() {
 
 export function login(data) {
 
+    console.log("logging in...");
+
     return new Promise((resolve, reject) => {
         loginValidator
             .run(data)
             .then((clean) => {
                 request
                     .post('/api/login/')
+                    .csrf(csrfToken)
                     .send(clean)
                     .end((err, res) => {
                         if (err) {

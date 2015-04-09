@@ -1,12 +1,8 @@
 import path from 'path';
-import serveStatic from 'koa-static';
-import body from 'koa-bodyparser';
-import logger from 'koa-logger';
-import error from 'koa-error';
-import render from 'koa-ejs';
+import helmet from 'koa-helmet';
 import Checkit from 'checkit';
 import passport from 'koa-passport';
-import session from 'koa-generic-session';
+import middlewares from 'koa-middlewares';
 
 
 export default function(app) {
@@ -18,18 +14,32 @@ export default function(app) {
         throw new Error("You must set a SECRET_KEY in your environment!")
     }
     app.keys = [process.env.SECRET_KEY];
-    app.use(session({ key: 'react-tutorial' }));
+    app.use(middlewares.session({ key: 'react-tutorial' }));
 
     // authentication
 
     app.use(passport.initialize());
     app.use(passport.session());
 
+    // security
+    //
+
+    app.use(helmet.defaults());
+
+    middlewares.csrf(app);
+    app.use(middlewares.csrf.middleware);
+
+    //
     // body parser
     //
-    app.use(body());
+    app.use(middlewares.bodyParser());
+    
+    // compression
+    app.use(middlewares.compress());
 
-    render(app, {
+    // templates
+
+    middlewares.ejs(app, {
         root: path.join(__dirname, '../views'),
         layout: false,
         viewExt: 'ejs',
@@ -37,12 +47,17 @@ export default function(app) {
         debug: devMode
     });
 
+    // static content 
+    //
     if (devMode) {
-        app.use(serveStatic(path.join(__dirname, '../public')));
+        app.use(middlewares.staticCache(path.join(__dirname, '../public')));
     }
 
+    app.use(middlewares.conditional());
+    app.use(middlewares.etag());
+
     // logging
-    app.use(logger());
+    app.use(middlewares.logger());
     //
 
     // error handling
@@ -51,7 +66,7 @@ export default function(app) {
 
     app.use(function* (next) {
         try {
-            yield next;
+            yield* next;
         } catch(err) {
             if (err instanceof Checkit.Error) {
                 this.status = 400;
@@ -66,6 +81,6 @@ export default function(app) {
         }
     });
 
-    app.use(error());
+    middlewares.onerror(app);
 
 }
