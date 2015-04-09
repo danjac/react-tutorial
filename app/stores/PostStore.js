@@ -20,6 +20,7 @@ export default Reflux.createStore({
         this.trigger({
             posts: this.posts,
             page: this.page,
+            total: this.total,
             isFirst: this.isFirst,
             isLast: this.isLast
         });

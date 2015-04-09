@@ -81,12 +81,12 @@ const Navigation = React.createClass({
     render() {
 
         const makeHref = this.context.router.makeHref,
-              brand = <Link to={makeHref("popular")}>ReaktNews!!!</Link>
+              brand = <Link to={makeHref("popular")}>ReaktNews</Link>
 
         return (
             <Navbar brand={brand} className="navbar navbar-inverse" fixedTop={true} fluid={true}>
               <Nav className="navbar-left">
-                <NavItemLink to={makeHref("latest")}>latest</NavItemLink>
+                <NavItemLink to={makeHref("latest")}>new</NavItemLink>
                 <NavItemLink to={makeHref("submit")}>submit</NavItemLink>
                 <form className="navbar-form navbar-left"
                       role="search"

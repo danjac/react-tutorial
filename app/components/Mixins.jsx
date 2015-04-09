@@ -24,7 +24,7 @@ export const PostsPage = {
     ],
 
     getInitialState () {
-        return PostStore.getDefaultData();
+        return {result: PostStore.getDefaultData() };
     },
 
     componentDidMount () {
@@ -32,17 +32,13 @@ export const PostsPage = {
     },
 
     onUpdate (data) {
-        this.setState(data);
+        this.setState({ result: data });
     },
 
     render () {
         return <Posts fetchPosts={this.fetchPosts} 
                       user={this.props.user}
-                      page={this.state.page}
-                      total={this.state.total}
-                      posts={this.state.posts}
-                      isFirst={this.state.isFirst}
-                      isLast={this.state.isLast} />;
+                      result={this.state.result} />
     }
 }
     

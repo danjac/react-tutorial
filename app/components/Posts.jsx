@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import {PureRenderMixin} from 'react/addons';
 import Router, {Link} from 'react-router';
+import Immutable from 'immutable';
 import _ from 'lodash';
 import moment from 'moment';
 import {Button, Modal, ModalTrigger, Pager, PageItem} from 'react-bootstrap';
@@ -25,7 +26,7 @@ const DeletePostModal = React.createClass({
                 </div>
                 <div className="modal-footer">
                     <Button onClick={this.props.onRequestHide}>Cancel</Button>
-                    <Button bsStyle="primary" onClick={this.handleDelete}>Delete</Button>
+                    <Button bsStyle="primary" onClick={this.handleDelete}>Yes, I'm sure</Button>
                 </div>
             </Modal>
 
@@ -96,13 +97,14 @@ const PostListItem = React.createClass({
 
         return (
             <li>
-                <b><a href={post.url} target="_blank">{post.title}</a></b>
+                <b><a href={post.url} target="_blank">{post.title}</a>
+                &nbsp;<small>{new URL(post.url).hostname}</small></b>
                 <div>
                     <small>
                         <mark>
-                            <Link to={this.context.router.makeHref("user", {name: post.author.name})}>{post.author.name}</Link>
-                            &nbsp; Score: <b>{post.score}</b>
-                            &nbsp; Posted: <b>{moment(post.created).fromNow()}</b>
+                            Score: <b>{post.score}</b>
+                            &nbsp; Posted by: <Link to={this.context.router.makeHref("user", {name: post.author.name})}>{post.author.name}</Link>
+                            &nbsp; <b>{moment(post.created).fromNow()}</b>
                             &nbsp; {this.deleteLink()} {this.votingLinks()}
                         </mark>
                     </small>
@@ -118,14 +120,23 @@ export default React.createClass({
     mixins: [PureRenderMixin],
 
     propTypes: {
-        posts: PropTypes.object,
-        total: PropTypes.number,
-        page: PropTypes.number,
-        isFirst: PropTypes.bool,
-        isLast: PropTypes.bool,
+        result: PropTypes.object,
         user: PropTypes.object,
         fetchPosts: PropTypes.func
     },
+
+    getDefaultProps() {
+        return {
+            result: {
+                total: 0,
+                isFirst: true,
+                isLast: true,
+                posts: Immutable.List(),
+                page: 1
+            }
+        };
+    },
+
 
     handlePageClick(page) {
         this.props.fetchPosts(page);
@@ -133,35 +144,41 @@ export default React.createClass({
      
     handleLastPageClick(event) {
         event.preventDefault()
-        if (this.props.isFirst) {
+        if (this.props.result.isFirst) {
             return;
         }
-        this.handlePageClick(this.props.page - 1);
+        this.handlePageClick(this.props.result.page - 1);
     },
 
     handleNextPageClick(event) {
         event.preventDefault()
-        if (this.props.isLast) {
+        if (this.props.result.isLast) {
             return;
         }
-        this.handlePageClick(this.props.page + 1);
+        this.handlePageClick(this.props.result.page + 1);
     },
 
     renderPager() {
         return (
             <Pager>
-                <PageItem previous onClick={this.handleLastPageClick} disabled={this.props.isFirst}>&larr; Previous</PageItem>
-                <PageItem next onClick={this.handleNextPageClick} disabled={this.props.isLast}>&rarr; Next</PageItem>
+                <PageItem previous onClick={this.handleLastPageClick} disabled={this.props.result.isFirst}>&larr; Previous</PageItem>
+                <PageItem next onClick={this.handleNextPageClick} disabled={this.props.result.isLast}>&rarr; Next</PageItem>
             </Pager>
         );
     },
 
 
     render() {
+
         return (
             <div>
+                <div className="container">
+                    <div className="col-md-2 col-md-offset-10 text-right">
+                        <b>Total: {this.props.result.total}</b>
+                    </div>
+                </div>
                 <ul className="list-unstyled">
-                    {this.props.posts.map((post) => {
+                    {this.props.result.posts.map((post) => {
                         return <PostListItem key={post._id} post={post} user={this.props.user} />
                     }).toJS()}
                 </ul>
