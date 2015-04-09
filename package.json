@@ -5,6 +5,8 @@
   "description": "JS port of lobste.rs",
   "licence": "MIT",
   "devDependencies": {
+    "babel-core": "^5.0.12",
+    "babel-loader": "^5.0.0",
     "babelify": "^5.0.4",
     "browser-sync": "^2.4.0",
     "chai": "^2.2.0",
@@ -24,10 +26,13 @@
     "main-bower-files": "^2.6.2",
     "mocha": "^2.2.4",
     "mocha-mongoose": "^1.0.4",
+    "react-hot-loader": "^1.2.4",
     "reactify": "^1.1.0",
     "sinon": "^1.14.1",
     "sinon-chai": "^2.7.0",
-    "supertest": "^0.15.0"
+    "supertest": "^0.15.0",
+    "webpack": "^1.8.2",
+    "webpack-dev-server": "^1.8.0"
   },
   "dependencies": {
     "babel": "^5.0.0",

@@ -81,7 +81,7 @@ export function signup(data) {
                       });
             })
             .catch(Checkit.Error, (err) => {
-                reject(err.toJSON());
+                return reject(err.toJSON());
             });
     });
 }

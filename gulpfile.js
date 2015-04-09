@@ -51,7 +51,7 @@ gulp.task('build-src', function() {
         //.pipe(uglify())
         .pipe(sourcemaps.write())
         .pipe(gulp.dest(dest.js))
-        .pipe(browserSync.reload({stream:true}))
+        //.pipe(browserSync.reload({stream:true}))
         .pipe(notify({
             message: 'Build complete'
         }))
@@ -85,7 +85,14 @@ gulp.task('install', shell.task([
     'bower install'
 ]))
 
+gulp.task('default', [], function() {
+    gulp.start('install', 'pkg', 'build-src')
+    gulp.watch(srcDir + '/**', {}, ['build-src'])
+})
+
+/*
 gulp.task('default', ['serve'], function() {
     gulp.start('install', 'pkg', 'build-src')
     gulp.watch(srcDir + '/**', {}, ['build-src'])
 })
+*/

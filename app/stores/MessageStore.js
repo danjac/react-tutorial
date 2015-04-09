@@ -38,7 +38,7 @@ export default Reflux.createStore({
     },
 
     loginFailed() {
-        this.warning("Sorry, you have entered incorrect login info");
+        this.warning("Sorry, login failed. Please try again.");
     },
 
     loginRequired() {

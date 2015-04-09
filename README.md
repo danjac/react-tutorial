@@ -6,7 +6,7 @@ This is a very simple Hacker News/Reddit clone I've made to teach myself React. 
 It's built with the following tech:
 
 - ES6 + Babel
-- NodeJS
+- io.js
 - Koa
 - React
 - React-router
