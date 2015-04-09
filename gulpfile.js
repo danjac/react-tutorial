@@ -58,6 +58,10 @@ gulp.task("webpack:build", function(callback) {
 	});
 });
 
+gulp.task("build-dev", ["webpack:build"], function() {
+	gulp.watch(["app/**/*"], ["webpack:build"]);
+});
+
 gulp.task("webpack-dev-server", function(callback) {
     new webpackDevServer(webpack(webpackConfig), {
         publicPath: webpackConfig.output.publicPath,
@@ -80,7 +84,4 @@ gulp.task('install', shell.task([
     'bower install'
 ]));
 
-gulp.task('default', ['webpack-dev-server'], function() {
-    gulp.start('install', 'pkg', 'webpack:build')
-    gulp.watch(srcDir + '/**', {}, ['watch'])
-});
+gulp.task('default', ['install', 'pkg', 'webpack-dev-server']);

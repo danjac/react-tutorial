@@ -4,7 +4,7 @@ var webpack = require('webpack');
 module.exports = {
   devServer: true,
   debug: true,
-  devtool: 'eval',
+  devtool: 'sourcemap',
   entry: [
     'webpack-dev-server/client?http://localhost:8080',
     'webpack/hot/only-dev-server',
