@@ -58,7 +58,7 @@ export default Reflux.createStore({
     },
 
     submitPostCompleted() {
-        this.success("Thank you for your post!");
+        this.success("Thank you for your post! It will appear shortly.");
     },
 
     signupCompleted(user) {

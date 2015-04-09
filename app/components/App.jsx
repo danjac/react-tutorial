@@ -81,7 +81,7 @@ const Navigation = React.createClass({
     render() {
 
         const makeHref = this.context.router.makeHref,
-              brand = <Link to={makeHref("popular")}>React News</Link>
+              brand = <Link to={makeHref("popular")}>Pinbook</Link>
 
         return (
             <Navbar brand={brand} className="navbar navbar-inverse" fixedTop={true} fluid={true}>
@@ -129,7 +129,8 @@ export default React.createClass({
     },
 
     onLogout() {
-        this.context.router.transitionTo("popular")
+        // reload site, so we clear all csrf tokens etc
+        window.location.href = "/";
     },
 
     onLoginRequired() {

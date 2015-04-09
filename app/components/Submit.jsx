@@ -62,7 +62,13 @@ export default React.createClass({
                        required
                        bsStyle={this.state.errors.image? 'error': null} 
                        help={this.state.errors.image} />
-                 <Input type="submit" value="Submit post" />
+                <Input ref="comment" 
+                       type="textarea" 
+                       label="Comment" 
+                       placeholder="Any stories to tell?"
+                       bsStyle={this.state.errors.comment? 'error': null} 
+                       help={this.state.errors.comment} />
+                  <Input type="submit" value="Submit post" />
             </form>
         );
     }

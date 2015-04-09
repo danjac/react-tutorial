@@ -4,9 +4,25 @@ import Router, {Link} from 'react-router';
 import Immutable from 'immutable';
 import _ from 'lodash';
 import moment from 'moment';
-import {Grid, Row, Col, Button, Modal, ModalTrigger, Pager, PageItem} from 'react-bootstrap';
+import {OverlayTrigger, Popover, Grid, Row, Col, Button, Modal, ModalTrigger, Pager, PageItem, Badge} from 'react-bootstrap';
 import actions from '../actions';
 
+
+const UserLink = React.createClass({
+    mixins: [PureRenderMixin],
+
+    propTypes: {
+        user: PropTypes.object
+    },
+
+    contextTypes: {
+        router: PropTypes.func
+    },
+
+    render() {
+        return <Link to={this.context.router.makeHref("user", {name: this.props.user.name})}>{this.props.user.name}</Link>
+    }
+});
 
 const DeletePostModal = React.createClass({
 
@@ -79,7 +95,7 @@ const PostListItem = React.createClass({
               post = this.props.post
 
         if (!user || user._id === post.author._id || _.includes(user.votes, post._id)){
-            return ''
+            return '';
         }
 
         return (
@@ -87,7 +103,36 @@ const PostListItem = React.createClass({
                 <a href="#" onClick={this.handleVoteUp}><i className="glyphicon glyphicon-arrow-up"></i></a>
                 <a href="#" onClick={this.handleVoteDown}><i className="glyphicon glyphicon-arrow-down"></i></a>
             </span>
-        )
+        );
+
+    },
+
+    overlay() {
+
+        const post = this.props.post;
+
+        if (!post.comment) {
+            return this.thumbnail();
+        }
+
+        return (
+        <OverlayTrigger trigger='hover' 
+                        placement='right' 
+                        overlay={<Popover >{post.comment}</Popover>}>
+                        {this.thumbnail()}</OverlayTrigger>
+        );
+
+    },
+
+    thumbnail() {
+
+        const post = this.props.post;
+
+        return (
+              <a href={post.url} target="_blank">
+                 <img className="img-rounded" src={"/uploads/" + post.image} alt={post.title} />
+              </a>
+        );
 
     },
 
@@ -97,16 +142,20 @@ const PostListItem = React.createClass({
 
         return (
             <Col sm={6} md={4}>
-                <a href={post.url} target="_blank" className="thumbnail">
-                  <img src={"/uploads/" + post.image} alt={post.title} />
+                <div className="thumbnail">
+                  {this.overlay()}
                   <div className="caption">
-                    <h3 className="text-center">{post.title}</h3>
-                    <p>
-                        {this.votingLinks()}
-                        {this.deleteLink()}
-                    </p>
+                    <h3 className="text-center">
+                        <a href={post.url} target="_blank" className="thumbnail">{post.title}</a>
+                    </h3>
+                    <small>
+                    <Badge>{post.score}</Badge>
+                    &nbsp;uploaded by <UserLink user={post.author} /> {moment(post.created).fromNow()}
+                    &nbsp;{this.votingLinks()}
+                    &nbsp;{this.deleteLink()}
+                    </small>
                   </div>
-                </a>
+                </div>
             </Col>
         );
     }

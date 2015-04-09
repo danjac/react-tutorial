@@ -138,7 +138,10 @@ export function submitPost(data) {
 };
 
 export function logout() {
-    request.post("/api/auth/logout").end();
+    request
+        .post("/api/auth/logout")
+        .csrf()
+        .end();
 };
 
 

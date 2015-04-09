@@ -21,6 +21,7 @@ export function Login() {
 export function NewPost(checkImage) {
     const rules = {
         title: ['minLength:6', 'maxLength:100'],
+        comment: [],
         url: [
             'required', 
             {
