@@ -62,6 +62,7 @@ export default React.createClass({
 
         return (
             <div>
+                {this.renderPager()}
                 <Grid>
                     <Row>
                         {this.props.result.posts.map((post) => {
