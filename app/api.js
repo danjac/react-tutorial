@@ -137,14 +137,6 @@ export function submitPost(data) {
     });
 };
 
-export function logout() {
-    request
-        .post("/api/auth/logout")
-        .csrf()
-        .end();
-};
-
-
 export function login(data) {
 
     return new Promise((resolve, reject) => {

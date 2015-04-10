@@ -4,14 +4,14 @@ var webpack = require('webpack');
 module.exports = {
   devServer: true,
   debug: true,
-  devtool: 'sourcemap',
+  devtool: '#sourcemap',
   entry: [
     'webpack-dev-server/client?http://localhost:8080',
     'webpack/hot/only-dev-server',
     './app/app.js'
   ],
   output: {
-    path: path.join(__dirname, 'build'),
+    path: path.join(__dirname, 'public', 'js'),
     filename: 'app.js',
     publicPath: 'http://localhost:8080/js/'
   },

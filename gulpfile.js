@@ -2,12 +2,15 @@ var bowerFiles = require('main-bower-files'),
     gulp = require('gulp'),
     util = require('gulp-util'),
     path = require('path'),
+    _ = require('lodash'),
     plumber = require('gulp-plumber'),
     shell = require('gulp-shell'),
     minifyCss = require('gulp-minify-css'),
     gulpFilter = require('gulp-filter'),
     concat = require('gulp-concat'),
-    uglify = require('gulp-uglify'), webpack = require('webpack'), webpackDevServer = require('webpack-dev-server'),
+    uglify = require('gulp-uglify'), 
+    webpack = require('webpack'), 
+    webpackDevServer = require('webpack-dev-server'),
     webpackConfig = require('./webpack.config.js'),
     notify = require('gulp-notify');
 
@@ -17,13 +20,27 @@ var staticDir = './public',
     jsFilter = gulpFilter('*.js'),
     fontFilter = gulpFilter(['*.eot', '*.woff', '*.svg', '*.ttf'])
 
+
+
 var dest = {
     js: staticDir + '/js',
     css: staticDir + '/css',
     fonts: staticDir + '/fonts'
 }
 
-var compiler = webpack(webpackConfig);
+var webpackBuildOptions = _.assign(webpackConfig, {
+        debug: false,
+        verbose: false,
+        devServer: false,
+        devtool: '#sourcemap',
+        watchDelay: 200,
+    });
+
+
+gulp.task("watch", ["build"], function() {
+	gulp.watch(["app/**/*"], ["build"]);
+});
+
 
 gulp.task('pkg', function() {
     // installs all the 3rd party stuffs.
@@ -47,20 +64,15 @@ gulp.task('pkg', function() {
         .pipe(gulp.dest(dest.fonts))
 })
 
-gulp.task("webpack:build", function(callback) {
-	// run webpack
-	compiler.run(function(err, stats) {
-		if(err) throw new util.PluginError("webpack:build", err);
-		util.log("[webpack:build]", stats.toString({
-			colors: true
-		}));
-		callback();
-	});
+
+gulp.task("build", function(callback) {
+    webpack(webpackBuildOptions, function(err, stats) {
+        if (err)  throw new util.PluginError("build", err);
+        util.log("build", stats.toString());
+        callback();
+    });
 });
 
-gulp.task("build-dev", ["webpack:build"], function() {
-	gulp.watch(["app/**/*"], ["webpack:build"]);
-});
 
 gulp.task("webpack-dev-server", function(callback) {
     new webpackDevServer(webpack(webpackConfig), {
@@ -84,4 +96,4 @@ gulp.task('install', shell.task([
     'bower install'
 ]));
 
-gulp.task('default', ['install', 'pkg', 'webpack-dev-server']);
+gulp.task('default', ['install', 'pkg', 'build', 'webpack-dev-server']);

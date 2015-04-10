@@ -4,7 +4,6 @@ import Immutable from 'immutable';
 import {Grid, Row, Col, Pager, PageItem} from 'react-bootstrap';
 import Post from './Post';
 
-
 export default React.createClass({
 
     mixins: [PureRenderMixin],

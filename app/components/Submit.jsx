@@ -105,7 +105,9 @@ export default React.createClass({
                        disabled={!this.state.enabled}
                        bsStyle={this.state.errors.comment? 'error': null} 
                        help={this.state.errors.comment} />
-                  <Input type="submit" value="Submit post" disabled={!this.state.enabled} />
+                  <Input type="submit" 
+                         value="Submit post" 
+                         disabled={!this.state.enabled} />
             </form>
         );
     }

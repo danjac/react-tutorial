@@ -2,13 +2,12 @@ import router from 'koa-router';
 import mount from 'koa-mount';
 import * as api from '../lib/controllers/api';
 import * as secure from '../lib/controllers/secure';
-import {index, upload} from '../lib/controllers';
+import {index, upload, logout} from '../lib/controllers';
 
 export default (app) => {
 
     app.use(mount('/api/auth', new router()
         .post("/submit/", secure.submit)
-        .post("/logout/", secure.logout)
         .delete("/:id", secure.deletePost)
         .put("/upvote/:id", secure.upvote)
         .put("/downvote/:id", secure.downvote)
@@ -27,6 +26,7 @@ export default (app) => {
         .routes()));
 
     app.use(mount('/', new router()
+        .get("/logout/", logout)
         .get('/uploads/:filename', upload)
         .get('/user/:user', index)
         .get('/:path', index)
