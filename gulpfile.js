@@ -96,4 +96,4 @@ gulp.task('install', shell.task([
     'bower install'
 ]));
 
-gulp.task('default', ['install', 'pkg', 'build', 'webpack-dev-server']);
+gulp.task('default', ['install', 'pkg', 'webpack-dev-server']);

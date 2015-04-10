@@ -67,19 +67,19 @@ export default React.createClass({
         if (this.state.enabled) {
             return '';
         }
-        return <ProgressBar now={this.state.progress} />
+        return <ProgressBar label="fetching image..." now={this.state.progress} />
     },
 
-    render() {
-
+    form() {
+        if (!this.state.enabled) {
+            return false;
+        }
         return (
             <form onSubmit={this.handleSubmit}>
-                {this.progressBar()}
                 <Input ref="title" 
                        type="text" 
                        label="Title" 
                        required
-                       disabled={!this.state.enabled}
                        bsStyle={this.state.errors.title? 'error': null} 
                        help={this.state.errors.title} />
                 <Input ref="url" 
@@ -87,7 +87,6 @@ export default React.createClass({
                        label="Link" 
                        placeholder="Enter a valid URL starting with http:// or https://"
                        required
-                       disabled={!this.state.enabled}
                        bsStyle={this.state.errors.url? 'error': null} 
                        help={this.state.errors.url} />
                 <Input ref="image" 
@@ -95,20 +94,25 @@ export default React.createClass({
                        label="Image" 
                        placeholder="Enter link to the image you want to pin"
                        required
-                       disabled={!this.state.enabled}
                        bsStyle={this.state.errors.image? 'error': null} 
                        help={this.state.errors.image} />
                 <Input ref="comment" 
                        type="textarea" 
                        label="Comment" 
                        placeholder="Any stories to tell?"
-                       disabled={!this.state.enabled}
                        bsStyle={this.state.errors.comment? 'error': null} 
                        help={this.state.errors.comment} />
-                  <Input type="submit" 
-                         value="Submit post" 
-                         disabled={!this.state.enabled} />
+                  <Input type="submit" value="Submit post" />
             </form>
+        );
+    },
+    render() {
+
+        return (
+            <div>
+            {this.progressBar()}
+            {this.form()}
+            </div>
         );
     }
 });

@@ -30,7 +30,7 @@ export default React.createClass({
     handlePageClick(page) {
         this.props.fetchPosts(page);
     },
-     
+
     handleLastPageClick(event) {
         event.preventDefault()
         if (this.props.result.isFirst) {
@@ -47,11 +47,27 @@ export default React.createClass({
         this.handlePageClick(this.props.result.page + 1);
     },
 
+    renderPreviousPageItem() {
+        if (this.props.result.isFirst) {
+            return '';
+        }
+        return <PageItem previous onClick={this.handleLastPageClick}>&larr; Previous</PageItem>;
+    },
+
+
+    renderNextPageItem() {
+        if (this.props.result.isLast) {
+            return '';
+        }
+        return <PageItem next onClick={this.handleNextPageClick}>&rarr; Next</PageItem>;
+    },
+
+
     renderPager() {
         return (
             <Pager>
-                <PageItem previous onClick={this.handleLastPageClick} disabled={this.props.result.isFirst}>&larr; Previous</PageItem>
-                <PageItem next onClick={this.handleNextPageClick} disabled={this.props.result.isLast}>&rarr; Next</PageItem>
+            {this.renderPreviousPageItem()}
+            {this.renderNextPageItem()}
             </Pager>
         );
     },
@@ -61,7 +77,6 @@ export default React.createClass({
 
         return (
             <div>
-                {this.renderPager()}
                 <Grid>
                     <Row>
                         {this.props.result.posts.map((post) => {
