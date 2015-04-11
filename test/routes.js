@@ -59,7 +59,8 @@ const createPost = function*() {
     const post = yield new Post({
                 title: 'testing something',
                 url: 'http://test',
-                author: user._id
+                author: user._id,
+                image: 'test.jpg'
             })
             .save();
 
