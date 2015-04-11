@@ -34,6 +34,13 @@ var webpackBuildOptions = _.assign(webpackConfig, {
         devServer: false,
         devtool: '#sourcemap',
         watchDelay: 200,
+        plugins: [
+            new webpack.optimize.UglifyJsPlugin({
+                compress: {
+                    warnings: false
+                }
+            })
+        ]
     });
 
 
@@ -65,7 +72,7 @@ gulp.task('pkg', function() {
 })
 
 
-gulp.task("build", function(callback) {
+gulp.task("build", ['install', 'pkg'], function(callback) {
     webpack(webpackBuildOptions, function(err, stats) {
         if (err)  throw new util.PluginError("build", err);
         util.log("build", stats.toString());

@@ -71,11 +71,11 @@ export default React.createClass({
     },
 
     form() {
-        if (!this.state.enabled) {
-            return false;
-        }
+
+        const style = this.state.enabled ? {} : {display: "none"};
+
         return (
-            <form onSubmit={this.handleSubmit}>
+            <form style={style} onSubmit={this.handleSubmit}>
                 <Input ref="title" 
                        type="text" 
                        label="Title" 

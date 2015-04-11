@@ -32,6 +32,7 @@ const isUnique = (field, url) => {
 
 };
 
+
 const signupValidator = validators.Signup(
         isUnique('name', '/api/isname'),
         isUnique('email', '/api/isemail')),
