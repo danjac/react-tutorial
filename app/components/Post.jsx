@@ -19,7 +19,7 @@ const UserLink = React.createClass({
     },
 
     render() {
-        return <Link to={this.context.router.makeHref("user", {name: this.props.user.name})}>{this.props.user.name}</Link>
+        return <Link to={this.context.router.makeHref("user", {name: this.props.user.name})}>{this.props.user.name}</Link>;
     }
 });
 
@@ -45,9 +45,9 @@ const DeletePostModal = React.createClass({
                 </div>
             </Modal>
 
-        )
+        );
     }
-})
+});
 
 
 export default React.createClass({
@@ -66,32 +66,33 @@ export default React.createClass({
     },
 
     handleVoteUp(event) {
-        event.preventDefault()
-        actions.voteUp(this.props.post) 
+        event.preventDefault();
+        actions.voteUp(this.props.post);
     },
 
-    handleVoteDown(event) { 
-        event.preventDefault()
-        actions.voteDown(this.props.post) 
+    handleVoteDown(event) {
+        event.preventDefault();
+        actions.voteDown(this.props.post);
     },
 
     deleteLink() {
         const user = this.props.user,
-              post = this.props.post
+              post = this.props.post;
+
         if (user && post.author._id === user._id) {
-            const modal = <DeletePostModal post={post} />
+            const modal = <DeletePostModal post={post} />;
             return (
                 <ModalTrigger modal={modal}>
                     <a href="#">delete</a>
                 </ModalTrigger>
-            )
+            );
         }
-        return ''
+        return '';
     },
 
     votingLinks() {
         const user = this.props.user,
-              post = this.props.post
+              post = this.props.post;
 
         if (!user || user._id === post.author._id || _.includes(user.votes, post._id)){
             return '';
@@ -115,8 +116,8 @@ export default React.createClass({
         }
 
         return (
-        <OverlayTrigger trigger='hover' 
-                        placement='right' 
+        <OverlayTrigger trigger='hover'
+                        placement='right'
                         overlay={<Popover >{post.comment}</Popover>}>
                         {this.thumbnail()}</OverlayTrigger>
         );
@@ -137,7 +138,7 @@ export default React.createClass({
 
     render() {
 
-        const post = this.props.post
+        const post = this.props.post;
 
         return (
             <Col sm={6} md={4}>
@@ -159,6 +160,6 @@ export default React.createClass({
         );
     }
 
-})
+});
 
 

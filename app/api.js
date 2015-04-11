@@ -14,7 +14,7 @@ const isUnique = (field, url) => {
     return (value) => {
 
         if (!value) {
-            return;
+            return false;
         }
 
         return new Promise((resolve, reject) => {
@@ -22,6 +22,9 @@ const isUnique = (field, url) => {
             .get(url)
             .query({ [field]: value })
             .end((err, res) => {
+                if (err) {
+                  return reject(err);
+                }
                 if (res && res.body.exists) {
                     reject(new Checkit.ValidationError("The " + field + " field is already in use"));
                 }
@@ -33,11 +36,11 @@ const isUnique = (field, url) => {
 };
 
 
-const signupValidator = validators.Signup(
+const signupValidator = validators.signup(
         isUnique('name', '/api/isname'),
         isUnique('email', '/api/isemail')),
-      postValidator = validators.NewPost(true),
-      loginValidator = validators.Login();
+      postValidator = validators.newPost(true),
+      loginValidator = validators.login();
 
 
 const fetchPosts = (page, orderBy) => {
@@ -49,14 +52,14 @@ const fetchPosts = (page, orderBy) => {
                 page: page,
                 orderBy: orderBy
             })
-            .end((err, res) =>  {
+            .end((err, res) => {
                 if (err) {
                     return reject(err);
                 }
                 resolve(res.body);
             });
     });
-}
+};
 
 
 export function voteUp(post) {
@@ -83,6 +86,9 @@ export function signup(data) {
                     .csrf()
                     .send(clean)
                     .end((err, res) => {
+                        if (err) {
+                            return reject(err);
+                        }
                         if (res.badRequest) {
                             return reject(res.body);
                         }
@@ -95,7 +101,7 @@ export function signup(data) {
     });
 }
 
-export function deletePost(post)  {
+export function deletePost(post) {
     return new Promise((resolve, reject) => {
         request
             .del("/api/auth/" + post._id)
@@ -133,10 +139,10 @@ export function submitPost(data) {
                     });
             })
             .catch(Checkit.Error, (err) => {
-                reject(err.toJSON())
+                reject(err.toJSON());
             });
     });
-};
+}
 
 export function login(data) {
 
@@ -161,7 +167,7 @@ export function login(data) {
             });
     });
 
-};
+}
 
 export function getUser() {
     return new Promise((resolve, reject) => {
@@ -174,7 +180,7 @@ export function getUser() {
                 resolve(res.body);
             });
     });
-};
+}
 
 export function searchPosts(page, query){
 
@@ -192,18 +198,18 @@ export function searchPosts(page, query){
                 if (err) {
                     return reject(err);
                 }
-                resolve(res.body); 
+                resolve(res.body);
             });
     });
 }
 
 
-export function fetchLatestPosts(page) { 
-    return fetchPosts(page, "id"); 
+export function fetchLatestPosts(page) {
+    return fetchPosts(page, "id");
 }
 
-export function fetchPopularPosts(page) { 
-    return fetchPosts(page, "score"); 
+export function fetchPopularPosts(page) {
+    return fetchPosts(page, "score");
 }
 
 export function fetchPostsForUser(page, name) {

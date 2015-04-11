@@ -1,12 +1,12 @@
-import React from 'react'
-import {PureRenderMixin} from 'react/addons'
-import Reflux from 'reflux'
-import Router, {RouteHandler, Link} from 'react-router'
-import {Alert, Navbar, Nav, NavItem, Input}  from 'react-bootstrap'
-import {NavItemLink} from 'react-router-bootstrap'
-import actions from '../actions'
-import UserStore from '../stores/UserStore'
-import MessageStore from '../stores/MessageStore'
+import React from 'react';
+import {PureRenderMixin} from 'react/addons';
+import Reflux from 'reflux';
+import Router, {RouteHandler, Link} from 'react-router';
+import {Alert, Navbar, Nav, NavItem, Input} from 'react-bootstrap';
+import {NavItemLink} from 'react-router-bootstrap';
+import actions from '../actions';
+import UserStore from '../stores/UserStore';
+import MessageStore from '../stores/MessageStore';
 
 
 const Messages = React.createClass({
@@ -24,12 +24,12 @@ const Messages = React.createClass({
                 return <Alert onDismiss={() => actions.dismissAlert(index)}
                               key={index}
                               dismissAfter={3000}
-                              bsStyle={msg.level}>{msg.text}</Alert>
+                              bsStyle={msg.level}>{msg.text}</Alert>;
             }).toJS()}
             </div>
-        )
+        );
     }
-})
+});
 
 
 const Navigation = React.createClass({
@@ -49,7 +49,7 @@ const Navigation = React.createClass({
     getRightNav() {
 
         const className = "navbar-right",
-              makeHref = this.context.router.makeHref
+              makeHref = this.context.router.makeHref;
 
         if (this.props.user) {
             return (
@@ -57,31 +57,31 @@ const Navigation = React.createClass({
                 <NavItemLink to={makeHref("user", {name: this.props.user.name})}>{this.props.user.name} ({this.props.user.totalScore})</NavItemLink>
                 <NavItem onClick={actions.logout}>logout</NavItem>
               </Nav>
-            )
+            );
         }
         return (
               <Nav className={className}>
                 <NavItemLink to={makeHref("login")}>login</NavItemLink>
                 <NavItemLink to={makeHref("signup")}>signup</NavItemLink>
               </Nav>
-        )
+        );
     },
 
     clearSearch(event) {
-        event.preventDefault()
-        this.refs.search.getInputDOMNode().value = ""
+        event.preventDefault();
+        this.refs.search.getInputDOMNode().value = "";
     },
 
     handleSearch(event) {
-        event.preventDefault()
-        const q = this.refs.search.getValue().trim()
-        this.context.router.transitionTo("search", null, {q: q})
+        event.preventDefault();
+        const q = this.refs.search.getValue().trim();
+        this.context.router.transitionTo("search", null, {q: q});
     },
 
     render() {
 
         const makeHref = this.context.router.makeHref,
-              brand = <Link to={makeHref("popular")}>Pinbook</Link>
+              brand = <Link to={makeHref("popular")}>Pinbook</Link>;
 
         return (
             <Navbar brand={brand} className="navbar navbar-inverse" fixedTop={true} fluid={true}>
@@ -94,16 +94,16 @@ const Navigation = React.createClass({
                     <Input type="text"
                            placeholder="Search"
                            onKeyUp={this.handleSearch}
-                           ref="search"  />
+                           ref="search" />
                 </form>
               </Nav>
               {this.getRightNav()}
             </Navbar>
-        )
+        );
 
     }
 
-})
+});
 
 export default React.createClass({
 
@@ -125,7 +125,7 @@ export default React.createClass({
             messages: MessageStore.getDefaultData(),
             user: UserStore.getDefaultData(),
             loading: false
-        }
+        };
     },
 
     onLogout() {
@@ -134,27 +134,27 @@ export default React.createClass({
     },
 
     onLoginRequired() {
-        this.context.router.transitionTo("login")
+        this.context.router.transitionTo("login");
     },
 
     onMessagesUpdate() {
-        this.setState({ messages: MessageStore.getDefaultData() })
+        this.setState({ messages: MessageStore.getDefaultData() });
     },
 
     onUserUpdate() {
-        this.setState({ user: UserStore.getDefaultData() })
+        this.setState({ user: UserStore.getDefaultData() });
     },
 
     onLoadingStart() {
-        this.setState({ loading: true })
+        this.setState({ loading: true });
     },
 
     onLoadingEnd() {
-        this.setState({ loading: false })
+        this.setState({ loading: false });
     },
 
     componentDidMount() {
-        actions.getUser()
+        actions.getUser();
     },
 
     render() {
@@ -167,15 +167,15 @@ export default React.createClass({
                         <h1>Loading....</h1>
                     </div>
                 </div>
-            )
+            );
         }
 
         return (
             <div className="container-fluid">
                 <Navigation user={this.state.user} />
                 <Messages messages={this.state.messages} />
-                <RouteHandler user={this.state.user}  />
+                <RouteHandler user={this.state.user} />
             </div>
-        )
+        );
     }
-})
+});

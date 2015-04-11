@@ -1,6 +1,6 @@
 import Checkit from 'checkit';
 
-export function Signup(nameExists, emailExists) {
+export function signup(nameExists, emailExists) {
     return new Checkit({
         name: ['minLength:10', 'maxLength:60', nameExists],
         email: ['required', 'email', emailExists],
@@ -8,7 +8,7 @@ export function Signup(nameExists, emailExists) {
     });
 }
 
-export function Login() {
+export function login() {
     return new Checkit({
         identity: {
             rule: 'required',
@@ -18,28 +18,28 @@ export function Login() {
     });
 }
 
-export function NewPost(checkImage) {
+export function newPost(checkImage) {
     const rules = {
         title: ['minLength:6', 'maxLength:100'],
         comment: [],
         url: [
-            'required', 
+            'required',
             {
                 rule: 'url',
                 message: 'Please provide a valid URL'
             }
-        ],
+        ]
     };
 
     if (checkImage) {
-        rules.image =  [
-            'required', 
+        rules.image = [
+            'required',
             {
                 rule: 'url',
                 message: 'Please provide a valid URL'
             }
         ];
     }
-    return Checkit(rules);
+    return new Checkit(rules);
 }
 
