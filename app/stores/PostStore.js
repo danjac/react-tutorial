@@ -7,9 +7,9 @@ import actions from '../actions';
 export default Reflux.createStore({
 
     listenables: actions,
-    
+
     init() {
-        this.posts = Immutable.List();
+        this.posts = new Immutable.List();
         this.page = 1;
         this.total = 0;
         this.isFirst = true;
@@ -37,9 +37,9 @@ export default Reflux.createStore({
     },
 
     adjustScore(post, amount) {
-        this.posts = this.posts.update(this.indexOf(post), (post) => {
-            post.score += amount
-            return post
+        this.posts = this.posts.update(this.indexOf(post), (p) => {
+            p.score += amount;
+            return p;
         });
         this._trigger();
     },
@@ -55,7 +55,7 @@ export default Reflux.createStore({
 
     fetchPostsCompleted(page, result) {
         this.page = page;
-        this.posts = Immutable.List(result.posts);
+        this.posts = new Immutable.List(result.posts);
         this.isFirst = result.isFirst;
         this.isLast = result.isLast;
         this.total = result.total;
@@ -71,4 +71,4 @@ export default Reflux.createStore({
             isLast: this.isLast
         };
     }
-})
+});

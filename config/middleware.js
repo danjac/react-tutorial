@@ -12,11 +12,11 @@ export default function(app) {
 
     // session configuration
     if (!process.env.SECRET_KEY) {
-        throw new Error("You must set a SECRET_KEY in your environment!")
+        throw new Error("You must set a SECRET_KEY in your environment!");
     }
     app.keys = [process.env.SECRET_KEY];
 
-    app.use(middlewares.session({ 
+    app.use(middlewares.session({
         key: 'react-tutorial',
         store: redisStore()
     }));
@@ -38,7 +38,7 @@ export default function(app) {
     // body parser
     //
     app.use(middlewares.bodyParser());
-    
+
     // compression
     app.use(middlewares.compress());
 
@@ -52,7 +52,7 @@ export default function(app) {
         debug: devMode
     });
 
-    // static content 
+    // static content
     //
     if (devMode) {
         app.use(middlewares.staticCache(path.join(__dirname, '../public')));
@@ -81,7 +81,7 @@ export default function(app) {
             if (err.status && err.status < 500) {
                 this.status = err.status;
                 return;
-            } 
+            }
             throw err;
         }
     });

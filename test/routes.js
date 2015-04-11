@@ -8,16 +8,16 @@ import mongoose from 'mongoose';
 import ClearDB from 'mocha-mongoose';
 import {expect} from 'chai';
 
-import routes from '../config/routes'
+import routes from '../config/routes';
 import Post from '../lib/models/Post';
 import User from '../lib/models/User';
 
-dotenv.load()
+dotenv.load();
 
 const ObjectId = mongoose.Types.ObjectId;
 const dbUri = 'mongodb://localhost/react-tutorial-test';
 
-const clearDB = ClearDB(dbUri);
+const clearDB = new ClearDB(dbUri);
 
 const app = koa();
 
@@ -67,15 +67,18 @@ const createPost = function*() {
     return [post, user];
 };
 
-describe("DELETE /api/delete",function() {
+
+describe("DELETE /api/delete", function() {
 
     let post, user;
 
     before((done) => {
-        if (mongoose.connection.db) return done()
-        mongoose.connect(dbUri, done)
+        if (mongoose.connection.db) {
+            return done();
+        }
+        mongoose.connect(dbUri, done);
     });
-    
+
     before((done) => {
         clearDB(done);
     });
@@ -89,18 +92,22 @@ describe("DELETE /api/delete",function() {
             .delete('/api/auth/' + post._id)
             .expect(404)
             .end((err, res) => {
-                if (err) throw err;
+                if (err) {
+                    throw err;
+                }
                 done();
             });
     });
 
     it('should return a 404 if no post exists', (done) => {
         req
-            .delete('/api/auth/' + ObjectId())
+            .delete('/api/auth/' + new ObjectId())
             .set('authToken', user._id)
             .expect(404)
             .end((err, res) => {
-                if (err) throw err;
+                if (err) {
+                    throw err;
+                }
                 done();
             });
     });
@@ -118,8 +125,11 @@ describe("DELETE /api/delete",function() {
             .set('authToken', other._id)
             .expect(404)
             .end(function*(err, res) {
+                if (err) {
+                    throw err;
+                }
                 const numPosts = yield Post.count();
-                expect(numPosts).to.equal(1);   
+                expect(numPosts).to.equal(1);
                 done();
             });
 
@@ -132,8 +142,11 @@ describe("DELETE /api/delete",function() {
             .set('authToken', user._id)
             .expect(200)
             .end(function*(err, res) {
+                if (err) {
+                    throw err;
+                }
                 const numPosts = yield Post.count();
-                expect(numPosts).to.equal(0);   
+                expect(numPosts).to.equal(0);
                 done();
             });
 
@@ -143,82 +156,78 @@ describe("DELETE /api/delete",function() {
 });
 
 
-describe("GET /api/auth", () =>  {
+describe("GET /api/auth", () => {
     it('should return a 401 if no user is authenticated', (done) => {
-        done()
-    })
+        done();
+    });
 
     it('should return a 401 if no valid user matches token', (done) => {
-        done()
-    })
+        done();
+    });
 
     it('should return some JSON if valid user matches token', (done) => {
-        done()
-    })
-    
-})
+        done();
+    });
+
+});
 
 describe("PUT /api/upvote", function() {
     it('should not allow upvote if not logged in', (done) => {
-        done()
-	})
+        done();
+	});
 
     it('should not allow upvote if post does not exist', (done) => {
 
-        done()
-	})
+        done();
+	});
 
     it('should allow upvote if post does not belong to user', (done) => {
 
-        done()
+        done();
 
-	})
+	});
 
     it('should not allow upvote if post belongs to user', (done) => {
 
-        done()
+        done();
 
-	})
+	});
 
 
     it('should not allow upvote if post if user has already voted', (done) => {
 
-        done()
+        done();
 
-	})
-
-
+	});
 
 
-
-
-})
+});
 
 describe("POST /api/submit", function() {
 
-   
+
     it('should not allow posting if user not authenticated', (done) => {
-        done()
-	})
+        done();
+	});
 
     it('should return errors if missing data', (done) => {
-        done()
-    })
+        done();
+    });
 
     it('should allow posting if legit user', (done) => {
-        done()
-    })
+        done();
+    });
 
-})
+});
 
 describe("GET /api/posts/", function() {
 
 	it('should render a list of posts by score', (done) => {
-        done()
-   	})
+        done();
+    });
 
 	it('should render a list of posts by id', (done) => {
-        done()
-    })
+        done();
+    });
 
-})
+});

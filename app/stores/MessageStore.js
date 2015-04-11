@@ -8,11 +8,11 @@ export default Reflux.createStore({
     listenables: actions,
 
     init() {
-        this.messages = Immutable.List();
+        this.messages = new Immutable.List();
     },
 
     getDefaultData() {
-        return this.messages
+        return this.messages;
     },
 
     addMessage(level, msg) {
@@ -65,6 +65,6 @@ export default Reflux.createStore({
         this.success(`Hi ${user.name}! Welcome to the site!`);
     }
 
-})
+});
 
 

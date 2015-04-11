@@ -8,9 +8,9 @@ var bowerFiles = require('main-bower-files'),
     minifyCss = require('gulp-minify-css'),
     gulpFilter = require('gulp-filter'),
     concat = require('gulp-concat'),
-    uglify = require('gulp-uglify'), 
-    webpack = require('webpack'), 
-    webpackDevServer = require('webpack-dev-server'),
+    uglify = require('gulp-uglify'),
+    webpack = require('webpack'),
+    WebpackDevServer = require('webpack-dev-server'),
     webpackConfig = require('./webpack.config.js'),
     notify = require('gulp-notify');
 
@@ -18,7 +18,7 @@ var staticDir = './public',
     srcDir = './app',
     cssFilter = gulpFilter('*.css'),
     jsFilter = gulpFilter('*.js'),
-    fontFilter = gulpFilter(['*.eot', '*.woff', '*.svg', '*.ttf'])
+    fontFilter = gulpFilter(['*.eot', '*.woff', '*.svg', '*.ttf']);
 
 
 
@@ -26,7 +26,7 @@ var dest = {
     js: staticDir + '/js',
     css: staticDir + '/css',
     fonts: staticDir + '/fonts'
-}
+};
 
 var webpackBuildOptions = _.assign(webpackConfig, {
         debug: false,
@@ -68,13 +68,15 @@ gulp.task('pkg', function() {
         .pipe(gulp.dest(dest.css))
         .pipe(cssFilter.restore())
         .pipe(fontFilter)
-        .pipe(gulp.dest(dest.fonts))
-})
+        .pipe(gulp.dest(dest.fonts));
+});
 
 
 gulp.task("build", ['install', 'pkg'], function(callback) {
     webpack(webpackBuildOptions, function(err, stats) {
-        if (err)  throw new util.PluginError("build", err);
+        if (err) {
+            throw new util.PluginError("build", err);
+        }
         util.log("build", stats.toString());
         callback();
     });
@@ -82,7 +84,7 @@ gulp.task("build", ['install', 'pkg'], function(callback) {
 
 
 gulp.task("webpack-dev-server", function(callback) {
-    new webpackDevServer(webpack(webpackConfig), {
+    new WebpackDevServer(webpack(webpackConfig), {
         publicPath: webpackConfig.output.publicPath,
         hot: true,
         quiet: false,
@@ -92,9 +94,9 @@ gulp.task("webpack-dev-server", function(callback) {
         historyApiFallback: true
     }).listen(8080, 'localhost', function (err, result) {
         if (err) {
-            console.log(err);
+            util.log(err);
         }
-        console.log('Listening at localhost:8080');
+        util.log('Listening at localhost:8080');
     });
 });
 

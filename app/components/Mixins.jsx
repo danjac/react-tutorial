@@ -1,9 +1,9 @@
-import React from 'react'
-import Reflux from 'reflux'
-import Posts from './Posts'
-import actions from '../actions'
-import UserStore from '../stores/UserStore'
-import PostStore from '../stores/PostStore'
+import React from 'react';
+import Reflux from 'reflux';
+import Posts from './Posts';
+import actions from '../actions';
+import UserStore from '../stores/UserStore';
+import PostStore from '../stores/PostStore';
 
 
 export const Authenticate = {
@@ -15,7 +15,7 @@ export const Authenticate = {
             }
         }
     }
-}
+};
 
 export const PostsPage = {
 
@@ -36,12 +36,12 @@ export const PostsPage = {
     },
 
     render () {
-        return <Posts fetchPosts={this.fetchPosts} 
+        return <Posts fetchPosts={this.fetchPosts}
                       user={this.props.user}
-                      result={this.state.result} />
+                      result={this.state.result} />;
     }
-}
-    
+};
+
 
 
 

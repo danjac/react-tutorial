@@ -1,6 +1,6 @@
-import React from 'react'
-import actions from '../actions'
-import {PostsPage} from './Mixins'
+import React from 'react';
+import actions from '../actions';
+import {PostsPage} from './Mixins';
 
 export default React.createClass({
 
@@ -12,4 +12,4 @@ export default React.createClass({
         actions.fetchPopularPosts(page);
     }
 
-})
+});

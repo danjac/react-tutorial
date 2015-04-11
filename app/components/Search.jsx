@@ -1,7 +1,7 @@
-import React from 'react'
-import Router from 'react-router'
-import actions from '../actions'
-import {PostsPage} from './Mixins'
+import React from 'react';
+import Router from 'react-router';
+import actions from '../actions';
+import {PostsPage} from './Mixins';
 
 export default React.createClass({
 
@@ -29,11 +29,10 @@ export default React.createClass({
 
     componentWillReceiveProps(nextProps) {
         const q = this.getSearchQuery();
-        if (q != this.state.search){
+        if (q !== this.state.search){
             this.setState({ search: q});
             actions.searchPosts(1, q);
         }
     }
 
-
-})
+});

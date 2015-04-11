@@ -1,4 +1,4 @@
-import router from 'koa-router';
+import Router from 'koa-router';
 import mount from 'koa-mount';
 import * as api from '../lib/controllers/api';
 import * as secure from '../lib/controllers/secure';
@@ -6,7 +6,7 @@ import {index, upload, logout} from '../lib/controllers';
 
 export default (app) => {
 
-    app.use(mount('/api/auth', new router()
+    app.use(mount('/api/auth', new Router()
         .post("/submit/", secure.submit)
         .delete("/:id", secure.deletePost)
         .put("/upvote/:id", secure.upvote)
@@ -15,7 +15,7 @@ export default (app) => {
         .use(secure.isSecure)
         .routes()));
 
-    app.use(mount('/api', new router()
+    app.use(mount('/api', new Router()
         .get("/posts/", api.getAll)
         .post("/login/", api.login)
         .post("/signup/", api.signup)
@@ -25,7 +25,7 @@ export default (app) => {
         .get("/isemail", api.emailExists)
         .routes()));
 
-    app.use(mount('/', new router()
+    app.use(mount('/', new Router()
         .get("/logout/", logout)
         .get('/uploads/:filename', upload)
         .get('/user/:user', index)

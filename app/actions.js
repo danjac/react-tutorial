@@ -1,4 +1,4 @@
-import Reflux from 'reflux'
+import Reflux from 'reflux';
 import * as api from './api';
 
 
@@ -93,7 +93,7 @@ actions.searchPosts.listen((page, query) => {
 
     api.searchPosts(page, query)
         .then((result) => {
-            actions.fetchPosts.completed(page, result); 
+            actions.fetchPosts.completed(page, result);
         });
 });
 
@@ -101,7 +101,7 @@ actions.fetchLatestPosts.listen((page) => {
 
     api.fetchLatestPosts(page)
         .then((result) => {
-            actions.fetchPosts.completed(page, result); 
+            actions.fetchPosts.completed(page, result);
         });
 });
 
@@ -109,7 +109,7 @@ actions.fetchPopularPosts.listen((page) => {
 
     api.fetchPopularPosts(page)
         .then((result) => {
-            actions.fetchPosts.completed(page, result); 
+            actions.fetchPosts.completed(page, result);
         });
 });
 
@@ -117,7 +117,7 @@ actions.fetchPopularPosts.listen((page) => {
 actions.fetchPostsForUser.listen((page, name) => {
     api.fetchPostsForUser(page, name)
         .then((result) => {
-            actions.fetchPosts.completed(page, result); 
+            actions.fetchPosts.completed(page, result);
         });
 });
 

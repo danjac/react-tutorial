@@ -9,5 +9,5 @@ export default function(app) {
     middleware(app);
     passport(app);
     routes(app);
-    
+
 }
