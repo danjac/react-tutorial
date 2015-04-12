@@ -19,7 +19,7 @@ export default Reflux.createStore({
 
     updateUser(user) {
         this.user = user;
-        this.trigger();
+        this.trigger(this.user);
     },
 
     loginCompleted(user) {
@@ -33,24 +33,24 @@ export default Reflux.createStore({
     deletePost(post) {
         if (this.user) {
             this.user.totalScore -= post.score;
-            this.trigger();
+            this.trigger(this.user);
         }
     },
 
     submitPost(post) {
         if (this.user) {
             this.user.totalScore += 1;
-            this.trigger();
+            this.trigger(this.user);
         }
     },
 
     logout() {
-        this.removeUser();
+        this.updateUser(null);
     },
 
     tallyVote(post) {
         this.user.votes.push(post._id);
-        this.trigger();
+        this.trigger(this.user);
     },
 
     voteUp(post) {

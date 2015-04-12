@@ -119,8 +119,8 @@ const Navigation = React.createClass({
 export default React.createClass({
 
     mixins: [
-        Reflux.listenTo(MessageStore, 'onMessagesUpdate'),
-        Reflux.listenTo(UserStore, 'onUserUpdate'),
+        Reflux.connect(MessageStore, 'messages'),
+        Reflux.connect(UserStore, 'user'),
         Reflux.listenTo(actions.loginRequired, 'onLoginRequired')
     ],
 
@@ -137,14 +137,6 @@ export default React.createClass({
 
     onLoginRequired() {
         this.context.router.transitionTo("login");
-    },
-
-    onMessagesUpdate() {
-        this.setState({ messages: MessageStore.getDefaultData() });
-    },
-
-    onUserUpdate() {
-        this.setState({ user: UserStore.getDefaultData() });
     },
 
     render() {

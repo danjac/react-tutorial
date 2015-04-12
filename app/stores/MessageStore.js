@@ -17,12 +17,12 @@ export default Reflux.createStore({
 
     addMessage(level, msg) {
         this.messages = this.messages.push({ level: level, text: msg });
-        this.trigger();
+        this.trigger(this.messages);
     },
 
     dismissAlert(index) {
         this.messages = this.messages.delete(index);
-        this.trigger();
+        this.trigger(this.messages);
     },
 
     success(msg){
