@@ -29,20 +29,6 @@ const req = request.agent(app.listen());
 
 app.use(body());
 
-// fake jwt
-//
-app.use(function*(next) {
-    const userId = this.request.headers.authtoken;
-    if (userId) {
-        this.authToken = {id: userId};
-    }
-    yield next;
-});
-
-//app.set('views', __dirname + '/../server/views')
-//app.set('view engine', 'ejs')
-//app.use(reactify(jsxRoutes))
-
 error(app);
 routes(app);
 
@@ -103,7 +89,6 @@ describe("DELETE /api/delete", function() {
     it('should return a 404 if no post exists', (done) => {
         req
             .delete('/api/auth/' + new ObjectId())
-            .set('authToken', user._id)
             .expect(404)
             .end((err, res) => {
                 if (err) {
@@ -123,7 +108,6 @@ describe("DELETE /api/delete", function() {
 
         req
             .delete('/api/auth/' + post._id)
-            .set('authToken', other._id)
             .expect(404)
             .end(function*(err, res) {
                 if (err) {
@@ -140,7 +124,6 @@ describe("DELETE /api/delete", function() {
 
         req
             .delete('/api/auth/' + post._id)
-            .set('authToken', user._id)
             .expect(200)
             .end(function*(err, res) {
                 if (err) {
