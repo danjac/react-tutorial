@@ -20,12 +20,11 @@ export default React.createClass({
                 total: 0,
                 isFirst: true,
                 isLast: true,
-                posts: new Immutable.List(),
+                posts: [],
                 page: 1
             }
         };
     },
-
 
     handlePageClick(page) {
         this.props.fetchPosts(page);
@@ -71,7 +70,6 @@ export default React.createClass({
             </Pager>
         );
     },
-
 
     render() {
 

@@ -46,6 +46,25 @@ const Navigation = React.createClass({
         router: React.PropTypes.func
     },
 
+    getLeftNav() {
+        const makeHref = this.context.router.makeHref;
+
+        return (
+          <Nav className="navbar-left">
+            <NavItemLink to={makeHref("latest")}>new</NavItemLink>
+            <NavItemLink to={makeHref("submit")}>submit</NavItemLink>
+            <form className="navbar-form navbar-left"
+                  role="search"
+                  onSubmit={this.clearSearch}>
+                <Input type="text"
+                       placeholder="Search"
+                       onKeyUp={this.handleSearch}
+                       ref="search" />
+            </form>
+          </Nav>
+        );
+    },
+
     getRightNav() {
 
         const className = "navbar-right",
@@ -55,7 +74,7 @@ const Navigation = React.createClass({
             return (
               <Nav className={className}>
                 <NavItemLink to={makeHref("user", {name: this.props.user.name})}>{this.props.user.name} ({this.props.user.totalScore})</NavItemLink>
-                <NavItem onClick={actions.logout}>logout</NavItem>
+                <NavItem href="/logout/">logout</NavItem>
               </Nav>
             );
         }
@@ -84,19 +103,11 @@ const Navigation = React.createClass({
               brand = <Link to={makeHref("popular")}>Pinbook</Link>;
 
         return (
-            <Navbar brand={brand} className="navbar navbar-inverse" fixedTop={true} fluid={true}>
-              <Nav className="navbar-left">
-                <NavItemLink to={makeHref("latest")}>new</NavItemLink>
-                <NavItemLink to={makeHref("submit")}>submit</NavItemLink>
-                <form className="navbar-form navbar-left"
-                      role="search"
-                      onSubmit={this.clearSearch}>
-                    <Input type="text"
-                           placeholder="Search"
-                           onKeyUp={this.handleSearch}
-                           ref="search" />
-                </form>
-              </Nav>
+            <Navbar brand={brand}
+                    className="navbar navbar-inverse"
+                    fixedTop={true}
+                    fluid={true}>
+              {this.getLeftNav()}
               {this.getRightNav()}
             </Navbar>
         );
@@ -110,10 +121,7 @@ export default React.createClass({
     mixins: [
         Reflux.listenTo(MessageStore, 'onMessagesUpdate'),
         Reflux.listenTo(UserStore, 'onUserUpdate'),
-        Reflux.listenTo(actions.loginRequired, 'onLoginRequired'),
-        Reflux.listenTo(actions.logout, 'onLogout'),
-        Reflux.listenTo(actions.startLoading, 'onLoadingStart'),
-        Reflux.listenTo(actions.endLoading, 'onLoadingEnd')
+        Reflux.listenTo(actions.loginRequired, 'onLoginRequired')
     ],
 
     contextTypes: {
@@ -123,14 +131,8 @@ export default React.createClass({
     getInitialState() {
         return {
             messages: MessageStore.getDefaultData(),
-            user: UserStore.getDefaultData(),
-            loading: false
+            user: UserStore.getDefaultData()
         };
-    },
-
-    onLogout() {
-        // reload site, so we clear all csrf tokens etc
-        window.location.href = "/";
     },
 
     onLoginRequired() {
@@ -145,30 +147,11 @@ export default React.createClass({
         this.setState({ user: UserStore.getDefaultData() });
     },
 
-    onLoadingStart() {
-        this.setState({ loading: true });
-    },
-
-    onLoadingEnd() {
-        this.setState({ loading: false });
-    },
-
     componentDidMount() {
         actions.getUser();
     },
 
     render() {
-
-        if (this.state.loading) {
-            // replace with loading gif...
-            return (
-                <div className="container-fluid">
-                    <div className="text-center">
-                        <h1>Loading....</h1>
-                    </div>
-                </div>
-            );
-        }
 
         return (
             <div className="container-fluid">

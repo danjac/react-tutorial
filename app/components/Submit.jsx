@@ -27,11 +27,15 @@ export default React.createClass({
         };
     },
 
-    onSubmitPostCompleted() {
+    enableForm() {
         this.setState({
             progress: 0,
             enabled: true
         });
+    },
+
+    onSubmitPostCompleted() {
+        this.enableForm();
         this.context.router.transitionTo(this.context.router.makeHref("latest"));
     },
 
@@ -39,21 +43,13 @@ export default React.createClass({
         if (errors) {
             this.setState({ errors: errors });
         }
-        this.setState({
-            progress: 0,
-            enabled: true
-        });
+        this.enableForm();
     },
 
     onSubmitPost() {
-        this.setState({
-            progress: 0,
-            enabled: false
-        });
+        this.enableForm();
         for (var i = 0; i < 100; i++) {
-            window.setTimeout(() => {
-                this.setState({ progress: i });
-            }, 100);
+            window.setTimeout(this.setState({progress: i}), 100);
         }
     },
 
@@ -67,7 +63,7 @@ export default React.createClass({
         if (this.state.enabled) {
             return '';
         }
-        return <ProgressBar label="fetching image..." now={this.state.progress} />
+        return <ProgressBar label="fetching image..." now={this.state.progress} />;
     },
 
     form() {
@@ -76,31 +72,31 @@ export default React.createClass({
 
         return (
             <form style={style} onSubmit={this.handleSubmit}>
-                <Input ref="title" 
-                       type="text" 
-                       label="Title" 
+                <Input ref="title"
+                       type="text"
+                       label="Title"
                        required
-                       bsStyle={this.state.errors.title? 'error': null} 
+                       bsStyle={this.state.errors.title? 'error': null}
                        help={this.state.errors.title} />
-                <Input ref="url" 
-                       type="text" 
-                       label="Link" 
+                <Input ref="url"
+                       type="text"
+                       label="Link"
                        placeholder="Enter a valid URL starting with http:// or https://"
                        required
-                       bsStyle={this.state.errors.url? 'error': null} 
+                       bsStyle={this.state.errors.url? 'error': null}
                        help={this.state.errors.url} />
-                <Input ref="image" 
-                       type="text" 
-                       label="Image" 
+                <Input ref="image"
+                       type="text"
+                       label="Image"
                        placeholder="Enter link to the image you want to pin"
                        required
-                       bsStyle={this.state.errors.image? 'error': null} 
+                       bsStyle={this.state.errors.image? 'error': null}
                        help={this.state.errors.image} />
-                <Input ref="comment" 
-                       type="textarea" 
-                       label="Comment" 
+                <Input ref="comment"
+                       type="textarea"
+                       label="Comment"
                        placeholder="Any stories to tell?"
-                       bsStyle={this.state.errors.comment? 'error': null} 
+                       bsStyle={this.state.errors.comment? 'error': null}
                        help={this.state.errors.comment} />
                   <Input type="submit" value="Submit post" />
             </form>

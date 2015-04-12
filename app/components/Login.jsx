@@ -11,7 +11,7 @@ export default React.createClass({
 
     mixins: [
         Reflux.listenTo(UserStore, 'onLoginSuccess'),
-        Reflux.listenTo(actions.login.failed, 'onLoginFailure'),
+        Reflux.listenTo(actions.login.failed, 'onLoginFailure')
     ],
 
     contextTypes: {
@@ -21,37 +21,37 @@ export default React.createClass({
     getInitialState() {
         return {
             errors: {}
-        }
+        };
     },
 
     redirect() {
-        const nextPath = this.context.router.getCurrentQuery().nextPath || "/"
-        this.context.router.transitionTo(nextPath)
+        const nextPath = this.context.router.getCurrentQuery().nextPath || "/";
+        this.context.router.transitionTo(nextPath);
     },
 
     componentDidMount() {
         if (this.props.user) {
-            return this.redirect()
+            return this.redirect();
         }
     },
 
     onLoginSuccess() {
-        const user = UserStore.getDefaultData()
+        const user = UserStore.getDefaultData();
         if (user) {
-            return this.redirect()
+            return this.redirect();
         }
     },
 
     onLoginFailure(errors) {
-        this.setState({ errors: errors || {} })
+        this.setState({ errors: errors || {} });
     },
 
     handleSubmit(event) {
-        event.preventDefault()
+        event.preventDefault();
 
-        const data = _.mapValues(this.refs, (ref) => ref.getValue())
+        const data = _.mapValues(this.refs, (ref) => ref.getValue());
 
-        actions.login(data)
+        actions.login(data);
 
     },
 
@@ -59,18 +59,18 @@ export default React.createClass({
 
         return (
             <form onSubmit={this.handleSubmit}>
-                <Input ref="identity" 
-                       type="text" 
-                       label="Email address or username" 
-                       help={this.state.errors.identity} 
+                <Input ref="identity"
+                       type="text"
+                       label="Email address or username"
+                       help={this.state.errors.identity}
                        bsStyle={this.state.errors.identity? 'error': null} />
-                <Input ref="password" 
-                       type="password" 
-                       label="Password" 
-                       help={this.state.errors.password} 
+                <Input ref="password"
+                       type="password"
+                       label="Password"
+                       help={this.state.errors.password}
                        bsStyle={this.state.errors.password? 'error': null} />
                 <Input type="submit" value="Login" />
             </form>
-        )
+        );
     }
-})
+});

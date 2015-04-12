@@ -5,10 +5,7 @@ import * as api from './api';
 const actions = Reflux.createActions([
     "dismissAlert",
     "loginRequired",
-    "permissionDenied",
-    "logout",
-    "startLoading",
-    "endLoading"
+    "permissionDenied"
 ]);
 
 
@@ -18,7 +15,6 @@ const asyncActions = [
     "searchPosts",
     "fetchPosts",
     "fetchPostsForUser",
-    "fetchPostsComplete",
     "login",
     "getUser",
     "submitPost",
