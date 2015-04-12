@@ -28,15 +28,6 @@ var dest = {
     fonts: staticDir + '/fonts'
 };
 
-var webpackBuildOptions = _.assign(webpackConfig, {
-        debug: false,
-        verbose: false,
-        devServer: false,
-        devtool: '#sourcemap',
-        watchDelay: 200
-    });
-
-
 gulp.task("watch", ["build"], function() {
 	gulp.watch(["app/**/*"], ["build"]);
 });
@@ -66,6 +57,18 @@ gulp.task('pkg', function() {
 
 
 gulp.task("build", function(callback) {
+    var webpackBuildOptions = _.create(webpackConfig, {
+            debug: false,
+            verbose: false,
+            devServer: false,
+            devtool: 'eval',
+            plugins: [
+                new webpack.optimize.UglifyJsPlugin({
+                    warnings: false
+                })
+            ]
+        });
+
     webpack(webpackBuildOptions, function(err, stats) {
         if (err) {
             throw new util.PluginError("build", err);

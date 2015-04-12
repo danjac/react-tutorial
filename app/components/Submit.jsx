@@ -47,9 +47,20 @@ export default React.createClass({
     },
 
     onSubmitPost() {
-        this.enableForm();
+
+        this.setState({
+            enabled: false,
+            progress: 0
+        });
+
+        const update = (progress) => {
+            return () => {
+                this.setState({ progress: progress });
+            };
+        };
+
         for (var i = 0; i < 100; i++) {
-            window.setTimeout(this.setState({progress: i}), 100);
+            window.setTimeout(update(i), 100);
         }
     },
 
@@ -63,7 +74,7 @@ export default React.createClass({
         if (this.state.enabled) {
             return '';
         }
-        return <ProgressBar label="fetching image..." now={this.state.progress} />;
+        return <ProgressBar now={this.state.progress} />;
     },
 
     form() {

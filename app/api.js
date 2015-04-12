@@ -169,19 +169,6 @@ export function login(data) {
 
 }
 
-export function getUser() {
-    return new Promise((resolve, reject) => {
-        request
-            .get("/api/auth/")
-            .end((err, res) => {
-                if (err) {
-                    return reject();
-                }
-                resolve(res.body);
-            });
-    });
-}
-
 export function searchPosts(page, query){
 
     if (!query) {

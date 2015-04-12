@@ -17,31 +17,21 @@ export default Reflux.createStore({
         return this.user != null;
     },
 
-    addUser(user) {
+    updateUser(user) {
         this.user = user;
         this.trigger();
     },
 
-    removeUser() {
-        this.user = null;
-        this.trigger();
+    getUser() {
+        this.updateUser(window._user || null);
     },
-
-    getUserCompleted(user){
-        this.addUser(user);
-    },
-
-    getUserFailed(){
-        this.removeUser();
-    },
-
 
     loginCompleted(user) {
-        this.addUser(user);
+        this.updateUser(user);
     },
 
     signupCompleted(user) {
-        this.addUser(user);
+        this.updateUser(user);
     },
 
     deletePost(post) {

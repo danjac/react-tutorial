@@ -10,8 +10,6 @@ import Signup from './components/Signup';
 import Submit from './components/Submit';
 import Search from './components/Search';
 
-console.log("routes.jsx")
-
 export default (
     <Route handler={App}>
         <DefaultRoute name="popular" handler={Popular} />

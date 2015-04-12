@@ -5,6 +5,7 @@ import * as api from './api';
 const actions = Reflux.createActions([
     "dismissAlert",
     "loginRequired",
+    "getUser",
     "permissionDenied"
 ]);
 
@@ -16,7 +17,6 @@ const asyncActions = [
     "fetchPosts",
     "fetchPostsForUser",
     "login",
-    "getUser",
     "submitPost",
     "deletePost",
     "signup",
@@ -71,17 +71,6 @@ actions.login.listen((data) => {
         })
         .catch((err) => {
             actions.login.failed(err);
-        });
-});
-
-actions.getUser.listen(() => {
-
-    api.getUser()
-        .then((user) => {
-            actions.getUser.completed(user);
-        })
-        .catch(() => {
-            actions.getUser.failed();
         });
 });
 

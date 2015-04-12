@@ -104,7 +104,6 @@ const Navigation = React.createClass({
 
         return (
             <Navbar brand={brand}
-                    className="navbar navbar-inverse"
                     fixedTop={true}
                     fluid={true}>
               {this.getLeftNav()}

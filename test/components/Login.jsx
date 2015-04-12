@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import {expect} from 'chai';
 import Login from '../../app/components/Login';
 import actions from '../../app/actions';
+import api from '../../app/api';
 import StubRouterContext from '../StubRouterContext';
 
 
