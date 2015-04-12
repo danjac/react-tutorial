@@ -5,7 +5,6 @@ import * as api from './api';
 const actions = Reflux.createActions([
     "dismissAlert",
     "loginRequired",
-    "getUser",
     "permissionDenied"
 ]);
 

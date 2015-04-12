@@ -6,7 +6,7 @@ export default Reflux.createStore({
     listenables: actions,
 
     init() {
-        this.user = null;
+        this.user = window._user || null;
     },
 
     getDefaultData() {
@@ -20,10 +20,6 @@ export default Reflux.createStore({
     updateUser(user) {
         this.user = user;
         this.trigger();
-    },
-
-    getUser() {
-        this.updateUser(window._user || null);
     },
 
     loginCompleted(user) {

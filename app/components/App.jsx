@@ -105,6 +105,7 @@ const Navigation = React.createClass({
         return (
             <Navbar brand={brand}
                     fixedTop={true}
+                    inverse={true}
                     fluid={true}>
               {this.getLeftNav()}
               {this.getRightNav()}
@@ -144,10 +145,6 @@ export default React.createClass({
 
     onUserUpdate() {
         this.setState({ user: UserStore.getDefaultData() });
-    },
-
-    componentDidMount() {
-        actions.getUser();
     },
 
     render() {

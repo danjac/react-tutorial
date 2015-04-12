@@ -6,6 +6,6 @@
   "private": true,
   "dependencies": {
     "bootstrap": "~3.3.2",
-    "bootswatch-dist": "yeti"
+    "bootswatch-dist": "superhero"
   }
 }
