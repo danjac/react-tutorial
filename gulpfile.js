@@ -33,14 +33,7 @@ var webpackBuildOptions = _.assign(webpackConfig, {
         verbose: false,
         devServer: false,
         devtool: '#sourcemap',
-        watchDelay: 200,
-        plugins: [
-            new webpack.optimize.UglifyJsPlugin({
-                compress: {
-                    warnings: false
-                }
-            })
-        ]
+        watchDelay: 200
     });
 
 
@@ -72,7 +65,7 @@ gulp.task('pkg', function() {
 });
 
 
-gulp.task("build", ['install', 'pkg'], function(callback) {
+gulp.task("build", function(callback) {
     webpack(webpackBuildOptions, function(err, stats) {
         if (err) {
             throw new util.PluginError("build", err);
@@ -94,9 +87,9 @@ gulp.task("webpack-dev-server", function(callback) {
         historyApiFallback: true
     }).listen(8080, 'localhost', function (err, result) {
         if (err) {
-            util.log(err);
+            console.log(err);
         }
-        util.log('Listening at localhost:8080');
+        console.log('Listening at localhost:8080');
     });
 });
 
