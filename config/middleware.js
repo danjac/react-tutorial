@@ -3,7 +3,10 @@ import helmet from 'koa-helmet';
 import Checkit from 'checkit';
 import passport from 'koa-passport';
 import redisStore from 'koa-redis';
+import React from 'react';
+import Router from 'react-router';
 import middlewares from 'koa-middlewares';
+import Routes from '../app/Routes';
 
 
 export default function(app) {
@@ -88,6 +91,27 @@ export default function(app) {
             throw err;
         }
     });
+
+    app.context.reactify = function() {
+
+        return new Promise((resolve, reject) => {
+            const router = Router.create({
+                routes: Routes,
+                location: this.url,
+                onAbort: (reason, location) => {
+                    const err = new Error();
+                    err.status = 302;
+                    err.location = "/login?next=" + encodeURI(this.url);
+                    reject(err);
+                }
+            });
+
+            router.run((Handler, state) => {
+                resolve(React.renderToString(<Handler />));
+            });
+        });
+    };
+
 
     middlewares.onerror(app);
 
