@@ -57,6 +57,7 @@ gulp.task('pkg', function() {
 
 
 gulp.task("build", function(callback) {
+
     var webpackBuildOptions = _.create(webpackConfig, {
             debug: false,
             verbose: false,

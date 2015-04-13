@@ -50,7 +50,7 @@ const Navigation = React.createClass({
         const makeHref = this.context.router.makeHref;
 
         return (
-          <Nav className="navbar-left">
+          <Nav left>
             <NavItemLink to={makeHref("latest")}>new</NavItemLink>
             <NavItemLink to={makeHref("submit")}>submit</NavItemLink>
             <form className="navbar-form navbar-left"
@@ -67,19 +67,18 @@ const Navigation = React.createClass({
 
     getRightNav() {
 
-        const className = "navbar-right",
-              makeHref = this.context.router.makeHref;
+        const makeHref = this.context.router.makeHref;
 
         if (this.props.user) {
             return (
-              <Nav className={className}>
+              <Nav right>
                 <NavItemLink to={makeHref("user", {name: this.props.user.name})}>{this.props.user.name} ({this.props.user.totalScore})</NavItemLink>
                 <NavItem href="/logout/">logout</NavItem>
               </Nav>
             );
         }
         return (
-              <Nav className={className}>
+              <Nav right>
                 <NavItemLink to={makeHref("login")}>login</NavItemLink>
                 <NavItemLink to={makeHref("signup")}>signup</NavItemLink>
               </Nav>
