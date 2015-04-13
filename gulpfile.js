@@ -56,13 +56,14 @@ gulp.task('pkg', function() {
 });
 
 
-gulp.task("build", function(callback) {
+gulp.task("build", ["install", "pkg"], function(callback) {
 
     var webpackBuildOptions = _.create(webpackConfig, {
             debug: false,
             verbose: false,
             devServer: false,
             devtool: 'eval',
+            entry: ['./app/app.js'],
             plugins: [
                 new webpack.optimize.UglifyJsPlugin({
                     warnings: false

@@ -58,7 +58,12 @@ export default function(app) {
     // static content
     //
     if (devMode) {
-        app.use(middlewares.staticCache(path.join(__dirname, '../public')));
+        app.use(middlewares.staticCache(path.join(__dirname, '../public'), {
+            dynamic: true,
+            buffer: true,
+            gzip: true,
+            maxAge: 10
+        }));
     }
 
     app.use(middlewares.conditional());
