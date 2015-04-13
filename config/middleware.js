@@ -78,8 +78,11 @@ export default function(app) {
                 this.body = err.toJSON();
                 return;
             }
-            if (err.status && err.status < 500) {
+            if (err && err.status && err.status < 500) {
                 this.status = err.status;
+                if (err.location) {
+                    this.redirect(err.location);
+                }
                 return;
             }
             throw err;

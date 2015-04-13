@@ -6,7 +6,7 @@ export default Reflux.createStore({
     listenables: actions,
 
     init() {
-        this.user = window._user || null;
+        this.user = null;
     },
 
     getDefaultData() {
