@@ -20,7 +20,7 @@ export const Authenticate = {
 export const PostsPage = {
 
     mixins: [
-        Reflux.listenTo(PostStore, 'onUpdate')
+        Reflux.connect(PostStore, 'result')
     ],
 
     getInitialState () {
@@ -29,10 +29,6 @@ export const PostsPage = {
 
     componentDidMount () {
         this.fetchPosts(1);
-    },
-
-    onUpdate (data) {
-        this.setState({ result: data });
     },
 
     render () {
