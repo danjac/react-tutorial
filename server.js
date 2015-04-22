@@ -17,5 +17,8 @@ console.log("Running on port", port);
 // sync DB
 //
 models.sequelize.sync().then(() => {
-    app.listen(port);
+    const server = app.listen(port, () => {
+        const address = server.address();
+        console.log("Listening at %s:%s", address.host, address.port);
+    });
 });
