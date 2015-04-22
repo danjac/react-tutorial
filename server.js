@@ -9,16 +9,12 @@ const app = express();
 
 configure(app);
 
-// run server
-
-const port = process.env.PORT || 5000;
-console.log("Running on port", port);
-
 // sync DB
 //
 models.sequelize.sync().then(() => {
+    const port = process.env.PORT || 5000;
     const server = app.listen(port, () => {
         const address = server.address();
-        console.log("Listening at %s:%s", address.host, address.port);
+        console.log("Listening at %s:%s", address.address, address.port);
     });
 });
