@@ -3,6 +3,7 @@ public
 build
 node_modules
 uploads
+config/config.json
 *.sqlite3
 *.swp
 *.swo

@@ -79,7 +79,7 @@ export default React.createClass({
         const user = this.props.user,
               post = this.props.post;
 
-        if (user && post.author._id === user._id) {
+        if (user && post.author.id === user.id) {
             const modal = <DeletePostModal post={post} />;
             return (
                 <ModalTrigger modal={modal}>
@@ -94,7 +94,7 @@ export default React.createClass({
         const user = this.props.user,
               post = this.props.post;
 
-        if (!user || user._id === post.author._id || _.includes(user.votes, post._id)){
+        if (!user || user.id === post.author.id || _.includes(user.votes, post.id)){
             return '';
         }
 

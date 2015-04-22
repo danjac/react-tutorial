@@ -64,14 +64,14 @@ const fetchPosts = (page, orderBy) => {
 
 export function voteUp(post) {
     return request
-        .put("/api/auth/upvote/" + post._id)
+        .put("/api/auth/upvote/" + post.id)
         .csrf()
         .end();
 }
 
 export function voteDown(post) {
     return request
-        .put("/api/auth/downvote/" + post._id)
+        .put("/api/auth/downvote/" + post.id)
         .csrf()
         .end();
 }
@@ -104,7 +104,7 @@ export function signup(data) {
 export function deletePost(post) {
     return new Promise((resolve, reject) => {
         request
-            .del("/api/auth/" + post._id)
+            .del("/api/auth/" + post.id)
             .csrf()
             .end((err, res) => {
                 if (err) {
