@@ -2,7 +2,6 @@ import url from 'url';
 import path from 'path';
 import uuid from 'node-uuid';
 import fs from 'fs';
-import co from 'co';
 import easyimg from 'easyimage';
 import request from 'superagent';
 
@@ -10,10 +9,9 @@ const allowedExtensions = [".jpg", ".png", ".gif"];
 
 export const thumbnailDir = path.join(process.cwd(), 'uploads');
 
-export const thumbnailPath = (filename) => {
+export function thumbnailPath (filename) {
     return path.join(thumbnailDir, filename);
 };
-
 
 const fetchImage = function (src) {
     return new Promise((resolve, reject) => {
@@ -43,39 +41,43 @@ export function deleteThumbnail(name) {
     });
 }
 
-export function* createThumbnail (src) {
+const resizeImage = (filename, data) => {
+    return new Promise((resolve, reject) => {
+        fs.writeFile(filename, data, (err) => {
+            if (err) {
+                return reject(err);
+            }
+            easyimg
+            .resize({
+                src: filename,
+                dst: filename,
+                width: 300,
+                height: 500
+            })
+            .then((image) => {
+                resolve(image);
+            });
+        });
+    });
+};
+
+export function createThumbnail (src) {
 
     if (!src) {
         throw new Error("Image is empty");
     }
-    const data = yield fetchImage(src);
 
-    const basename = url.parse(src).pathname,
-          ext = path.parse(basename).ext.toLowerCase(),
-          image = uuid.v4() + ext,
-          filename = thumbnailPath(image);
-
-    if (!allowedExtensions.includes(ext)) {
-        throw new Error("Must be an image file!");
-    }
-
-    yield function*() {
-        fs.writeFile(filename, data, (err) => {
-            if (err) {
-                throw err;
-            }
-        });
-    }();
-
-    yield easyimg
-        .resize({
-            src: filename,
-            dst: filename,
-            width: 300,
-            height: 500
-        });
-
-    return image;
+    return fetchImage(src)
+    .then((data) => {
+        const basename = url.parse(src).pathname,
+              ext = path.parse(basename).ext.toLowerCase(),
+              image = uuid.v4() + ext,
+              filename = thumbnailPath(image);
+        if (!allowedExtensions.includes(ext)) {
+            throw new Error("Must be an image file!");
+        }
+        return resizeImage(filename, data);
+    });
 
 }
 

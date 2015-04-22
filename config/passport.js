@@ -1,6 +1,6 @@
 import LocalStrategy from 'passport-local';
-import passport from 'koa-passport';
-import models from '../lib/models';
+import passport from 'passport';
+import models from '../src/models';
 
 export default function(app) {
 
