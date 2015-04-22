@@ -20,7 +20,6 @@ fs
     return (file.indexOf('.') !== 0) && (file !== basename);
   })
   .forEach((file) => {
-    console.log(file);
     const model = sequelize['import'](path.join(__dirname, file));
     db[model.name] = model;
   });

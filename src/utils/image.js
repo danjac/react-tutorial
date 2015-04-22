@@ -7,7 +7,7 @@ import request from 'superagent';
 
 const allowedExtensions = [".jpg", ".png", ".gif"];
 
-export const thumbnailDir = path.join(process.cwd(), 'uploads');
+export const thumbnailDir = path.join(process.cwd(), 'public', 'uploads');
 
 export function thumbnailPath (filename) {
     return path.join(thumbnailDir, filename);
@@ -43,19 +43,21 @@ export function deleteThumbnail(name) {
 
 const resizeImage = (filename, data) => {
     return new Promise((resolve, reject) => {
-        fs.writeFile(filename, data, (err) => {
+        const fullpath = thumbnailPath(filename);
+
+        fs.writeFile(fullpath, data, (err) => {
             if (err) {
                 return reject(err);
             }
             easyimg
             .resize({
-                src: filename,
-                dst: filename,
+                src: fullpath,
+                dst: fullpath,
                 width: 300,
                 height: 500
             })
             .then((image) => {
-                resolve(image);
+                resolve(filename);
             });
         });
     });
@@ -71,12 +73,13 @@ export function createThumbnail (src) {
     .then((data) => {
         const basename = url.parse(src).pathname,
               ext = path.parse(basename).ext.toLowerCase(),
-              image = uuid.v4() + ext,
-              filename = thumbnailPath(image);
+              filename = uuid.v4() + ext;
         if (!allowedExtensions.includes(ext)) {
             throw new Error("Must be an image file!");
         }
         return resizeImage(filename, data);
+    }).then((filename) => {
+        return filename;
     });
 
 }

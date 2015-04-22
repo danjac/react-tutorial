@@ -4,17 +4,15 @@ import {createThumbnail, deleteThumbnail} from '../utils/image';
 
 const vote = (amount) => {
 
-    return (req, res) => {
+    return (req, res, next) => {
 
         models.Post
         .findOne({
-            where: {
-                id: req.params.id,
-                $not: {
-                    author_id: req.user.id,
-                    id: req.user.votes
-                }
-            },
+            where: [
+                { id: req.params.id },
+                { $not: { author_id: req.user.id } },
+                { $not: { id: req.user.votes } }
+            ],
             include: [{
                 model: models.User,
                 as: 'author',
@@ -23,35 +21,38 @@ const vote = (amount) => {
         .then((post) => {
 
             if (!post) {
-                return res.sendStatus(404);
+                return next();
             }
 
-            req.user.votes = req.user.votes || [];
-            req.user.votes.push(post.id);
+            const votes = req.user.votes ? req.user.votes.slice(0) : [];
+            votes.push(post.id);
 
-            Promise.all([
+            return Promise.all([
 
                 post.update({
                     score: post.score + amount
                 }),
 
-                post.author.update({
-                    totalScore: post.author.totalScore + amount
+                req.user.update({
+                    votes: votes
                 }),
 
-                req.user.update({
-                    votes: req.user.votes
+                post.author.update({
+                    totalScore: post.author.totalScore + amount
                 })
 
             ]);
+        })
+        .then((result) => {
             res.sendStatus(204);
-        });
+        })
+        .catch((err) => next(err));
     };
 
 };
 
 
-export function submit(req, res) {
+export function submit(req, res, next) {
 
     // fetch and resize image
     //
@@ -61,7 +62,6 @@ export function submit(req, res) {
 
     createThumbnail(image)
     .then((filename) => {
-
         return models.Post
         .create({
             title: title,
@@ -74,22 +74,23 @@ export function submit(req, res) {
     })
     .then((post) => {
         req.user.update({
-            totalScore: user.totalScore + 1
+            totalScore: req.user.totalScore + 1
         });
     })
-    .then(() => res.sendStatus(204));
+    .then(() => res.sendStatus(204))
+    .catch((err) => next(err));
 }
 
 export const upvote = vote(1);
 export const downvote = vote(-1);
 
-export function deletePost(req, res) {
+export function deletePost(req, res, next) {
 
     models.Post
     .findOne({
         where: {
-            id: this.params.id,
-            author_id: user.id
+            id: req.params.id,
+            author_id: req.user.id
         }
     })
     .then((post) => {
@@ -99,20 +100,22 @@ export function deletePost(req, res) {
         return Promise.all([
             post.destroy(),
             deleteThumbnail(post.image),
-            user.update({
-            totalScore: user.totalScore - post.score
+            req.user.update({
+                totalScore: req.user.totalScore - post.score
             })
         ])
     })
     .then(() => {
         res.sendStatus(204);
-    });
+    })
+    .catch((err) => next(err) );
 
 }
 
 export function isSecure(req, res, next) {
     if (!req.isAuthenticated()) {
         res.sendStatus(401)
+    } else {
+        next();
     }
-    next(req, res);
 }

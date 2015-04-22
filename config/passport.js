@@ -14,9 +14,12 @@ export default function(app) {
     });
 
     passport.use(new LocalStrategy({
-        usernameField: 'identity'
+        usernameField: 'identity',
+        passwordField: 'password',
+        passReqToCallback: true
     },
-    (identity, password, done) => {
+    (req, identity, password, done) => {
+        console.log("authenticating...", identity, password);
         models.User.authenticate(identity, password)
         .then((user) => {
             done(null, user || false);

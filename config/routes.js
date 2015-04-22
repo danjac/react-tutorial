@@ -13,19 +13,16 @@ export default function(app) {
         .get("/search/", api.search)
         .get("/user/:name", api.getUser)
         .get("/isname", api.nameExists)
-        .get("/isemail", api.emailExists));
+        .get("/isemail", api.emailExists))
 
-    app
     .use('/api/auth', express.Router()
         .use(secure.isSecure)
         .post("/submit/", secure.submit)
         .delete("/:id", secure.deletePost)
         .put("/upvote/:id", secure.upvote)
-        .put("/downvote/:id", secure.downvote));
+        .put("/downvote/:id", secure.downvote))
 
-    app
     .get("/logout/", logout)
-    .get('/uploads/:filename', upload)
     .get('/user/:user', index)
     .get('/:path', index)
     .get('/', index);

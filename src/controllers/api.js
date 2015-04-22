@@ -32,7 +32,7 @@ const getPosts = (page, orderBy, where) => {
 
         query.offset = offset;
         query.limit = pageSize;
-        query.order = orderBy;
+        query.order = orderBy + ' DESC';
 
         return models.Post.findAll(query);
     })
@@ -56,21 +56,26 @@ export function getAll(req, res) {
     });
 }
 
-export function login(req, res) {
+export function login(req, res, next) {
 
     passport.authenticate("local", (err, user, info) => {
 
         if(err) {
-            throw err;
+            next(err);
         }
-        if (user === false) {
+        if (!user) {
             res.sendStatus(400);
         } else {
-            req.login(user);
-            res.json(user);
+            req.logIn(user, (err) => {
+                if (err) {
+                    next(err);
+                } else {
+                    res.json(user);
+                }
+            });
         }
 
-    });
+    })(req, res, next);
 
 }
 
@@ -122,9 +127,9 @@ export function search(req, res) {
 
 }
 
-export function getUser() {
+export function getUser(req, res) {
 
-    getPosts(req.query.page, req.query.orderBy,  ["author.name = ?", this.params.name])
+    getPosts(req.query.page, req.query.orderBy,  ["author.name = ?", req.params.name])
     .then((result) => { res.json(result) });
 
 }
