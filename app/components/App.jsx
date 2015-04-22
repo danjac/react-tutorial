@@ -51,7 +51,7 @@ const Navigation = React.createClass({
 
         return (
           <Nav left>
-            <NavItemLink to={makeHref("latest")}>new</NavItemLink>
+            <NavItemLink to={makeHref("latest")}>latest</NavItemLink>
             <NavItemLink to={makeHref("submit")}>submit</NavItemLink>
             <form className="navbar-form navbar-left"
                   role="search"

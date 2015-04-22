@@ -6,7 +6,13 @@ import User from '../lib/models/User';
 export default (app) => {
 
     passport.serializeUser((user, done) => done(null, user._id));
-    passport.deserializeUser((id, done) => User.findById(id, done));
+    passport.deserializeUser((id, done) => {
+        User
+        .findOne(id)
+        .then((user) => {
+            done(user);
+        });
+    });
 
     passport.use(new LocalStrategy({
         usernameField: 'identity'
