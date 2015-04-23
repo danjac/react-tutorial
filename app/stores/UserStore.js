@@ -22,6 +22,10 @@ export default Reflux.createStore({
         this.trigger(this.user);
     },
 
+    setInitData(user) {
+        this.updateUser(user);
+    },
+
     loginCompleted(user) {
         this.updateUser(user);
     },

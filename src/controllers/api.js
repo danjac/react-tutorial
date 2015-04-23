@@ -3,7 +3,7 @@ import models from '../models';
 
 const pageSize = 12;
 
-const getPosts = (page, orderBy, where) => {
+export function getPosts(page, orderBy, where) {
 
     const offset = (page * pageSize) - pageSize;
 
@@ -48,12 +48,30 @@ const getPosts = (page, orderBy, where) => {
     });
 };
 
+export function index (req, res) {
+    getPosts(req.query.page, "score")
+    .then((result) => {
+        res.reactify({ result: result });
+    });
+}
+
+export function latest (req, res) {
+    getPosts(req.query.page, "created")
+    .then((result) => {
+        res.reactify({ result: result });
+    });
+}
+
 
 export function getAll(req, res) {
     getPosts(req.query.page, req.query.orderBy)
     .then((result) => {
-        res.json(result);
+        res.reactify({ result: result });
     });
+}
+
+export function loginPage(req, res) {
+    res.reactify();
 }
 
 export function login(req, res, next) {
@@ -123,13 +141,17 @@ export function search(req, res) {
     });
 
     getPosts(req.query.page, req.query.orderBy, { $or: where })
-    .then((result) => { res.json(result) });
+    .then((result) => {
+        res.reactify({ result: result });
+    });
 
 }
 
 export function getUser(req, res) {
 
     getPosts(req.query.page, req.query.orderBy,  ["author.name = ?", req.params.name])
-    .then((result) => { res.json(result) });
+    .then((result) => {
+        res.reactify({ result: result });
+    });
 
 }

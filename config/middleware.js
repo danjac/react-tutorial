@@ -12,6 +12,7 @@ import passport from 'passport';
 import React from 'react';
 import Router from 'react-router';
 import Routes from '../app/Routes';
+import bootstrap from '../app/bootstrap';
 
 
 export default function(app) {
@@ -24,9 +25,9 @@ export default function(app) {
 
     app.set('view engine', 'ejs');
 
+    app.use(responseTime());
     app.use(morgan('combined'));
     app.use(errorhandler({ log: true }));
-    app.use(responseTime());
 
     app.use(bodyParser.json());
     app.use(serveStatic(path.join(__dirname, '../public')));
@@ -37,23 +38,45 @@ export default function(app) {
     app.use(passport.session());
 
     app.use((req, res, next) => {
-        req.reactify = () => {
-            return new Promise((resolve, reject) => {
+        res.reactify = (data) => {
+
+            console.log(req.url, "XHR?", req.xhr);
+            if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+                return res.json(data);
+            }
+            const user = req.user || null;
+
+            data = data || {};
+            data.user = user;
+
+            new Promise((resolve, reject) => {
                 const router = Router.create({
                     routes: Routes,
                     location: req.url,
                     onAbort: (reason, location) => {
-                        const err = new Error();
-                        err.status = 302;
-                        err.location = "/login?next=" + encodeURI(req.url);
-                        reject(err);
+                        const url = "/login?next=" + encodeURI(req.url);
+                        res.redirect(url);
                     }
                 });
+
+                bootstrap(data);
 
                 router.run((Handler, state) => {
                     resolve(React.renderToString(<Handler />));
                 });
-            });
+            })
+            .then((component) => {
+
+                const appjs = process.env.NODE_ENV === 'development'? 'http://localhost:8080/js/app.js' : '/js/app.js';
+
+                res.render('index', {
+                    component: component,
+                    csrfToken: req.csrfToken(),
+                    appjs: appjs,
+                    initData: JSON.stringify(data)
+                });
+            })
+            .catch((err) => next(err));
         };
         next();
     });

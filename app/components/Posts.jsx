@@ -78,7 +78,7 @@ export default React.createClass({
                 <Grid>
                     <Row>
                         {this.props.result.posts.map((post) => {
-                            return <Post key={post._id} post={post} user={this.props.user} />;
+                            return <Post key={post.id} post={post} user={this.props.user} />;
                         }).toJS()}
                     </Row>
                 </Grid>

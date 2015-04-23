@@ -62,6 +62,15 @@ export default Reflux.createStore({
         this._trigger();
     },
 
+    setInitData(result) {
+        this.page = 1;
+        this.posts = new Immutable.List(result.posts || []);
+        this.total = result.total || 0;
+        this.isFirst = result.isFirst || true;
+        this.isLast = result.isLast || true;
+        this._trigger();
+    },
+
     getDefaultData() {
         return {
             posts: this.posts,

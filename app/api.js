@@ -37,8 +37,8 @@ const isUnique = (field, url) => {
 
 
 const signupValidator = validators.signup(
-        isUnique('name', '/api/isname'),
-        isUnique('email', '/api/isemail')),
+        isUnique('name', '/isname'),
+        isUnique('email', '/isemail')),
       postValidator = validators.newPost(true),
       loginValidator = validators.login();
 
@@ -47,7 +47,9 @@ const fetchPosts = (page, orderBy) => {
 
     return new Promise((resolve, reject) => {
         request
-            .get('/api/posts/')
+            .get('/posts/')
+            .type('json')
+            .accept('json')
             .query({
                 page: page,
                 orderBy: orderBy
@@ -56,7 +58,7 @@ const fetchPosts = (page, orderBy) => {
                 if (err) {
                     return reject(err);
                 }
-                resolve(res.body);
+                resolve(res.body.result);
             });
     });
 };
@@ -64,14 +66,14 @@ const fetchPosts = (page, orderBy) => {
 
 export function voteUp(post) {
     return request
-        .put("/api/auth/upvote/" + post.id)
+        .put("/auth/upvote/" + post.id)
         .csrf()
         .end();
 }
 
 export function voteDown(post) {
     return request
-        .put("/api/auth/downvote/" + post.id)
+        .put("/auth/downvote/" + post.id)
         .csrf()
         .end();
 }
@@ -82,7 +84,7 @@ export function signup(data) {
             .run(data)
             .then((clean) => {
                 request
-                    .post("/api/signup/")
+                    .post("/signup/")
                     .csrf()
                     .send(clean)
                     .end((err, res) => {
@@ -104,7 +106,7 @@ export function signup(data) {
 export function deletePost(post) {
     return new Promise((resolve, reject) => {
         request
-            .del("/api/auth/" + post.id)
+            .del("/auth/" + post.id)
             .csrf()
             .end((err, res) => {
                 if (err) {
@@ -122,7 +124,7 @@ export function submitPost(data) {
             .run(data)
             .then((clean) => {
                 request
-                    .post("/api/auth/submit/")
+                    .post("/auth/submit/")
                     .csrf()
                     .send(clean)
                     .end((err, res) => {
@@ -151,7 +153,7 @@ export function login(data) {
             .run(data)
             .then((clean) => {
                 request
-                    .post('/api/login/')
+                    .post('/login/')
                     .csrf()
                     .send(clean)
                     .end((err, res) => {
@@ -176,7 +178,9 @@ export function searchPosts(page, query){
     }
     return new Promise((resolve, reject) => {
         request
-            .get('/api/search/')
+            .get('/search/')
+            .type('json')
+            .accept('json')
             .query({
                 page: page,
                 q: query
@@ -185,7 +189,7 @@ export function searchPosts(page, query){
                 if (err) {
                     return reject(err);
                 }
-                resolve(res.body);
+                resolve(res.body.result);
             });
     });
 }
@@ -202,7 +206,9 @@ export function fetchPopularPosts(page) {
 export function fetchPostsForUser(page, name) {
     return new Promise((resolve, reject) => {
         request
-            .get('/api/user/' + name)
+            .get('/user/' + name)
+            .type('json')
+            .accept('json')
             .query({
                 page: page,
                 orderBy: 'score'
@@ -211,7 +217,7 @@ export function fetchPostsForUser(page, name) {
                 if (err) {
                     return reject(err);
                 }
-                resolve(res.body);
+                resolve(res.body.result);
             });
     });
 }

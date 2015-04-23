@@ -14,7 +14,7 @@
     <%- component %>
     <script>
         window._csrf = '<%= csrfToken %>';
-        window._user = <%- user %>;
+        window.initData = <%- initData %>;
     </script>
     <script src="/js/vendor.js"></script>
     <script src="<%= appjs %>"></script>

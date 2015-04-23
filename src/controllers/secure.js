@@ -21,7 +21,7 @@ const vote = (amount) => {
         .then((post) => {
 
             if (!post) {
-                return next();
+                return  null;
             }
 
             const votes = req.user.votes ? req.user.votes.slice(0) : [];
@@ -44,13 +44,17 @@ const vote = (amount) => {
             ]);
         })
         .then((result) => {
-            res.sendStatus(204);
+            const status = result ? 204 : 404;
+            res.sendStatus(status);
         })
         .catch((err) => next(err));
     };
 
 };
 
+export function submitPage(req, res) {
+    res.reactify();
+}
 
 export function submit(req, res, next) {
 
